@@ -51,6 +51,7 @@ const products = [
 ];
 const money = n => "₹" + n.toLocaleString("en-IN");
 const ADMIN_HASH = "#12345Rsadmin";
+const PENDING_CHECKOUT_KEY = "pending-checkout";
 
 function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, onGoogleSignIn, onSignOut }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -192,7 +193,7 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCata
     <div className="breadcrumbs">Home <span>/</span> Shop <span>/</span> {product.name}</div>
     <div className="detail-layout"><div className={"detail-gallery"+(gallery.length>1?"":" single")}>{gallery.length>1&&<div className="thumbs">{gallery.map((src,i)=><button key={src.src} className={i===active?"chosen":""} aria-label={"View image "+(i+1)} onClick={()=>setActive(i)}><img src={src.src} alt="" style={{objectFit:src.contain?"contain":"cover"}}/></button>)}</div>}<div className="detail-main-image"><img src={gallery[active].src} alt={product.name} style={{objectFit:gallery[active].contain?"contain":"cover"}}/></div></div>
       <div className="detail-info"><span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span><h1>{product.name}</h1><p className="product-craft-note">Hand-embroidered with care</p><div className="detail-price">{money(product.price)}</div><p className="detail-description">Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear.</p>
-        <div className="option-label">Size <strong>{size}</strong></div><div className="size-options">{sizes.map(s=><button key={s} className={size===s?"selected":""} onClick={()=>setSize(s)}>{s}</button>)}</div>
+        <div className="option-label">Size</div><div className="size-options">{sizes.map(s=><button key={s} className={size===s?"selected":""} onClick={()=>setSize(s)}>{s}</button>)}</div>
         <label className="personal-label">Personalization <span>Optional</span><input value={personalization} onChange={e=>setPersonalization(e.target.value)} placeholder="Add a name or short message"/></label>
         <div className="option-label">Quantity</div><div className="quantity"><button onClick={()=>setQty(Math.max(1,qty-1))}><Minus size={14}/></button><span>{qty}</span><button onClick={()=>setQty(qty+1)}><Plus size={14}/></button></div>
         <button className="btn primary add-large" onClick={()=>onAdd({...product,quantity:qty,size,personalization})}>Add to bag — {money(product.price*qty)}</button><button className="btn secondary buy-large" onClick={()=>onBuyNow({...product,quantity:qty,size,personalization})}>Buy now</button>
@@ -298,10 +299,31 @@ function App() {
   const [bagOpen,setBagOpen] = useState(false);
   const [checkoutItem,setCheckoutItem] = useState(null);
   const [user, setUser] = useState(null);
+  const restorePendingCheckout = () => {
+    const pending = sessionStorage.getItem(PENDING_CHECKOUT_KEY);
+    if (!pending) return;
+    try {
+      const item = JSON.parse(pending);
+      if (item?.id) {
+        setCheckoutItem(item);
+        setPage("checkout");
+      }
+      sessionStorage.removeItem(PENDING_CHECKOUT_KEY);
+    } catch (error) {
+      console.error("Unable to restore the pending checkout item.", error);
+      sessionStorage.removeItem(PENDING_CHECKOUT_KEY);
+    }
+  };
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user || null));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user || null));
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user || null);
+      if (data.session?.user) restorePendingCheckout();
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+      if (session?.user) restorePendingCheckout();
+    });
     return () => listener.subscription.unsubscribe();
   }, []);
   const signInWithGoogle = async () => {
@@ -309,6 +331,9 @@ function App() {
       setToast(true);
       console.error("Google sign-in requires Supabase browser credentials.");
       return;
+    }
+    if (checkoutItem) {
+      sessionStorage.setItem(PENDING_CHECKOUT_KEY, JSON.stringify(checkoutItem));
     }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
