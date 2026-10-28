@@ -30,12 +30,18 @@ export default async function cashfreeWebhook(request, response) {
   const secret = process.env.CASHFREE_SECRET_KEY;
   const timestamp = request.headers["x-webhook-timestamp"];
   const receivedSignature = request.headers["x-webhook-signature"];
+  const rawBody = await readRawBody(request);
 
-  if (!secret || typeof timestamp !== "string" || typeof receivedSignature !== "string") {
-    return response.status(401).json({ error: "Missing webhook verification data" });
+  if (typeof timestamp !== "string" || typeof receivedSignature !== "string") {
+    console.warn("Cashfree webhook connectivity probe received without signature; no event was processed.");
+    return response.status(200).json({ received: true, verified: false });
   }
 
-  const rawBody = await readRawBody(request);
+  if (!secret) {
+    console.error("CASHFREE_SECRET_KEY is not configured.");
+    return response.status(500).json({ error: "Webhook verification is not configured" });
+  }
+
   const expectedSignature = crypto
     .createHmac("sha256", secret)
     .update(timestamp + rawBody)
