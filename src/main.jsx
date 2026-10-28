@@ -204,6 +204,29 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCata
   </main>;
 }
 
+function GoogleSignInScreen({ onGoogleSignIn }) {
+  return <section className="google-signin-page">
+    <img className="google-flower google-flower-one" src={IMG + "flower-1.webp"} alt="" aria-hidden="true"/>
+    <img className="google-flower google-flower-two" src={IMG + "flower-2.webp"} alt="" aria-hidden="true"/>
+    <img className="google-flower google-flower-three" src={IMG + "flower-3.webp"} alt="" aria-hidden="true"/>
+    <div className="google-signin-brand">
+      <img src={IMG + "logo.png"} alt="The Hand Craft Atelier"/>
+      <span>The Hand Craft Atelier</span>
+      <small>HAND EMBROIDERED · SLOW FASHION · TIMELESS PIECES</small>
+    </div>
+    <section className="google-signin-card">
+      <div className="google-signin-mark">⌁</div>
+      <h2>Welcome back</h2>
+      <p>Sign in to continue to your account and<br/>keep track of your orders, favourites and more.</p>
+      <button className="google-signin-button" type="button" onClick={onGoogleSignIn}>
+        <img src={IMG + "G_logo.webp"} alt="" aria-hidden="true"/>
+        <span>Continue with Google</span>
+        <ArrowRight size={19}/>
+      </button>
+    </section>
+  </section>;
+}
+
 function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
   const [submitted, setSubmitted] = useState(false);
   const [address, setAddress] = useState("");
@@ -253,7 +276,7 @@ function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
   };
   return <main className="checkout-page">
     <div className="checkout-heading"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Complete your order</h1><p>Your handmade piece is almost on its way.</p></div>
-    {!user ? <section className="checkout-success"><UserRound size={32}/><h2>Sign in to continue</h2><p>Please sign in with Google before entering your delivery details.</p><button className="story-cta" type="button" onClick={onGoogleSignIn}>Continue with Google <ArrowRight size={15}/></button></section> :
+    {!user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> :
     submitted ? <section className="checkout-success"><span>✓</span><h2>Thank you for your order.</h2><p>We have received your details and will be in touch shortly.</p><button className="story-cta" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
       <form className="checkout-layout" onSubmit={e=>{e.preventDefault();setSubmitted(true);onPlaceOrder();}}>
         <section className="checkout-form"><h2>Delivery details</h2><button className="text-link" type="button" onClick={useCurrentLocation}>Use my current location <ArrowRight size={15}/></button>{locationStatus&&<small role="status">{locationStatus}</small>}<div className="checkout-fields"><label>Full name<input required autoComplete="name" placeholder="Your full name"/></label><label>Email address<input required type="email" autoComplete="email" placeholder="you@example.com"/></label><label>Phone number<input required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Address<input required autoComplete="street-address" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>City<input required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>PIN code<input required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="000000" value={pin} onChange={event=>setPin(event.target.value)}/></label></div><h2 className="payment-title">Payment</h2><div className="payment-note">Cash on delivery and payment instructions will be confirmed with you after placing the order.</div><button className="story-cta checkout-submit" type="submit">Place order <ArrowRight size={15}/></button></section>
