@@ -209,11 +209,6 @@ function GoogleSignInScreen({ onGoogleSignIn }) {
     <img className="google-flower google-flower-one" src={IMG + "flower-1.webp"} alt="" aria-hidden="true"/>
     <img className="google-flower google-flower-two" src={IMG + "flower-2.webp"} alt="" aria-hidden="true"/>
     <img className="google-flower google-flower-three" src={IMG + "flower-3.webp"} alt="" aria-hidden="true"/>
-    <div className="google-signin-brand">
-      <img src={IMG + "logo.png"} alt="The Hand Craft Atelier"/>
-      <span>The Hand Craft Atelier</span>
-      <small>HAND EMBROIDERED · SLOW FASHION · TIMELESS PIECES</small>
-    </div>
     <section className="google-signin-card">
       <div className="google-signin-mark">⌁</div>
       <h2>Welcome back</h2>
@@ -275,7 +270,7 @@ function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
     }, { enableHighAccuracy: true, timeout: 10000 });
   };
   return <main className="checkout-page">
-    <div className="checkout-heading"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Complete your order</h1><p>Your handmade piece is almost on its way.</p></div>
+    {user && <div className="checkout-heading"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Complete your order</h1><p>Your handmade piece is almost on its way.</p></div>}
     {!user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> :
     submitted ? <section className="checkout-success"><span>✓</span><h2>Thank you for your order.</h2><p>We have received your details and will be in touch shortly.</p><button className="story-cta" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
       <form className="checkout-layout" onSubmit={e=>{e.preventDefault();setSubmitted(true);onPlaceOrder();}}>
