@@ -22,6 +22,10 @@ function signaturesMatch(expected, received) {
 }
 
 export default async function cashfreeWebhook(request, response) {
+  if (request.method === "GET") {
+    return response.status(200).json({ status: "ok", endpoint: "cashfree-webhook" });
+  }
+
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
     return response.status(405).json({ error: "Method not allowed" });
