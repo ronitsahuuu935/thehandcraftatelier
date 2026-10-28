@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, Star, SlidersHorizontal, Plus, Minus, ChevronDown } from "lucide-react";
 import "./styles.css";
+import { productStorageBucket, supabase } from "./lib/supabase";
 
 const IMG = "/images/";           // site images (from assets/)
 const PRODUCT_IMG = "/products/"; // product photos (from products/)
@@ -123,8 +124,8 @@ function ProductGrid({ items, onOpen, onAdd }) {
   return <div className="product-grid">{items.map(p=><ProductCard key={p.id} product={p} onOpen={onOpen} onAdd={onAdd}/>)}</div>;
 }
 
-function Home({ onOpen, onAdd, goShop, search }) {
-  const visible = products.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
+function Home({ onOpen, onAdd, goShop, search, productCatalog }) {
+  const visible = productCatalog.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
   return <main>
     <section className="hero">
       <div className="hero-copy"><img className="hero-logo" src={images.logo} alt="The Hand Craft Atelier embroidered logo"/><span className="eyebrow">Stitched to Stand Out</span><h1>Not Just Thread.<br/>A Work of Art.</h1><p>Timeless embroidery. Thoughtful details. Pieces made just for you.</p><button className="btn primary" onClick={()=>goShop()}>Explore the collection <ArrowRight size={16}/></button></div>
@@ -148,12 +149,12 @@ function Home({ onOpen, onAdd, goShop, search }) {
   </main>;
 }
 
-function Shop({ onOpen, onAdd, search, category, setCategory }) {
+function Shop({ onOpen, onAdd, search, category, setCategory, productCatalog }) {
   const [sort, setSort] = useState("Featured");
   const [filterOpen, setFilterOpen] = useState(false);
   const [maxPrice, setMaxPrice] = useState(2500);
   const filtered = useMemo(() => {
-    let list = products.filter(p => (category==="All pieces" || p.category===category) && p.price<=maxPrice && p.name.toLowerCase().includes(search.toLowerCase()));
+    let list = productCatalog.filter(p => (category==="All pieces" || p.category===category) && p.price<=maxPrice && p.name.toLowerCase().includes(search.toLowerCase()));
     if(sort==="Price: Low to High") list.sort((a,b)=>a.price-b.price);
     if(sort==="Price: High to Low") list.sort((a,b)=>b.price-a.price);
     return list;
@@ -177,7 +178,7 @@ function Shop({ onOpen, onAdd, search, category, setCategory }) {
   </main>;
 }
 
-function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop }) {
+function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCatalog }) {
   const sizes = product.category === "Kids" ? KIDS_SIZES : ADULT_SIZES;
   const [size,setSize] = useState(sizes[Math.min(1,sizes.length-1)]);
   const [qty,setQty] = useState(1);
@@ -197,7 +198,7 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop }) {
         <div className="detail-tabs">{["Details","Shipping","Care"].map(t=><button key={t} className={activeTab===t?"selected":""} onClick={()=>setActiveTab(t)}>{t}</button>)}</div>
         <div className="tab-content">{activeTab==="Details"?"Soft, breathable fabric with hand embroidery in cotton thread. Each piece is finished by hand, so small variations make it yours.":activeTab==="Shipping"?"Carefully packed and dispatched in 5–7 business days. Complimentary shipping on orders above ₹2,000.":"Gentle hand wash in cold water. Do not wring or bleach. Dry in shade and iron on the reverse side."}</div>
       </div></div>
-    <section className="section-wrap related"><div className="section-heading"><div><span className="eyebrow">A FEW MORE LOVELY THINGS</span><h2>You may also like</h2></div><button className="text-link" onClick={()=>goShop()}>Shop all <ArrowRight size={15}/></button></div><ProductGrid items={products.filter(p=>p.id!==product.id).slice(0,4)} onOpen={p=>navigate("product",p)} onAdd={onAdd}/></section>
+    <section className="section-wrap related"><div className="section-heading"><div><span className="eyebrow">A FEW MORE LOVELY THINGS</span><h2>You may also like</h2></div><button className="text-link" onClick={()=>goShop()}>Shop all <ArrowRight size={15}/></button></div><ProductGrid items={productCatalog.filter(p=>p.id!==product.id).slice(0,4)} onOpen={p=>navigate("product",p)} onAdd={onAdd}/></section>
   </main>;
 }
 
@@ -215,6 +216,7 @@ function Checkout({ item, onBack, onPlaceOrder }) {
 }
 
 function App() {
+  const [productCatalog, setProductCatalog] = useState(products);
   const [page,setPage] = useState("home");
   const [selected,setSelected] = useState(products[0]);
   const [cart,setCart] = useState([]);
@@ -223,6 +225,49 @@ function App() {
   const [toast,setToast] = useState(false);
   const [bagOpen,setBagOpen] = useState(false);
   const [checkoutItem,setCheckoutItem] = useState(null);
+  useEffect(() => {
+    if (!supabase) {
+      console.error("Supabase is not configured with browser-safe VITE_ credentials.");
+      return;
+    }
+
+    let active = true;
+    const loadProductImages = async () => {
+      const { data, error } = await supabase.storage.from(productStorageBucket).list("", { limit: 100 });
+      if (error) {
+        console.error("Unable to load product images from Supabase Storage.", error);
+        return;
+      }
+
+      const availableFiles = new Set((data || []).map(file => file.name));
+      const withStorageImages = products.map(product => {
+        const gallery = product.gallery.map(image => {
+          const fileName = image.src.replace(PRODUCT_IMG, "");
+          if (!availableFiles.has(fileName)) return image;
+          return {
+            ...image,
+            src: supabase.storage.from(productStorageBucket).getPublicUrl(fileName).data.publicUrl
+          };
+        });
+        const imageFileName = product.image.replace(PRODUCT_IMG, "");
+        return {
+          ...product,
+          image: availableFiles.has(imageFileName)
+            ? supabase.storage.from(productStorageBucket).getPublicUrl(imageFileName).data.publicUrl
+            : product.image,
+          gallery
+        };
+      });
+
+      if (active) {
+        setProductCatalog(withStorageImages);
+        setSelected(current => withStorageImages.find(product => product.id === current.id) || current);
+      }
+    };
+
+    loadProductImages();
+    return () => { active = false; };
+  }, []);
   const navigate = (next,product) => { if(product) setSelected(product); setPage(next); window.scrollTo({top:0,behavior:"smooth"}); };
   const goShop = (cat="All pieces") => { setCategory(cat); navigate("shop"); };
   const goSection = id => { setPage("home"); setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:"smooth"}),80); };
@@ -239,9 +284,9 @@ function App() {
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
   return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)}/>
-    {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search}/>}
-    {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory}/>}
-    {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop}/>}
+    {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
+    {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
+    {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
     {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onPlaceOrder={()=>{}}/>}
     <Footer goShop={goShop}/>
     <FloatingSocials/>
