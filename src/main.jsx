@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, Star, SlidersHorizontal, Plus, Minus, ChevronDown } from "lucide-react";
 import "./styles.css";
-import { productStorageBucket, supabase } from "./lib/supabase";
+import { googleMapsApiKey, productStorageBucket, supabase } from "./lib/supabase";
 import AdminPanel from "./AdminPanel";
 
 const IMG = "/images/";           // site images (from assets/)
@@ -52,7 +52,7 @@ const products = [
 const money = n => "₹" + n.toLocaleString("en-IN");
 const ADMIN_HASH = "#12345Rsadmin";
 
-function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag }) {
+function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, onGoogleSignIn, onSignOut }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return <header className="site-header">
     <div className="announcement">A little love, in every stitch. Complimentary shipping on orders ₹2,000+</div>
@@ -61,7 +61,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <button className="wordmark" onClick={() => navigate("home")}><span>The Hand Craft Atelier</span><small>HANDMADE · HEARTFELT · FOREVER</small></button>
       <div className="search-inline"><Search size={17}/><input placeholder="Find something lovely" aria-label="Search products" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value && page === "product") navigate("shop"); }} /></div>
       <div className="header-actions">
-        <button className="icon-btn" aria-label="Account"><UserRound/></button>
+        <button className="icon-btn" aria-label={user ? "Sign out" : "Sign in with Google"} title={user ? `Sign out ${user.email || ""}` : "Sign in with Google"} onClick={user ? onSignOut : onGoogleSignIn}><UserRound/></button>
         <button className="icon-btn" aria-label="Wishlist"><Heart/></button>
         <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}><ShoppingBag/><span>{cartCount}</span></button>
       </div>
@@ -106,7 +106,7 @@ function Footer({ goShop }) {
       <div><h4>HERE TO HELP</h4><a>Contact us</a><a href="/policies/shipping.html" target="_blank" rel="noopener noreferrer">Shipping policy</a><a href="/policies/refund.html" target="_blank" rel="noopener noreferrer">Refund policy</a><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></div>
       <div><h4>THE ATELIER</h4><a>Our story</a><a>Our craft</a><a>The journal</a><a>Made slowly. Kept forever.</a></div>
     </section>
-    <div className="legal"><span>© 2026 The Hand Craft Atelier. All lovingly reserved.</span><span><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer">Terms of service</a>　·　 VISA　 Mastercard</span></div>
+    <div className="legal"><span>© 2026 The Hand Craft Atelier. All lovingly reserved.</span></div>
   </footer>;
 }
 
@@ -204,14 +204,59 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCata
   </main>;
 }
 
-function Checkout({ item, onBack, onPlaceOrder }) {
+function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
   const [submitted, setSubmitted] = useState(false);
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [pin, setPin] = useState("");
+  const [locationStatus, setLocationStatus] = useState("");
   const quantity = item.quantity || 1;
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("Location access is not supported by this browser.");
+      return;
+    }
+    if (!googleMapsApiKey) {
+      setLocationStatus("Location lookup is not configured yet.");
+      return;
+    }
+
+    setLocationStatus("Requesting your location...");
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      try {
+        const params = new URLSearchParams({
+          latlng: `${coords.latitude},${coords.longitude}`,
+          key: googleMapsApiKey
+        });
+        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?${params}`);
+        if (!response.ok) throw new Error("Location lookup failed.");
+        const result = await response.json();
+        if (result.status !== "OK" || !result.results?.[0]) throw new Error("Address not found.");
+
+        const firstResult = result.results[0];
+        const components = firstResult.address_components || [];
+        const component = type => components.find(value => value.types.includes(type))?.long_name || "";
+        setAddress(firstResult.formatted_address || "");
+        setCity(component("locality") || component("administrative_area_level_2"));
+        setPin(component("postal_code"));
+        setLocationStatus("Address filled from your location.");
+      } catch (error) {
+        console.error("Unable to convert location into an address.", error);
+        setLocationStatus("We could not find an address for that location.");
+      }
+    }, error => {
+      const message = error.code === error.PERMISSION_DENIED
+        ? "Location permission was not granted."
+        : "We could not access your location.";
+      setLocationStatus(message);
+    }, { enableHighAccuracy: true, timeout: 10000 });
+  };
   return <main className="checkout-page">
     <div className="checkout-heading"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Complete your order</h1><p>Your handmade piece is almost on its way.</p></div>
-    {submitted ? <section className="checkout-success"><span>✓</span><h2>Thank you for your order.</h2><p>We have received your details and will be in touch shortly.</p><button className="story-cta" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
+    {!user ? <section className="checkout-success"><UserRound size={32}/><h2>Sign in to continue</h2><p>Please sign in with Google before entering your delivery details.</p><button className="story-cta" type="button" onClick={onGoogleSignIn}>Continue with Google <ArrowRight size={15}/></button></section> :
+    submitted ? <section className="checkout-success"><span>✓</span><h2>Thank you for your order.</h2><p>We have received your details and will be in touch shortly.</p><button className="story-cta" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
       <form className="checkout-layout" onSubmit={e=>{e.preventDefault();setSubmitted(true);onPlaceOrder();}}>
-        <section className="checkout-form"><h2>Delivery details</h2><div className="checkout-fields"><label>Full name<input required autoComplete="name" placeholder="Your full name"/></label><label>Email address<input required type="email" autoComplete="email" placeholder="you@example.com"/></label><label>Phone number<input required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Address<input required autoComplete="street-address" placeholder="House number and street"/></label><label>City<input required autoComplete="address-level2" placeholder="Your city"/></label><label>PIN code<input required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="000000"/></label></div><h2 className="payment-title">Payment</h2><div className="payment-note">Cash on delivery and payment instructions will be confirmed with you after placing the order.</div><button className="story-cta checkout-submit" type="submit">Place order <ArrowRight size={15}/></button></section>
+        <section className="checkout-form"><h2>Delivery details</h2><button className="text-link" type="button" onClick={useCurrentLocation}>Use my current location <ArrowRight size={15}/></button>{locationStatus&&<small role="status">{locationStatus}</small>}<div className="checkout-fields"><label>Full name<input required autoComplete="name" placeholder="Your full name"/></label><label>Email address<input required type="email" autoComplete="email" placeholder="you@example.com"/></label><label>Phone number<input required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Address<input required autoComplete="street-address" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>City<input required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>PIN code<input required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="000000" value={pin} onChange={event=>setPin(event.target.value)}/></label></div><h2 className="payment-title">Payment</h2><div className="payment-note">Cash on delivery and payment instructions will be confirmed with you after placing the order.</div><button className="story-cta checkout-submit" type="submit">Place order <ArrowRight size={15}/></button></section>
         <aside className="checkout-summary"><h2>Order summary</h2><div className="checkout-product"><img src={item.image} alt={item.name}/><div><h3>{item.name}</h3>{item.size&&<small>Size: {item.size}</small>}{item.personalization&&<small>Personalized: {item.personalization}</small>}<p>{money(item.price)} × {quantity}</p></div></div><div className="checkout-total"><span>Subtotal</span><strong>{money(item.price*quantity)}</strong></div><small>Complimentary shipping on orders above ₹2,000.</small></aside>
       </form>}
   </main>;
@@ -234,6 +279,32 @@ function App() {
   const [toast,setToast] = useState(false);
   const [bagOpen,setBagOpen] = useState(false);
   const [checkoutItem,setCheckoutItem] = useState(null);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user || null));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user || null));
+    return () => listener.subscription.unsubscribe();
+  }, []);
+  const signInWithGoogle = async () => {
+    if (!supabase) {
+      setToast(true);
+      console.error("Google sign-in requires Supabase browser credentials.");
+      return;
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin }
+    });
+    if (error) {
+      setToast(true);
+      console.error("Google sign-in failed.", error);
+    }
+  };
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error("Sign out failed.", error);
+  };
   useEffect(() => {
     if (!supabase) {
       console.error("Supabase is not configured with browser-safe VITE_ credentials.");
@@ -293,11 +364,11 @@ function App() {
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
   if (adminMode) return <AdminPanel products={productCatalog} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
-  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)}/>
+  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} onGoogleSignIn={signInWithGoogle} onSignOut={signOut}/>
     {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
     {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
     {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
-    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onPlaceOrder={()=>{}}/>}
+    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onPlaceOrder={()=>{}} user={user} onGoogleSignIn={signInWithGoogle}/>}
     <Footer goShop={goShop}/>
     <FloatingSocials/>
     {bagOpen&&<><button className="cart-backdrop" aria-label="Close shopping bag" onClick={()=>setBagOpen(false)}/><CartDrawer cart={cart} onClose={()=>setBagOpen(false)} onRemove={removeFromCart} onQuantityChange={changeCartQuantity}/></>}
