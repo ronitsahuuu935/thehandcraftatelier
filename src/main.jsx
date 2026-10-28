@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, Star, SlidersHorizontal, Plus, Minus, ChevronDown } from "lucide-react";
 import "./styles.css";
 import { productStorageBucket, supabase } from "./lib/supabase";
+import AdminPanel from "./AdminPanel";
 
 const IMG = "/images/";           // site images (from assets/)
 const PRODUCT_IMG = "/products/"; // product photos (from products/)
@@ -49,6 +50,7 @@ const products = [
   { id: 10, name: "Palm Tree Shirt", price: 2499, category: "Shirts", image: PRODUCT_IMG + "p10.webp", gallery: [g("p10.webp")] }
 ];
 const money = n => "₹" + n.toLocaleString("en-IN");
+const ADMIN_HASH = "#12345Rsadmin";
 
 function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,7 +118,7 @@ function ProductCard({ product, onOpen, onAdd }) {
       {product.tag && <span className="product-tag">{product.tag}</span>}
       <button className={"wishlist "+(liked?"liked":"")} aria-label="Toggle wishlist" onClick={e=>{e.stopPropagation();setLiked(!liked)}}><Heart size={17} fill={liked?"currentColor":"none"}/></button>
     </div>
-    <div className="product-info"><button className="product-name" onClick={() => onOpen(product)}>{product.name}</button><strong>{money(product.price)}</strong><div className="rating"><span>★★★★★</span> <small>4.8 (124)</small></div><button className="quick-add" onClick={() => onAdd(product)}>Add to bag <Plus size={13}/></button></div>
+    <div className="product-info"><button className="product-name" onClick={() => onOpen(product)}>{product.name}</button><strong>{money(product.price)}</strong><p className="product-craft-note">Handcrafted with care</p><button className="quick-add" onClick={() => onAdd(product)}>Add to bag <Plus size={13}/></button></div>
   </article>;
 }
 
@@ -138,11 +140,11 @@ function Home({ onOpen, onAdd, goShop, search, productCatalog }) {
         ["Shirts", images.catShirts], ["Tops & Tees", images.catTops], ["Kids", images.catKids], ["Personalized", images.catPersonalized]
       ].map(([name,img])=><button className="category-card" key={name} onClick={()=>goShop(name)}><img src={img} alt=""/><span>{name}<small>Shop now ↗</small></span></button>)}
     </section>
-    <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">THE PIECES YOU LOVE</span><h2>Best Sellers</h2><p>Timeless favourites, loved by many.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd}/></section>
+    <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FROM THE ATELIER</span><h2>Featured Pieces</h2><p>Thoughtfully stitched designs from the collection.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd}/></section>
     <section className="story-split" id="story"><div className="story-image"><img src={images.artisan} alt="Woman in a linen co-ord set standing among pink flowers" loading="lazy"/></div><div className="story-copy"><span className="story-leaf story-leaf-top">⌁</span><span className="eyebrow">A SLOWER KIND OF BEAUTY <i/></span><h2>More Than Just<br/>Products</h2><p>Every piece is a result of patience, skill and a deep love for traditional craftsmanship. Made slowly, to be treasured for years.</p><div className="story-benefits"><div><span><Leaf size={25} strokeWidth={1.6}/></span><strong>HANDCRAFTED<br/>WITH CARE</strong></div><div><span><Heart size={25} strokeWidth={1.6}/></span><strong>TIMELESS<br/>DESIGNS</strong></div><div><span><Leaf size={25} strokeWidth={1.6}/></span><strong>SUPPORTS<br/>ARTISANS</strong></div></div><button className="story-cta" onClick={()=>goShop()}>Shop the collection <ArrowRight size={17}/></button><span className="story-leaf story-leaf-bottom">⌁</span></div></section>
     <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FRESH FROM THE ATELIER</span><h2>New Arrivals</h2><p>Fresh designs for your special moments.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(4,8).length ? visible.slice(4,8) : visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd}/></section>
     <section className="testimonial">
-      <div className="testimonial-copy"><span className="eyebrow"><Leaf size={24}/>OUR CUSTOMERS</span><h2>What Our <em>Customers</em> Say</h2><blockquote><span className="quote-mark">“</span><span>The quality and detailing are beyond beautiful.<br/>It feels so special to own something handmade.”</span></blockquote><p className="testimonial-author"><span className="author-mark"><UserRound size={18}/></span> — Priya S.</p><div className="rating testimonial-rating">★★★★★</div></div>
+      <div className="testimonial-copy"><span className="eyebrow"><Leaf size={24}/>OUR PROMISE</span><h2>Made with <em>thoughtful</em> detail</h2><blockquote><span className="quote-mark">“</span><span>Every piece is stitched slowly, with care in every detail.<br/>Made to be worn, gifted, and kept close.</span></blockquote><p className="testimonial-author"><span className="author-mark"><Leaf size={18}/></span> Handmade, heartfelt, forever</p></div>
       <div className="testimonial-art"><img src={images.floralEmbroideryHoop} alt="Floral embroidery hoop" loading="lazy"/></div>
     </section>
     <section className="journal-strip" id="journal"><img src={images.journal2} alt="Hand-embroidered hoop with tiny birds and flowers on turquoise fabric" style={{objectPosition:"center 52%"}} loading="lazy"/><div><span className="eyebrow">NOTES FROM THE ATELIER <i/></span><h2>Made to be <em>kept close.</em></h2><p>Thoughtful gifts, little rituals, and the beauty of making things slowly.</p><button className="story-cta" onClick={()=>goShop()}>Discover more <ArrowRight size={15}/></button></div><div className="journal-decoration" aria-hidden="true"/><Leaf className="journal-sprig sprig-left" aria-hidden="true"/><Leaf className="journal-sprig sprig-right" aria-hidden="true"/><span className="journal-heart" aria-hidden="true">♡</span></section>
@@ -189,7 +191,7 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCata
   return <main className="detail-page">
     <div className="breadcrumbs">Home <span>/</span> Shop <span>/</span> {product.name}</div>
     <div className="detail-layout"><div className={"detail-gallery"+(gallery.length>1?"":" single")}>{gallery.length>1&&<div className="thumbs">{gallery.map((src,i)=><button key={src.src} className={i===active?"chosen":""} aria-label={"View image "+(i+1)} onClick={()=>setActive(i)}><img src={src.src} alt="" style={{objectFit:src.contain?"contain":"cover"}}/></button>)}</div>}<div className="detail-main-image"><img src={gallery[active].src} alt={product.name} style={{objectFit:gallery[active].contain?"contain":"cover"}}/></div></div>
-      <div className="detail-info"><span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span><h1>{product.name}</h1><div className="rating large"><span>★★★★★</span> <small>4.8 · 124 reviews</small></div><div className="detail-price">{money(product.price)}</div><p className="detail-description">Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear.</p>
+      <div className="detail-info"><span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span><h1>{product.name}</h1><p className="product-craft-note">Hand-embroidered with care</p><div className="detail-price">{money(product.price)}</div><p className="detail-description">Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear.</p>
         <div className="option-label">Size <strong>{size}</strong></div><div className="size-options">{sizes.map(s=><button key={s} className={size===s?"selected":""} onClick={()=>setSize(s)}>{s}</button>)}</div>
         <label className="personal-label">Personalization <span>Optional</span><input value={personalization} onChange={e=>setPersonalization(e.target.value)} placeholder="Add a name or short message"/></label>
         <div className="option-label">Quantity</div><div className="quantity"><button onClick={()=>setQty(Math.max(1,qty-1))}><Minus size={14}/></button><span>{qty}</span><button onClick={()=>setQty(qty+1)}><Plus size={14}/></button></div>
@@ -215,8 +217,15 @@ function Checkout({ item, onBack, onPlaceOrder }) {
   </main>;
 }
 
+
 function App() {
   const [productCatalog, setProductCatalog] = useState(products);
+  const [adminMode, setAdminMode] = useState(() => window.location.hash === ADMIN_HASH);
+  useEffect(() => {
+    const syncAdminRoute = () => setAdminMode(window.location.hash === ADMIN_HASH);
+    window.addEventListener("hashchange", syncAdminRoute);
+    return () => window.removeEventListener("hashchange", syncAdminRoute);
+  }, []);
   const [page,setPage] = useState("home");
   const [selected,setSelected] = useState(products[0]);
   const [cart,setCart] = useState([]);
@@ -283,6 +292,7 @@ function App() {
   const removeFromCart = index => setCart(old => old.filter((_, itemIndex) => itemIndex !== index));
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
+  if (adminMode) return <AdminPanel products={productCatalog} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
   return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)}/>
     {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
     {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
