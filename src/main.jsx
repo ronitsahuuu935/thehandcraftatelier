@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, Star, SlidersHorizontal, Plus, Minus, ChevronDown } from "lucide-react";
+import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck } from "lucide-react";
 import "./styles.css";
 import { googleMapsApiKey, productStorageBucket, supabase } from "./lib/supabase";
 import AdminPanel from "./AdminPanel";
@@ -223,10 +223,12 @@ function GoogleSignInScreen({ onGoogleSignIn }) {
   </section>;
 }
 
-function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
+function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, onGoogleSignIn }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [activeStep, setActiveStep] = useState(1);
+  const [reviewDetails, setReviewDetails] = useState(null);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [pin, setPin] = useState("");
@@ -238,14 +240,14 @@ function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
       setLocationStatus("Location access is not supported by this browser.");
       return;
     }
-    if (!googleMapsApiKey) {
-      setLocationStatus("Location lookup is not configured yet.");
-      return;
-    }
 
     setLocationStatus("Requesting your location...");
     navigator.geolocation.getCurrentPosition(async ({ coords }) => {
       try {
+        if (!googleMapsApiKey) {
+          setLocationStatus("Location permission was granted, but address lookup is not configured yet.");
+          return;
+        }
         const params = new URLSearchParams({
           latlng: `${coords.latitude},${coords.longitude}`,
           key: googleMapsApiKey
@@ -268,34 +270,60 @@ function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
       }
     }, error => {
       const message = error.code === error.PERMISSION_DENIED
-        ? "Location permission was not granted."
-        : "We could not access your location.";
+        ? "Location permission was blocked. Allow location access in your browser settings, then try again."
+        : error.code === error.TIMEOUT
+          ? "Location request timed out. Please try again."
+          : "We could not access your location. Please try again.";
       setLocationStatus(message);
-    }, { enableHighAccuracy: true, timeout: 10000 });
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 });
   };
   const submitOrder = async event => {
     event.preventDefault();
+    if (activeStep === 1) {
+      setReviewDetails(Object.fromEntries(new FormData(event.currentTarget).entries()));
+      setActiveStep(2);
+      return;
+    }
+    if (activeStep !== 3) return;
     setSubmitting(true);
     setSubmitError("");
     const details = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
       const error = await onPlaceOrder(details);
       if (error) setSubmitError(error);
-      else setSubmitted(true);
+      else { setSubmitted(true); setActiveStep(4); }
     } catch {
       setSubmitError("We could not save your order. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
+  const steps=["Shipping","Payment","Review","Confirmation"];
   return <main className="checkout-page">
-    {user && <div className="checkout-heading"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Complete your order</h1><p>Your handmade piece is almost on its way.</p></div>}
-    {!user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> :
-    submitted ? <section className="checkout-success"><span>✓</span><h2>Thank you for your order.</h2><p>We have received your details and will be in touch shortly.</p><button className="story-cta" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
-      <form className="checkout-layout" onSubmit={submitOrder}>
-        <section className="checkout-form"><h2>Delivery details</h2><button className="text-link" type="button" onClick={useCurrentLocation}>Use my current location <ArrowRight size={15}/></button>{locationStatus&&<small role="status">{locationStatus}</small>}<div className="checkout-fields"><label>Full name<input name="customer_name" required autoComplete="name" placeholder="Your full name"/></label><label>Email address<input name="email" required type="email" autoComplete="email" placeholder="you@example.com"/></label><label>Phone number<input name="phone" required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Address<input name="address" required autoComplete="street-address" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>City<input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>PIN code<input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="000000" value={pin} onChange={event=>setPin(event.target.value)}/></label></div><h2 className="payment-title">Payment</h2><div className="payment-note">Cash on delivery and payment instructions will be confirmed with you after placing the order.</div>{submitError&&<p className="checkout-order-error" role="alert">{submitError}</p>}<button className="story-cta checkout-submit" type="submit" disabled={submitting}>{submitting?"Placing order…":"Place order"} <ArrowRight size={15}/></button></section>
-        <aside className="checkout-summary"><h2>Order summary</h2>{checkoutItems.map((product,index)=><div className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<p>{money(product.price)} × {product.quantity||1}</p></div></div>)}<div className="checkout-total"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div><small>Complimentary shipping on orders above ₹2,000.</small></aside>
-      </form>}
+    {!user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> : <>
+      <div className="checkout-heading checkout-heading-left"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Checkout <Leaf size={25}/></h1><p>Fill in your details and complete your order securely.</p></div>
+      <div className="checkout-layout">
+        <section className="checkout-main-column">
+          <nav className="checkout-steps" aria-label="Checkout progress">{steps.map((step,index)=>{const number=index+1;return <button type="button" key={step} className={number===activeStep?"active":number<activeStep?"complete":""} onClick={()=>number<activeStep&&setActiveStep(number)} disabled={number>activeStep} aria-current={number===activeStep?"step":undefined}><span>{number<activeStep?<Check size={14}/>:number}</span><b>{step}</b></button>;})}</nav>
+          {submitted ? <section className="checkout-success"><span><Check size={23}/></span><h2>Your order is confirmed.</h2><p>We’ve saved your order details. Our atelier will contact you to confirm delivery and payment.</p><button className="story-cta" type="button" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
+          <form className="checkout-form checkout-multistep" onSubmit={submitOrder}>
+            <section className="checkout-step-panel" hidden={activeStep!==1}>
+              <div className="checkout-section-heading"><span><Truck size={21}/></span><div><h2>Shipping address</h2><p>Enter your delivery details</p></div></div>
+              <button className="checkout-location" type="button" onClick={useCurrentLocation}><MapPin size={14}/> Use my current location</button>{locationStatus&&<small className="checkout-location-status" role="status">{locationStatus}</small>}
+              <div className="checkout-fields"><label>Full name <i>*</i><input name="customer_name" required autoComplete="name" defaultValue={user.user_metadata?.full_name||""} placeholder="Your full name"/></label><label>Phone number <i>*</i><input name="phone" required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Email address <i>*</i><input name="email" required type="email" autoComplete="email" defaultValue={user.email||""} placeholder="you@example.com"/></label><label>Address line 1 <i>*</i><input name="address" required autoComplete="address-line1" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>Address line 2 <small>(optional)</small><input name="address_line2" autoComplete="address-line2" placeholder="Apartment, suite, etc."/></label><label>City <i>*</i><input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>State <i>*</i><input name="state" required autoComplete="address-level1" placeholder="Your state"/></label><label>PIN code <i>*</i><input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="6-digit PIN" value={pin} onChange={event=>setPin(event.target.value)}/></label></div>
+              <label className="checkout-billing-check"><input type="checkbox" defaultChecked/> Use this address for billing as well</label>
+              <div className="checkout-section-heading checkout-subheading"><span><Truck size={20}/></span><div><h2>Shipping method</h2><p>Thoughtful packing, delivered with care</p></div></div>
+              <label className="checkout-choice selected"><input type="radio" name="shipping_method" value="standard" defaultChecked/><span><b>Standard delivery</b><small>5–7 business days</small></span><strong>Complimentary</strong><Leaf size={16}/></label>
+            </section>
+            {activeStep===2&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><CreditCard size={20}/></span><div><h2>Payment method</h2><p>Choose how you’d like to pay</p></div></div><label className="checkout-payment-choice selected"><input type="radio" name="payment_method" value="Cash on delivery" defaultChecked/><span><b>Cash on delivery</b><small>Pay when your handmade order arrives</small></span><Check size={18}/></label><div className="checkout-secure-note"><ShieldCheck size={18}/><span>Your order details are sent securely. We’ll contact you to confirm payment and delivery.</span></div><p className="checkout-payment-unavailable">Online payments are not available at checkout yet.</p></section>}
+            {activeStep===3&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><Check size={20}/></span><div><h2>Review your order</h2><p>Check your delivery details before placing the order</p></div></div><div className="checkout-review-card"><b>{reviewDetails?.customer_name}</b><span>{reviewDetails?.email} · {reviewDetails?.phone}</span><span>{[reviewDetails?.address,reviewDetails?.address_line2,reviewDetails?.city,reviewDetails?.state,reviewDetails?.postal_code].filter(Boolean).join(", ")}</span><button type="button" onClick={()=>setActiveStep(1)}>Edit address</button></div><div className="checkout-review-card"><b>Delivery & payment</b><span>Standard delivery · 5–7 business days</span><span>Cash on delivery</span><input type="hidden" name="payment_method" value="Cash on delivery"/><button type="button" onClick={()=>setActiveStep(2)}>Edit payment</button></div></section>}
+            <div className="checkout-step-actions">{activeStep===1?<button className="checkout-back-link" type="button" onClick={onBackToCart}><ArrowLeft size={15}/> Back to cart</button>:<button className="checkout-back-link" type="button" onClick={()=>setActiveStep(activeStep-1)}><ArrowLeft size={15}/> Back</button>}{activeStep===1&&<button className="story-cta checkout-submit" type="submit">Continue to Payment <ArrowRight size={15}/></button>}{activeStep===2&&<button className="story-cta checkout-submit" type="button" onClick={()=>setActiveStep(3)}>Review Order <ArrowRight size={15}/></button>}{activeStep===3&&<button className="story-cta checkout-submit" type="submit" disabled={submitting}>{submitting?"Placing order…":"Place COD order"} <ArrowRight size={15}/></button>}</div>
+            {submitError&&<p className="checkout-order-error" role="alert">{submitError}</p>}
+          </form>}
+        </section>
+        <aside className="checkout-summary"><div className="checkout-summary-heading"><span><Leaf size={19}/></span><div><h2>Order summary</h2><p>Review your items and total amount</p></div></div><div className="checkout-summary-items">{checkoutItems.map((product,index)=><article className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<small>Qty: {product.quantity||1}</small></div><strong>{money(Number(product.price)*(product.quantity||1))}</strong></article>)}</div><div className="checkout-cost-row"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div><div className="checkout-cost-row"><span>Shipping</span><strong>Complimentary</strong></div><div className="checkout-total"><span>Total</span><strong>{money(orderTotal)}</strong></div><div className="checkout-thankyou"><Leaf size={20}/><div><b>Every piece tells a story…</b><span>Thank you for supporting handmade. 💚</span></div><Leaf size={20}/></div></aside>
+      </div>
+    </>}
   </main>;
 }
 
@@ -316,6 +344,7 @@ function App() {
   const [toast,setToast] = useState(false);
   const [bagOpen,setBagOpen] = useState(false);
   const [checkoutItem,setCheckoutItem] = useState(null);
+  const [checkoutFromBag,setCheckoutFromBag] = useState(false);
   const [user, setUser] = useState(null);
   const restorePendingCheckout = () => {
     const pending = sessionStorage.getItem(PENDING_CHECKOUT_KEY);
@@ -429,8 +458,9 @@ function App() {
   const navigate = (next,product) => { if(product) setSelected(product); setPage(next); window.scrollTo({top:0,behavior:"smooth"}); };
   const goShop = (cat="All pieces") => { setCategory(cat); navigate("shop"); };
   const goSection = id => { setPage("home"); setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:"smooth"}),80); };
-  const buyNow = product => { setCheckoutItem({items:[product]}); setBagOpen(false); navigate("checkout"); };
-  const checkoutCart = () => { setCheckoutItem({items:cart}); setBagOpen(false); navigate("checkout"); };
+  const buyNow = product => { setCheckoutItem({items:[product]}); setCheckoutFromBag(false); setBagOpen(false); navigate("checkout"); };
+  const checkoutCart = () => { setCheckoutItem({items:cart}); setCheckoutFromBag(true); setBagOpen(false); navigate("checkout"); };
+  const returnToCart = () => { if(checkoutFromBag){setPage("home");setBagOpen(true);window.scrollTo({top:0,behavior:"smooth"});}else navigate("home"); };
   const add = product => {
     setCart(old => {
       const match = old.findIndex(item => item.id === product.id && item.size === product.size && item.personalization === product.personalization);
@@ -447,7 +477,7 @@ function App() {
     {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
     {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
     {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
-    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onPlaceOrder={async details=>{
+    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
       if(!supabase)return "Order placement is unavailable because Supabase is not configured.";
       const checkoutItems=checkoutItem.items||[checkoutItem];
       const orderItems=checkoutItems.map(product=>({product_id:product.id,name:product.name,unit_price:Number(product.price),quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}));
@@ -468,10 +498,12 @@ function App() {
         recipient_email:String(details.email||"").trim(),
         recipient_phone:String(details.phone||"").trim(),
         shipping_address_line1:String(details.address||"").trim(),
+        shipping_address_line2:String(details.address_line2||"").trim()||null,
         shipping_city:String(details.city||"").trim(),
+        shipping_state:String(details.state||"").trim()||null,
         shipping_postal_code:String(details.postal_code||"").trim(),
         shipping_country:"India",
-        payment_method:"Cash on delivery",
+        payment_method:String(details.payment_method||"Cash on delivery"),
         items:orderItems
       });
       if(!error)setCart([]);
