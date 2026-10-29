@@ -59,7 +59,7 @@ export default async function createCashfreeOrder(request, response) {
     });
   }
   const total = Math.round(orderItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0) * 100) / 100;
-  if (!Number.isFinite(total) || total < 100) return response.status(400).json({ error: "The catalog price for this order looks incomplete. Please contact the atelier before paying." });
+  if (!Number.isFinite(total) || total < 1) return response.status(400).json({ error: "The order total is not valid for online payment." });
 
   const { data: customer, error: customerError } = await admin.from("customers").upsert({
     auth_user_id: user.id,
