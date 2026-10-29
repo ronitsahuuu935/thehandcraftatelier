@@ -22,11 +22,15 @@ export default async function verifyCashfreeOrder(request, response) {
     .maybeSingle();
   if (orderError) return response.status(500).json({ error: "Could not load your order." });
   if (!order) return response.status(404).json({ error: "Order not found." });
-  const { data: customer, error: customerError } = await admin.from("customers")
-    .select("auth_user_id")
-    .eq("id", order.customer_id)
-    .maybeSingle();
-  if (customerError || customer?.auth_user_id !== user.id) return response.status(403).json({ error: "This order does not belong to your account." });
+  let orderBelongsToUser = order.customer_id === user.id;
+  if (!orderBelongsToUser) {
+    const { data: customer, error: customerError } = await admin.from("customers")
+      .select("auth_user_id")
+      .eq("id", order.customer_id)
+      .maybeSingle();
+    orderBelongsToUser = !customerError && customer?.auth_user_id === user.id;
+  }
+  if (!orderBelongsToUser) return response.status(403).json({ error: "This order does not belong to your account." });
 
   let gatewayResponse;
   try {

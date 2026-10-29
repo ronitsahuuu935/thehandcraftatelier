@@ -73,9 +73,9 @@ export default async function createCashfreeOrder(request, response) {
   }
 
   const addressLine2 = clean(details.address_line2);
-  const fullAddress = [address, addressLine2].filter(Boolean).join(", ");
+  const fullAddress = [address, addressLine2, state].filter(Boolean).join(", ");
   const { data: order, error: orderError } = await admin.from("orders").insert({
-    customer_id: customer.id,
+    customer_id: user.id,
     customer_name: fullName,
     email,
     phone,
@@ -93,14 +93,12 @@ export default async function createCashfreeOrder(request, response) {
     recipient_email: email,
     recipient_phone: phone,
     shipping_address_line1: address,
-    shipping_address_line2: addressLine2 || null,
     shipping_city: city,
-    shipping_state: state,
     shipping_postal_code: postalCode,
     shipping_country: "India"
   }).select("id").single();
   if (orderError || !order) {
-    console.error("Cashfree checkout could not create store order", orderError?.message);
+    console.error("Cashfree checkout could not create store order", { code: orderError?.code, message: orderError?.message, details: orderError?.details, hint: orderError?.hint });
     return response.status(500).json({ error: "We could not create your order. Please try again." });
   }
 
