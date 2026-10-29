@@ -91,10 +91,12 @@ function AdminPanel({products=[],onProductsChange,onExit}){
   const category=chosenCategory===CREATE_CATEGORY_VALUE?newCategoryName.trim():chosenCategory.trim();
   if(!category){setCatalogError("Enter a name for the new category.");setSavingProduct(false);return;}
   const values={name:String(form.get("name")).trim(),price:Number(form.get("price")),category,tag:String(form.get("tag")).trim()||null,description:String(form.get("description")).trim()||null};
-  const {data,error}=await supabase.from("products").update(values).eq("id",editingProduct.id).select("id,name,price,category,image_url,gallery,tag,description,stock_quantity").single();
+  const {error}=await supabase.from("products").update(values).eq("id",editingProduct.id);
   setSavingProduct(false);
   if(error){setCatalogError("Could not save product. Check the products table migration and admin access. Details: "+error.message);return;}
-  const saved=catalogFromRow(data);
+  const {data:savedRow,error:reloadError}=await supabase.from("products").select("id,name,price,category,image_url,gallery,tag,description,stock_quantity").eq("id",editingProduct.id).maybeSingle();
+  if(reloadError||!savedRow){setCatalogError("Product update was not accepted. Confirm this Supabase user is listed in public.admin_users.");return;}
+  const saved=catalogFromRow(savedRow);
   const updated=catalogProducts.map(item=>item.id===saved.id?saved:item);
   setCatalogProducts(updated);setCategories([...new Set(updated.map(row=>row.category).filter(Boolean))]);onProductsChange?.(updated);setEditingProduct(null);setNotice("Product updated in Supabase.");
  };
