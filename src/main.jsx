@@ -31,6 +31,10 @@ const images = {
 const CATEGORIES = ["Shirts", "Tops & Tees", "Kids", "Personalized"];
 const ADULT_SIZES = ["S", "M", "L", "XL"];
 const KIDS_SIZES = ["2-3 yrs", "4-5 yrs", "6-7 yrs"];
+const INDIAN_STATES_AND_UTS = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+];
 // NOTE: names and prices below are placeholders - replace with your real ones.
 // image = card photo, gallery = photos on the product page (contain:true = two-view collage)
 const g = (src, contain) => ({ src: PRODUCT_IMG + src, contain });
@@ -223,7 +227,7 @@ function GoogleSignInScreen({ onGoogleSignIn }) {
   </section>;
 }
 
-function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, onGoogleSignIn }) {
+function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, authLoading, onGoogleSignIn }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -231,6 +235,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, onGoogleSign
   const [reviewDetails, setReviewDetails] = useState(null);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [pin, setPin] = useState("");
   const [locationStatus, setLocationStatus] = useState("");
   const checkoutItems = item.items || [item];
@@ -262,6 +267,8 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, onGoogleSign
         const component = type => components.find(value => value.types.includes(type))?.long_name || "";
         setAddress(firstResult.formatted_address || "");
         setCity(component("locality") || component("administrative_area_level_2"));
+        const detectedState = component("administrative_area_level_1");
+        setState(INDIAN_STATES_AND_UTS.find(value => value.toLowerCase() === detectedState.toLowerCase()) || "");
         setPin(component("postal_code"));
         setLocationStatus("Address filled from your location.");
       } catch (error) {
@@ -300,7 +307,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, onGoogleSign
   };
   const steps=["Shipping","Payment","Review","Confirmation"];
   return <main className="checkout-page">
-    {!user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> : <>
+    {authLoading ? <section className="checkout-success" aria-live="polite"><span><Leaf size={22}/></span><h2>Preparing your checkout</h2><p>We’re restoring your secure sign-in. Your selected piece is saved.</p></section> : !user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> : <>
       <div className="checkout-heading checkout-heading-left"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Checkout <Leaf size={25}/></h1><p>Fill in your details and complete your order securely.</p></div>
       <div className="checkout-layout">
         <section className="checkout-main-column">
@@ -310,7 +317,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, onGoogleSign
             <section className="checkout-step-panel" hidden={activeStep!==1}>
               <div className="checkout-section-heading"><span><Truck size={21}/></span><div><h2>Shipping address</h2><p>Enter your delivery details</p></div></div>
               <button className="checkout-location" type="button" onClick={useCurrentLocation}><MapPin size={14}/> Use my current location</button>{locationStatus&&<small className="checkout-location-status" role="status">{locationStatus}</small>}
-              <div className="checkout-fields"><label>Full name <i>*</i><input name="customer_name" required autoComplete="name" defaultValue={user.user_metadata?.full_name||""} placeholder="Your full name"/></label><label>Phone number <i>*</i><input name="phone" required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Email address <i>*</i><input name="email" required type="email" autoComplete="email" defaultValue={user.email||""} placeholder="you@example.com"/></label><label>Address line 1 <i>*</i><input name="address" required autoComplete="address-line1" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>Address line 2 <small>(optional)</small><input name="address_line2" autoComplete="address-line2" placeholder="Apartment, suite, etc."/></label><label>City <i>*</i><input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>State <i>*</i><input name="state" required autoComplete="address-level1" placeholder="Your state"/></label><label>PIN code <i>*</i><input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="6-digit PIN" value={pin} onChange={event=>setPin(event.target.value)}/></label></div>
+              <div className="checkout-fields"><label>Full name <i>*</i><input name="customer_name" required autoComplete="name" defaultValue={user.user_metadata?.full_name||""} placeholder="Your full name"/></label><label>Phone number <i>*</i><input name="phone" required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Email address <i>*</i><input name="email" required type="email" autoComplete="email" defaultValue={user.email||""} placeholder="you@example.com"/></label><label>Address line 1 <i>*</i><input name="address" required autoComplete="address-line1" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>Address line 2 <small>(optional)</small><input name="address_line2" autoComplete="address-line2" placeholder="Apartment, suite, etc."/></label><label>City <i>*</i><input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>State <i>*</i><select name="state" required autoComplete="address-level1" value={state} onChange={event=>setState(event.target.value)}><option value="" disabled>Select state or union territory</option>{INDIAN_STATES_AND_UTS.map(value=><option key={value} value={value}>{value}</option>)}</select></label><label>PIN code <i>*</i><input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="6-digit PIN" value={pin} onChange={event=>setPin(event.target.value)}/></label></div>
               <label className="checkout-billing-check"><input type="checkbox" defaultChecked/> Use this address for billing as well</label>
               <div className="checkout-section-heading checkout-subheading"><span><Truck size={20}/></span><div><h2>Shipping method</h2><p>Thoughtful packing, delivered with care</p></div></div>
               <label className="checkout-choice selected"><input type="radio" name="shipping_method" value="standard" defaultChecked/><span><b>Standard delivery</b><small>5–7 business days</small></span><strong>Complimentary</strong><Leaf size={16}/></label>
@@ -346,6 +353,7 @@ function App() {
   const [checkoutItem,setCheckoutItem] = useState(null);
   const [checkoutFromBag,setCheckoutFromBag] = useState(false);
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(Boolean(supabase));
   const restorePendingCheckout = () => {
     const pending = sessionStorage.getItem(PENDING_CHECKOUT_KEY);
     if (!pending) return;
@@ -362,14 +370,21 @@ function App() {
     }
   };
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setAuthLoading(false);
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null);
-      if (data.session?.user) restorePendingCheckout();
-    });
+      const sessionUser = data.session?.user || null;
+      setUser(sessionUser);
+      if (sessionUser) restorePendingCheckout();
+    }).catch(error => {
+      console.error("Unable to restore the Supabase session.", error);
+    }).finally(() => setAuthLoading(false));
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
       if (session?.user) restorePendingCheckout();
+      setAuthLoading(false);
     });
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -458,8 +473,19 @@ function App() {
   const navigate = (next,product) => { if(product) setSelected(product); setPage(next); window.scrollTo({top:0,behavior:"smooth"}); };
   const goShop = (cat="All pieces") => { setCategory(cat); navigate("shop"); };
   const goSection = id => { setPage("home"); setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:"smooth"}),80); };
-  const buyNow = product => { setCheckoutItem({items:[product]}); setCheckoutFromBag(false); setBagOpen(false); navigate("checkout"); };
-  const checkoutCart = () => { setCheckoutItem({items:cart}); setCheckoutFromBag(true); setBagOpen(false); navigate("checkout"); };
+  const startCheckout = (items, fromBag = false) => {
+    const checkoutItems = items.map(item => {
+      const catalogItem = productCatalog.find(product => product.id === item.id);
+      return { ...(catalogItem || {}), ...item, quantity: item.quantity || 1 };
+    });
+    setCheckoutItem({ items: checkoutItems });
+    setCheckoutFromBag(fromBag);
+    setBagOpen(false);
+    setPage("checkout");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const buyNow = product => startCheckout([product]);
+  const checkoutCart = () => startCheckout(cart, true);
   const returnToCart = () => { if(checkoutFromBag){setPage("home");setBagOpen(true);window.scrollTo({top:0,behavior:"smooth"});}else navigate("home"); };
   const add = product => {
     setCart(old => {
@@ -477,7 +503,7 @@ function App() {
     {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
     {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
     {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
-    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
+    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
       if(!supabase)return "Order placement is unavailable because Supabase is not configured.";
       const checkoutItems=checkoutItem.items||[checkoutItem];
       const orderItems=checkoutItems.map(product=>({product_id:product.id,name:product.name,unit_price:Number(product.price),quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}));
