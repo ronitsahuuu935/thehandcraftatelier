@@ -394,9 +394,13 @@ function App() {
         });
       }
 
-      const { data, error } = await supabase.storage.from(productStorageBucket).list("", { limit: 100 });
-      if (error) console.error("Unable to load product images from Supabase Storage.", error);
-      const availableFiles = new Set((data || []).map(file => file.name));
+      const { data: rootFiles, error: rootError } = await supabase.storage.from(productStorageBucket).list("", { limit: 100 });
+      const { data: catalogFiles, error: catalogStorageError } = await supabase.storage.from(productStorageBucket).list("catalog", { limit: 100 });
+      if (rootError || catalogStorageError) console.error("Unable to load product images from Supabase Storage.", rootError || catalogStorageError);
+      const availableFiles = new Set([
+        ...(rootFiles || []).map(file => file.name),
+        ...(catalogFiles || []).map(file => `catalog/${file.name}`)
+      ]);
       const withStorageImages = catalog.map(product => {
         const gallery = product.gallery.map(image => {
           const fileName = image.src.replace(PRODUCT_IMG, "");
@@ -448,7 +452,21 @@ function App() {
       const checkoutItems=checkoutItem.items||[checkoutItem];
       const orderItems=checkoutItems.map(product=>({product_id:product.id,name:product.name,unit_price:Number(product.price),quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}));
       const total=orderItems.reduce((sum,product)=>sum+product.unit_price*product.quantity,0);
-      const {error}=await supabase.from("orders").insert({customer_id:user.id,customer_name:String(details.customer_name||"").trim(),email:String(details.email||"").trim(),phone:String(details.phone||"").trim(),address:String(details.address||"").trim(),city:String(details.city||"").trim(),postal_code:String(details.postal_code||"").trim(),items:orderItems,total,payment_method:"Cash on delivery",status:"Pending confirmation"});
+      const {error}=await supabase.from("orders").insert({
+        customer_id:user.id,
+        subtotal:total,
+        shipping_cost:0,
+        total,
+        recipient_name:String(details.customer_name||"").trim(),
+        recipient_email:String(details.email||"").trim(),
+        recipient_phone:String(details.phone||"").trim(),
+        shipping_address_line1:String(details.address||"").trim(),
+        shipping_city:String(details.city||"").trim(),
+        shipping_postal_code:String(details.postal_code||"").trim(),
+        shipping_country:"India",
+        payment_method:"Cash on delivery",
+        items:orderItems
+      });
       if(!error)setCart([]);
       return error?"We could not save your order: "+error.message:null;
     }} user={user} onGoogleSignIn={signInWithGoogle}/>}

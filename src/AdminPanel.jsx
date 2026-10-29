@@ -125,10 +125,10 @@ function AdminPanel({products=[],onProductsChange,onExit}){
   if(!supabase||!sessionUser)return;
   let active=true;
   const loadOrders=async()=>{
-   const {data,error}=await supabase.from("orders").select("id,customer_name,email,phone,address,city,postal_code,items,total,payment_method,status,created_at").order("created_at",{ascending:false}).limit(30);
+   const {data,error}=await supabase.from("orders").select("id,recipient_name,recipient_email,recipient_phone,shipping_address_line1,shipping_city,shipping_postal_code,items,total,payment_method,status,created_at").order("created_at",{ascending:false}).limit(30);
    if(!active)return;
-   if(error){setCatalogError("Could not load sales notifications. Run supabase/migrations/20261029_orders_and_product_images.sql, then refresh. Details: "+error.message);return;}
-   setOrders((data||[]).map(order=>({...order,name:order.customer_name,date:new Date(order.created_at).toLocaleDateString(),method:order.payment_method,total:Number(order.total),items:Array.isArray(order.items)?order.items:[]})));
+   if(error){setCatalogError("Could not load sales notifications. Apply the latest Supabase migration, then refresh. Details: "+error.message);return;}
+   setOrders((data||[]).map(order=>({...order,name:order.recipient_name,email:order.recipient_email,phone:order.recipient_phone,address:order.shipping_address_line1,city:order.shipping_city,postal_code:order.shipping_postal_code,date:new Date(order.created_at).toLocaleDateString(),method:order.payment_method,total:Number(order.total),items:Array.isArray(order.items)?order.items:[]})));
   };
   loadOrders();
   const timer=window.setInterval(loadOrders,30000);

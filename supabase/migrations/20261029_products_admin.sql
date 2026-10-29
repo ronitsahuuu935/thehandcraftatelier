@@ -1,6 +1,22 @@
 -- Product catalog administration for The Handcraft Atelier.
 -- Apply this in Supabase SQL Editor. Product records below are the existing storefront catalog.
 
+create table if not exists public.products (
+  id bigint primary key,
+  name text not null,
+  price numeric(12,2) not null check (price >= 0),
+  category text not null,
+  image_url text,
+  gallery jsonb not null default '[]'::jsonb,
+  tag text,
+  description text,
+  stock_quantity integer not null default 0,
+  gallery_urls text[] not null default '{}',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 alter table public.products
   add column if not exists image_url text,
   add column if not exists gallery jsonb not null default '[]'::jsonb,
