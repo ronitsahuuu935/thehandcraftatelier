@@ -57,7 +57,7 @@ const money = n => "₹" + n.toLocaleString("en-IN");
 const ADMIN_HASH = "#12345Rsadmin";
 const PENDING_CHECKOUT_KEY = "pending-checkout";
 
-function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, onGoogleSignIn }) {
+function Header({ page, navigate, goShop, goSection, cartCount, wishlistCount, search, setSearch, onBag, onWishlist, user, onGoogleSignIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
   return <header className="site-header">
     <div className="announcement">A little love, in every stitch. Complimentary shipping on orders ₹2,000+</div>
@@ -67,7 +67,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <div className="search-inline"><Search size={17}/><input placeholder="Find something lovely" aria-label="Search products" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value && page === "product") navigate("shop"); }} /></div>
       <div className="header-actions">
         <button className={user ? "icon-btn profile-trigger signed-in" : "icon-btn profile-trigger"} aria-label={user ? "Open your account" : "Sign in with Google"} title={user ? "My profile" : "Sign in with Google"} onClick={() => user ? navigate("account") : onGoogleSignIn}><UserRound/></button>
-        <button className="icon-btn" aria-label="Wishlist"><Heart/></button>
+        <button className="icon-btn wishlist-header-button" aria-label="Open wishlist" title="Wishlist" onClick={onWishlist}><Heart/><span>{wishlistCount}</span></button>
         <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}><ShoppingBag/><span>{cartCount}</span></button>
       </div>
     </div>
@@ -292,29 +292,28 @@ function Footer({ goShop }) {
       <div className="footer-brand"><h3>The Hand Craft Atelier</h3><p className="tagline">Handmade · Heartfelt · Forever</p><p>Thoughtful keepsakes, stitched slowly. For the little moments and the people who mean everything.</p></div>
       <div><h4>EXPLORE</h4><a href="#shop" onClick={e=>{e.preventDefault();goShop()}}>Shop all</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Shirts")}}>Shirts</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Personalized")}}>Personalized</a></div>
       <div><h4>HERE TO HELP</h4><a>Contact us</a><a href="/policies/shipping.html" target="_blank" rel="noopener noreferrer">Shipping policy</a><a href="/policies/refund.html" target="_blank" rel="noopener noreferrer">Refund policy</a><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></div>
-      <div><h4>THE ATELIER</h4><a>Our story</a><a>Our craft</a><a>The journal</a><a>Made slowly. Kept forever.</a></div>
+      <div><h4>THE ATELIER</h4><a>Our story</a><a>Made slowly. Kept forever.</a></div>
     </section>
     <div className="legal"><span>© 2026 The Hand Craft Atelier. All lovingly reserved.</span></div>
   </footer>;
 }
 
-function ProductCard({ product, onOpen, onAdd }) {
-  const [liked, setLiked] = useState(false);
+function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWishlist }) {
   return <article className="product-card">
     <div className="product-image" onClick={() => onOpen(product)} role="button" tabIndex={0} onKeyDown={e=>e.key==="Enter"&&onOpen(product)}>
       <img src={product.image} alt={product.name} loading="lazy" style={product.pos?{objectPosition:product.pos}:undefined} onError={e=>{e.currentTarget.style.opacity=".15"}}/>
       {product.tag && <span className="product-tag">{product.tag}</span>}
-      <button className={"wishlist "+(liked?"liked":"")} aria-label="Toggle wishlist" onClick={e=>{e.stopPropagation();setLiked(!liked)}}><Heart size={17} fill={liked?"currentColor":"none"}/></button>
+      <button className={"wishlist "+(isWishlisted?"liked":"")} aria-label={isWishlisted?"Remove from wishlist":"Add to wishlist"} onClick={e=>{e.stopPropagation();onToggleWishlist(product)}}><Heart size={17} fill={isWishlisted?"currentColor":"none"}/></button>
     </div>
     <div className="product-info"><button className="product-name" onClick={() => onOpen(product)}>{product.name}</button><strong>{money(product.price)}</strong><p className="product-craft-note">Handcrafted with care</p><button className="quick-add" onClick={() => onAdd(product)}>Add to bag <Plus size={13}/></button></div>
   </article>;
 }
 
-function ProductGrid({ items, onOpen, onAdd }) {
-  return <div className="product-grid">{items.map(p=><ProductCard key={p.id} product={p} onOpen={onOpen} onAdd={onAdd}/>)}</div>;
+function ProductGrid({ items, onOpen, onAdd, isWishlisted, onToggleWishlist }) {
+  return <div className="product-grid">{items.map(p=><ProductCard key={p.id} product={p} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted(p.id)} onToggleWishlist={onToggleWishlist}/>)}</div>;
 }
 
-function Home({ onOpen, onAdd, goShop, search, productCatalog }) {
+function Home({ onOpen, onAdd, goShop, search, productCatalog, isWishlisted, onToggleWishlist }) {
   const visible = productCatalog.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
   return <main>
     <section className="hero">
@@ -328,9 +327,9 @@ function Home({ onOpen, onAdd, goShop, search, productCatalog }) {
         ["Shirts", images.catShirts], ["Tops & Tees", images.catTops], ["Kids", images.catKids], ["Personalized", images.catPersonalized]
       ].map(([name,img])=><button className="category-card" key={name} onClick={()=>goShop(name)}><img src={img} alt=""/><span>{name}<small>Shop now ↗</small></span></button>)}
     </section>
-    <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FROM THE ATELIER</span><h2>Featured Pieces</h2><p>Thoughtfully stitched designs from the collection.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd}/></section>
+    <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FROM THE ATELIER</span><h2>Featured Pieces</h2><p>Thoughtfully stitched designs from the collection.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
     <section className="story-split" id="story"><div className="story-image"><img src={images.artisan} alt="Woman in a linen co-ord set standing among pink flowers" loading="lazy"/></div><div className="story-copy"><span className="story-leaf story-leaf-top">⌁</span><span className="eyebrow">A SLOWER KIND OF BEAUTY <i/></span><h2>More Than Just<br/>Products</h2><p>Every piece is a result of patience, skill and a deep love for traditional craftsmanship. Made slowly, to be treasured for years.</p><div className="story-benefits"><div><span><Leaf size={25} strokeWidth={1.6}/></span><strong>HANDCRAFTED<br/>WITH CARE</strong></div><div><span><Heart size={25} strokeWidth={1.6}/></span><strong>TIMELESS<br/>DESIGNS</strong></div><div><span><Leaf size={25} strokeWidth={1.6}/></span><strong>SUPPORTS<br/>ARTISANS</strong></div></div><button className="story-cta" onClick={()=>goShop()}>Shop the collection <ArrowRight size={17}/></button><span className="story-leaf story-leaf-bottom">⌁</span></div></section>
-    <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FRESH FROM THE ATELIER</span><h2>New Arrivals</h2><p>Fresh designs for your special moments.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(4,8).length ? visible.slice(4,8) : visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd}/></section>
+    <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FRESH FROM THE ATELIER</span><h2>New Arrivals</h2><p>Fresh designs for your special moments.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(4,8).length ? visible.slice(4,8) : visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
     <section className="testimonial">
       <div className="testimonial-copy"><span className="eyebrow"><Leaf size={24}/>OUR PROMISE</span><h2>Made with <em>thoughtful</em> detail</h2><blockquote><span className="quote-mark">“</span><span>Every piece is stitched slowly, with care in every detail.<br/>Made to be worn, gifted, and kept close.</span></blockquote><p className="testimonial-author"><span className="author-mark"><Leaf size={18}/></span> Handmade, heartfelt, forever</p></div>
       <div className="testimonial-art"><img src={images.floralEmbroideryHoop} alt="Floral embroidery hoop" loading="lazy"/></div>
@@ -339,7 +338,7 @@ function Home({ onOpen, onAdd, goShop, search, productCatalog }) {
   </main>;
 }
 
-function Shop({ onOpen, onAdd, search, category, setCategory, productCatalog }) {
+function Shop({ onOpen, onAdd, search, category, setCategory, productCatalog, isWishlisted, onToggleWishlist }) {
   const [sort, setSort] = useState("Featured");
   const [filterOpen, setFilterOpen] = useState(false);
   const [maxPrice, setMaxPrice] = useState(2500);
@@ -360,7 +359,7 @@ function Shop({ onOpen, onAdd, search, category, setCategory, productCatalog }) 
         <div className="filter-group"><h4>Personalization</h4><label><input type="checkbox"/> Can be personalized</label></div>
       </aside>
       <section className="shop-results"><div className="shop-toolbar"><button className="filter-trigger" onClick={()=>setFilterOpen(true)}><SlidersHorizontal size={16}/> Filter & sort</button><span>{filtered.length} thoughtfully made pieces</span><label className="sort-label">Sort by <select value={sort} onChange={e=>setSort(e.target.value)}><option>Featured</option><option>Price: Low to High</option><option>Price: High to Low</option></select></label></div>
-        <ProductGrid items={filtered} onOpen={onOpen} onAdd={onAdd}/>
+        <ProductGrid items={filtered} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/>
         {filtered.length===0&&<div className="empty-state">No pieces match those filters. Try clearing your filters.</div>}
       </section>
     </div>
@@ -368,7 +367,7 @@ function Shop({ onOpen, onAdd, search, category, setCategory, productCatalog }) 
   </main>;
 }
 
-function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCatalog }) {
+function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCatalog, isWishlisted, onToggleWishlist }) {
   const sizes = product.category === "Kids" ? KIDS_SIZES : ADULT_SIZES;
   const [size,setSize] = useState(sizes[Math.min(1,sizes.length-1)]);
   const [qty,setQty] = useState(1);
@@ -379,7 +378,7 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCata
   return <main className="detail-page">
     <div className="breadcrumbs">Home <span>/</span> Shop <span>/</span> {product.name}</div>
     <div className="detail-layout"><div className={"detail-gallery"+(gallery.length>1?"":" single")}>{gallery.length>1&&<div className="thumbs">{gallery.map((src,i)=><button key={src.src} className={i===active?"chosen":""} aria-label={"View image "+(i+1)} onClick={()=>setActive(i)}><img src={src.src} alt="" style={{objectFit:src.contain?"contain":"cover"}}/></button>)}</div>}<div className="detail-main-image"><img src={gallery[active].src} alt={product.name} style={{objectFit:gallery[active].contain?"contain":"cover"}}/></div></div>
-      <div className="detail-info"><span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span><h1>{product.name}</h1><p className="product-craft-note">Hand-embroidered with care</p><div className="detail-price">{money(product.price)}</div><p className="detail-description">Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear.</p>
+      <div className="detail-info"><span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span><div className="detail-title-row"><h1>{product.name}</h1><button className={"wishlist detail-wishlist "+(isWishlisted(product.id)?"liked":"")} aria-label={isWishlisted(product.id)?"Remove from wishlist":"Add to wishlist"} onClick={()=>onToggleWishlist(product)}><Heart size={20} fill={isWishlisted(product.id)?"currentColor":"none"}/></button></div><p className="product-craft-note">Hand-embroidered with care</p><div className="detail-price">{money(product.price)}</div><p className="detail-description">Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear.</p>
         <div className="option-label">Size</div><div className="size-options">{sizes.map(s=><button key={s} className={size===s?"selected":""} onClick={()=>setSize(s)}>{s}</button>)}</div>
         <label className="personal-label">Personalization <span>Optional</span><input value={personalization} onChange={e=>setPersonalization(e.target.value)} placeholder="Add a name or short message"/></label>
         <div className="option-label">Quantity</div><div className="quantity"><button onClick={()=>setQty(Math.max(1,qty-1))}><Minus size={14}/></button><span>{qty}</span><button onClick={()=>setQty(qty+1)}><Plus size={14}/></button></div>
@@ -388,8 +387,12 @@ function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCata
         <div className="detail-tabs">{["Details","Shipping","Care"].map(t=><button key={t} className={activeTab===t?"selected":""} onClick={()=>setActiveTab(t)}>{t}</button>)}</div>
         <div className="tab-content">{activeTab==="Details"?"Soft, breathable fabric with hand embroidery in cotton thread. Each piece is finished by hand, so small variations make it yours.":activeTab==="Shipping"?"Carefully packed and dispatched in 5–7 business days. Complimentary shipping on orders above ₹2,000.":"Gentle hand wash in cold water. Do not wring or bleach. Dry in shade and iron on the reverse side."}</div>
       </div></div>
-    <section className="section-wrap related"><div className="section-heading"><div><span className="eyebrow">A FEW MORE LOVELY THINGS</span><h2>You may also like</h2></div><button className="text-link" onClick={()=>goShop()}>Shop all <ArrowRight size={15}/></button></div><ProductGrid items={productCatalog.filter(p=>p.id!==product.id).slice(0,4)} onOpen={p=>navigate("product",p)} onAdd={onAdd}/></section>
+    <section className="section-wrap related"><div className="section-heading"><div><span className="eyebrow">A FEW MORE LOVELY THINGS</span><h2>You may also like</h2></div><button className="text-link" onClick={()=>goShop()}>Shop all <ArrowRight size={15}/></button></div><ProductGrid items={productCatalog.filter(p=>p.id!==product.id).slice(0,4)} onOpen={p=>navigate("product",p)} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
   </main>;
+}
+
+function Wishlist({ products, onOpen, onAdd, isWishlisted, onToggleWishlist, onShop }) {
+  return <main className="wishlist-page"><div className="wishlist-page-heading"><span className="eyebrow">SAVED WITH LOVE</span><h1>Your Wishlist</h1><p>Keep the pieces you would love to bring home.</p></div>{products.length?<ProductGrid items={products} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/>:<div className="wishlist-empty"><Heart size={30}/><h2>Your wishlist is empty</h2><p>Tap the heart on any product to save it here.</p><button className="btn primary" onClick={onShop}>Explore the collection <ArrowRight size={16}/></button></div>}</main>;
 }
 
 function GoogleSignInScreen({ onGoogleSignIn }) {
@@ -553,6 +556,10 @@ function App() {
   const [page,setPage] = useState("home");
   const [selected,setSelected] = useState(products[0]);
   const [cart,setCart] = useState([]);
+  const [wishlistIds,setWishlistIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("atelier-wishlist") || "[]").map(Number); }
+    catch { return []; }
+  });
   const [search,setSearch] = useState("");
   const [category,setCategory] = useState("All pieces");
   const [toast,setToast] = useState(false);
@@ -749,15 +756,20 @@ function App() {
     });
     setToast(true);
   };
+  const toggleWishlist = product => setWishlistIds(current => current.includes(Number(product.id)) ? current.filter(id => id !== Number(product.id)) : [...current, Number(product.id)]);
+  const isWishlisted = id => wishlistIds.includes(Number(id));
+  const wishlistProducts = productCatalog.filter(product => isWishlisted(product.id));
+  useEffect(() => { localStorage.setItem("atelier-wishlist", JSON.stringify(wishlistIds)); }, [wishlistIds]);
   const removeFromCart = index => setCart(old => old.filter((_, itemIndex) => itemIndex !== index));
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
   if (adminMode) return <AdminPanel products={productCatalog} onProductsChange={updated=>{setProductCatalog(updated);setSelected(current=>updated.find(product=>product.id===current.id)||current);}} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
-  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} onGoogleSignIn={signInWithGoogle}/>
+  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} wishlistCount={wishlistIds.length} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} onWishlist={()=>navigate("wishlist")} user={user} onGoogleSignIn={signInWithGoogle}/>
     {cashfreeReturn ? <main className="checkout-page"><section className="checkout-success" aria-live="polite"><span>{cashfreeReturn.status==="paid"?<Check size={23}/>:<ShieldCheck size={22}/>}</span><h2>{cashfreeReturn.status==="paid"?"Payment confirmed":cashfreeReturn.status==="verifying"?"Verifying your payment":cashfreeReturn.status==="pending"?"Payment is processing":"Payment needs confirmation"}</h2><p>{cashfreeReturn.status==="paid"?"Cashfree confirmed your payment. Your order is now being prepared.":cashfreeReturn.status==="verifying"?"We’re checking your payment securely with Cashfree.":cashfreeReturn.status==="pending"?"Cashfree has not confirmed the payment yet. Check again shortly.":cashfreeReturn.message||"If your account was charged, please contact the atelier with this order reference."}</p><small>Order reference: {cashfreeReturn.orderId}</small>{cashfreeReturn.status!=="paid"&&<button className="checkout-back-link" type="button" onClick={()=>setCashfreeReturn(current=>({...current,status:"verifying",message:""}))}>Check payment status</button>}<button className="story-cta checkout-submit" type="button" onClick={()=>{setCashfreeReturn(null);navigate("home");}}>Continue shopping <ArrowRight size={15}/></button></section></main> : <>
-      {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
-      {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
-      {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
+      {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
+      {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
+      {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
+      {page==="wishlist"&&<Wishlist products={wishlistProducts} onOpen={p=>navigate("product",p)} onAdd={add} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist} onShop={()=>goShop()}/>}
       {page==="account"&&user&&<CustomerAccount user={user} customerProfile={customerProfile} productCatalog={productCatalog} onSignOut={signOut} onShop={()=>goShop()}/>}
       {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} user={user} customerProfile={customerProfile} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
         if(!supabase)return {error:"Online payment is unavailable because Supabase is not configured."};
