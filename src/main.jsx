@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck, Phone, Mail, LogOut } from "lucide-react";
+import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck, Phone, Mail, LogOut, Package, ChevronRight } from "lucide-react";
 import "./styles.css";
 import { googleMapsApiKey, productStorageBucket, supabase } from "./lib/supabase";
 import AdminPanel from "./AdminPanel";
@@ -57,19 +57,8 @@ const money = n => "₹" + n.toLocaleString("en-IN");
 const ADMIN_HASH = "#12345Rsadmin";
 const PENDING_CHECKOUT_KEY = "pending-checkout";
 
-function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, customerProfile, onGoogleSignIn, onSignOut }) {
+function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, onGoogleSignIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  useEffect(() => {
-    if (!profileOpen) return;
-    const closeOnEscape = event => { if (event.key === "Escape") setProfileOpen(false); };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [profileOpen]);
-  const profileName = customerProfile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Your account";
-  const profileEmail = customerProfile?.email || user?.email || "Not added yet";
-  const profilePhone = customerProfile?.phone || user?.phone || "Not added yet";
-  const hasAddress = Boolean(customerProfile?.address_line1 || customerProfile?.city || customerProfile?.state || customerProfile?.postal_code);
   return <header className="site-header">
     <div className="announcement">A little love, in every stitch. Complimentary shipping on orders ₹2,000+</div>
     <div className="brandbar">
@@ -77,7 +66,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <button className="wordmark" onClick={() => navigate("home")}><span>The Hand Craft Atelier</span><small>HANDMADE · HEARTFELT · FOREVER</small></button>
       <div className="search-inline"><Search size={17}/><input placeholder="Find something lovely" aria-label="Search products" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value && page === "product") navigate("shop"); }} /></div>
       <div className="header-actions">
-        <button className={user ? "icon-btn profile-trigger signed-in" : "icon-btn profile-trigger"} aria-label={user ? "Open your account details" : "Sign in with Google"} title={user ? "Your account" : "Sign in with Google"} aria-haspopup={user ? "dialog" : undefined} aria-expanded={user ? profileOpen : undefined} onClick={() => user ? setProfileOpen(value => !value) : onGoogleSignIn}><UserRound/></button>
+        <button className={user ? "icon-btn profile-trigger signed-in" : "icon-btn profile-trigger"} aria-label={user ? "Open your account" : "Sign in with Google"} title={user ? "My profile" : "Sign in with Google"} onClick={() => user ? navigate("account") : onGoogleSignIn}><UserRound/></button>
         <button className="icon-btn" aria-label="Wishlist"><Heart/></button>
         <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}><ShoppingBag/><span>{cartCount}</span></button>
       </div>
@@ -89,8 +78,156 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <button onClick={() => {goShop("Personalized");setMenuOpen(false)}}>Personalized</button>
       <button onClick={() => {goSection("story");setMenuOpen(false)}}>Our Story</button>
     </nav>
-    {profileOpen&&user&&<div className="account-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setProfileOpen(false);}}><section className="account-panel" role="dialog" aria-modal="true" aria-labelledby="account-title"><div className="account-panel-heading"><span className="account-avatar"><UserRound size={22}/></span><div><small>THE HANDCRAFT ATELIER</small><h2 id="account-title">Your account</h2></div><button className="account-close" type="button" aria-label="Close account details" onClick={()=>setProfileOpen(false)}><X size={18}/></button></div><div className="account-welcome"><strong>{profileName}</strong><span>Your personal and delivery details</span></div><section className="account-detail-section" aria-label="Contact details"><h3>Contact details</h3><div className="account-detail-row"><Mail size={16}/><div><small>Email address</small><span>{profileEmail}</span></div></div><div className="account-detail-row"><Phone size={16}/><div><small>Phone number</small><span>{profilePhone}</span></div></div></section><section className="account-detail-section" aria-label="Delivery address"><h3>Delivery address</h3>{hasAddress?<><div className="account-detail-row"><MapPin size={16}/><div><small>Address</small><span>{[customerProfile?.address_line1,customerProfile?.address_line2].filter(Boolean).join(", ")||"Not added yet"}</span></div></div><div className="account-address-grid"><div><small>City</small><span>{customerProfile?.city||"Not added yet"}</span></div><div><small>State / UT</small><span>{customerProfile?.state||"Not added yet"}</span></div><div><small>PIN code</small><span>{customerProfile?.postal_code||"Not added yet"}</span></div></div></>:<p className="account-empty-address">No delivery address saved yet. Your details will appear here after checkout.</p>}</section><button className="account-signout" type="button" onClick={()=>{setProfileOpen(false);onSignOut();}}><LogOut size={16}/> Sign out</button></section></div>}
   </header>;
+}
+
+function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onShop }) {
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState("");
+  const [reviewSetupError, setReviewSetupError] = useState("");
+  const [section, setSection] = useState("profile");
+  const [reviewedPurchases, setReviewedPurchases] = useState([]);
+  const [reviewing, setReviewing] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [reviewMessage, setReviewMessage] = useState("");
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const name = customerProfile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Your account";
+  const email = customerProfile?.email || user?.email || "Not added yet";
+  const phone = customerProfile?.phone || user?.phone || "Not added yet";
+  const address = [customerProfile?.address_line1, customerProfile?.address_line2, customerProfile?.city, customerProfile?.state, customerProfile?.postal_code].filter(Boolean).join(", ");
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "A";
+
+  useEffect(() => {
+    let active = true;
+    const loadOrders = async () => {
+      if (!supabase || !customerProfile?.id) {
+        setOrders([]);
+        setOrdersLoading(false);
+        return;
+      }
+      setOrdersLoading(true);
+      setOrdersError("");
+      const { data, error } = await supabase.from("orders")
+        .select("id,items,total,status,payment_status,refund_status,created_at")
+        .eq("customer_id", customerProfile.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (!active) return;
+      if (error) {
+        console.error("Unable to load customer orders.", error);
+        setOrdersError("We couldn't load your orders right now.");
+        setOrders([]);
+      } else {
+        setOrders((data || []).map(order => ({ ...order, items: Array.isArray(order.items) ? order.items : [] })));
+        const { data: reviews, error: reviewsError } = await supabase.from("product_reviews").select("order_id,product_id").eq("customer_id", customerProfile.id);
+        if (!active) return;
+        if (reviewsError) {
+          console.error("Unable to load the customer's submitted reviews.", reviewsError);
+          setReviewedPurchases([]);
+          if (["PGRST205", "42P01", "42501"].includes(reviewsError.code)) setReviewSetupError("Run supabase/migrations/20261029230000_verified_product_reviews.sql in the Supabase SQL Editor to enable verified reviews.");
+        } else {
+          setReviewSetupError("");
+          setReviewedPurchases((reviews || []).map(review => `${review.order_id}:${review.product_id}`));
+        }
+      }
+      setOrdersLoading(false);
+    };
+    loadOrders();
+    return () => { active = false; };
+  }, [customerProfile?.id]);
+
+  const navItems = [
+    { id: "profile", label: "My Profile", icon: UserRound },
+    { id: "orders", label: "My Orders", icon: Package },
+    { id: "addresses", label: "Addresses", icon: MapPin },
+    { id: "reviews", label: "Reviews", icon: Star }
+  ];
+  const eligibleReviews = orders
+    .filter(order => String(order.payment_status || "").toLowerCase() === "paid" && !["cancelled", "canceled", "rejected", "refunded"].includes(String(order.status || "").toLowerCase()) && ["", "not_required", "not required"].includes(String(order.refund_status || "not_required").toLowerCase()))
+    .flatMap(order => order.items.map(item => {
+      const product = productCatalog.find(candidate => String(candidate.id) === String(item.product_id));
+      const key = `${order.id}:${item.product_id}`;
+      return product && !reviewedPurchases.includes(key) ? { order, item, product, key } : null;
+    }).filter(Boolean));
+  const uniqueEligibleReviews = eligibleReviews.filter((candidate, index) => eligibleReviews.findIndex(value => value.key === candidate.key) === index);
+  const submitReview = async event => {
+    event.preventDefault();
+    if (!reviewing || !supabase) return;
+    setReviewBusy(true);
+    setReviewMessage("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Sign in again to submit your review.");
+      const result = await fetch("/api/customer-reviews", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ orderId: reviewing.order.id, productId: reviewing.product.id, rating: reviewRating, review: reviewText })
+      });
+      const payload = await result.json().catch(() => ({}));
+      if (!result.ok) throw new Error(payload.error || "We could not submit your review.");
+      setReviewedPurchases(current => [...current, reviewing.key]);
+      setReviewMessage("Thank you. Your verified purchase review has been submitted.");
+      setReviewing(null);
+      setReviewText("");
+      setReviewRating(5);
+    } catch (error) {
+      setReviewMessage(error.message || "We could not submit your review.");
+    } finally {
+      setReviewBusy(false);
+    }
+  };
+  const renderReviews = () => ordersLoading
+    ? <div className="account-orders-empty"><Star size={24}/><h3>Checking your purchases</h3><p>We’re verifying your paid orders.</p></div>
+    : reviewSetupError
+      ? <div className="account-orders-empty"><Star size={24}/><h3>Reviews need setup</h3><p>{reviewSetupError}</p></div>
+    : ordersError
+      ? <div className="account-orders-empty"><Star size={24}/><h3>Reviews unavailable</h3><p>{ordersError}</p></div>
+      : uniqueEligibleReviews.length
+        ? <div className="customer-review-list">{uniqueEligibleReviews.map(candidate => <article className="customer-review-item" key={candidate.key}><img src={candidate.product.image} alt=""/><div><strong>{candidate.product.name}</strong><small>Order #{String(candidate.order.id).slice(0, 8)} · Paid</small></div><button className="account-edit-button" onClick={() => { setReviewing(candidate); setReviewRating(5); setReviewText(""); setReviewMessage(""); }}>Write review</button></article>)}</div>
+        : <div className="account-orders-empty"><Star size={24}/><h3>No eligible purchases yet</h3><p>Once an order is successfully paid, you can leave a review for the products in it.</p></div>;
+  const renderOrders = () => ordersLoading
+    ? <div className="account-orders-empty"><Package size={24}/><h3>Loading your orders</h3><p>Your order history will be here in a moment.</p></div>
+    : ordersError
+      ? <div className="account-orders-empty"><Package size={24}/><h3>Orders unavailable</h3><p>{ordersError}</p></div>
+      : orders.length
+        ? <div className="account-order-list">{(section === "orders" ? orders : orders.slice(0, 5)).map(order => {
+          const firstItem = order.items[0];
+          const product = productCatalog.find(item => String(item.id) === String(firstItem?.product_id));
+          const orderName = firstItem?.name || "Handcrafted order";
+          const itemCount = order.items.reduce((sum, item) => sum + Number(item.quantity || 1), 0);
+          const status = String(order.status || "processing").replaceAll("_", " ");
+          return <article className="account-order-row" key={order.id}>
+            <img src={product?.image || firstItem?.image || images.logo} alt=""/>
+            <div className="account-order-id"><strong>#{String(order.id).slice(0, 8)}</strong><small>{new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</small></div>
+            <div className="account-order-items"><span>{orderName}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ""}</span><small>{itemCount} {itemCount === 1 ? "item" : "items"}</small></div>
+            <strong className="account-order-total">{money(Number(order.total || 0))}</strong>
+            <span className={`account-order-status status-${status.toLowerCase().replaceAll(" ", "-")}`}>{status}</span>
+          </article>;
+        })}</div>
+        : <div className="account-orders-empty"><Package size={24}/><h3>No orders yet</h3><p>Your orders will appear here after you place one.</p><button className="account-edit-button" onClick={onShop}>Explore the collection <ArrowRight size={15}/></button></div>;
+
+  return <main className="customer-account-page">
+    <aside className="customer-account-sidebar">
+      <nav aria-label="Account sections">{navItems.map(item => { const Icon = item.icon; return <button key={item.id} className={section === item.id ? "active" : ""} onClick={() => setSection(item.id)}><Icon size={19}/>{item.label}</button>; })}</nav>
+      <div className="customer-account-sidebar-note">Small<br/>handmade pieces.<br/><em>Big happiness.</em><Leaf size={19}/></div>
+      <button className="customer-account-logout" onClick={onSignOut}><LogOut size={17}/> Log out</button>
+    </aside>
+    <div className="customer-account-main">
+      <section className="customer-profile-hero">
+        <div className="customer-profile-banner"><div><span className="eyebrow">YOUR ATELIER ACCOUNT</span><h1>{section === "profile" ? "My Profile" : section === "orders" ? "My Orders" : section === "reviews" ? "My Reviews" : "Your Address"}</h1><p>Manage your account details, orders, and delivery information.</p></div><span className="customer-profile-flower" aria-hidden="true">✿</span></div>
+        <div className="customer-profile-card">
+          <div className="customer-profile-avatar" aria-label={`${name} initials`}>{initials}</div>
+          <div className="customer-profile-identity"><div className="customer-profile-name"><h2>{name}</h2><span><Check size={13}/> Customer account</span></div><p>{email}</p><p><Phone size={14}/>{phone}</p><small><Leaf size={14}/> Member since {new Date(user?.created_at || Date.now()).toLocaleDateString("en-IN", { month: "long", year: "numeric" })}</small></div>
+          <button className="account-edit-button" onClick={() => setSection("addresses")}><MapPin size={15}/> View address</button>
+        </div>
+      </section>
+      {section === "addresses" ? <section className="customer-account-card customer-address-card"><div className="customer-account-card-heading"><span><MapPin size={19}/></span><div><h2>Shipping address</h2><p>Your saved delivery details</p></div></div>{address ? <div className="customer-saved-address"><strong>{name}</strong><p>{address}</p>{phone !== "Not added yet" && <small>{phone}</small>}</div> : <div className="account-orders-empty"><MapPin size={24}/><h3>No saved address yet</h3><p>Your delivery address will be saved here after checkout.</p></div>}</section> : section === "reviews" ? <section className="customer-account-card customer-reviews-card"><div className="customer-account-card-heading"><span><Star size={19}/></span><div><h2>Verified purchase reviews</h2><p>Only products in your successfully paid orders are eligible.</p></div></div>{renderReviews()}{reviewMessage&&<p className="customer-review-message" role="status">{reviewMessage}</p>}</section> : <section className="customer-account-card customer-orders-card"><div className="customer-account-card-heading"><span><Package size={19}/></span><div><h2>{section === "orders" ? "All your orders" : "Recent Orders"}</h2><p>View your latest orders and their status.</p></div><button onClick={() => setSection("orders")}>View all orders <ArrowRight size={14}/></button></div>{renderOrders()}</section>}
+    </div>
+    <aside className="customer-account-aside"><section className="customer-account-card customer-quick-links"><h2>Quick Links</h2>{[{label:"My Orders",id:"orders",icon:Package},{label:"Addresses",id:"addresses",icon:MapPin},{label:"Continue shopping",id:"shop",icon:ShoppingBag}].map(item=>{const Icon=item.icon;return <button key={item.id} onClick={()=>item.id==="shop"?onShop():setSection(item.id)}><Icon size={17}/><span>{item.label}</span><ChevronRight size={16}/></button>})}<button onClick={onSignOut}><LogOut size={17}/><span>Log out</span><ChevronRight size={16}/></button></section><section className="customer-account-card customer-address-summary"><div className="customer-account-card-heading"><span><MapPin size={18}/></span><div><h2>Shipping Address</h2></div><button onClick={() => setSection("addresses")}>View</button></div>{address ? <div className="customer-saved-address"><strong>{name}</strong><p>{address}</p>{phone !== "Not added yet" && <small>{phone}</small>}</div> : <p className="customer-account-muted">No address saved. It will appear here after checkout.</p>}</section><section className="customer-account-care"><Leaf size={18}/><div><strong>Love handmade?</strong><span>Thank you for supporting our little atelier.</span></div></section></aside>
+    {reviewing&&<div className="customer-review-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!reviewBusy)setReviewing(null);}}><form className="customer-review-dialog" role="dialog" aria-modal="true" aria-labelledby="customer-review-title" onSubmit={submitReview}><button className="customer-review-close" type="button" aria-label="Close review form" onClick={()=>setReviewing(null)}>×</button><span className="eyebrow">VERIFIED PURCHASE</span><h2 id="customer-review-title">Review {reviewing.product.name}</h2><p>Your review is linked to order #{String(reviewing.order.id).slice(0, 8)}.</p><label className="customer-review-rating-label">Your rating</label><div className="customer-review-stars" role="group" aria-label="Rating from 1 to 5 stars">{[1,2,3,4,5].map(value=><button type="button" key={value} aria-label={`${value} star${value===1?"":"s"}`} aria-pressed={reviewRating===value} onClick={()=>setReviewRating(value)}><Star size={25} fill={reviewRating>=value?"currentColor":"none"}/></button>)}</div><label className="customer-review-text-label">Your review<textarea value={reviewText} onChange={event=>setReviewText(event.target.value)} minLength={5} maxLength={2000} required placeholder="Share what you loved about this handmade piece."/></label>{reviewMessage&&<p className="customer-review-message" role="alert">{reviewMessage}</p>}<button className="account-edit-button customer-review-submit" disabled={reviewBusy||reviewText.trim().length<5}>{reviewBusy?"Submitting…":"Submit verified review"}</button></form></div>}
+  </main>;
 }
 
 function CartDrawer({ cart, onClose, onRemove, onQuantityChange, onCheckout }) {
@@ -435,7 +572,7 @@ function App() {
       return;
     }
     let active = true;
-    supabase.from("customers").select("full_name,email,phone,address_line1,address_line2,city,state,postal_code").eq("auth_user_id", user.id).maybeSingle()
+    supabase.from("customers").select("id,full_name,email,phone,address_line1,address_line2,city,state,postal_code").eq("auth_user_id", user.id).maybeSingle()
       .then(({ data, error }) => {
         if (error) console.error("Unable to load the saved customer profile.", error);
         if (active) setCustomerProfile(data || null);
@@ -491,6 +628,7 @@ function App() {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) console.error("Sign out failed.", error);
+    else setPage("home");
   };
   useEffect(() => {
     if (!supabase) {
@@ -581,11 +719,12 @@ function App() {
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
   if (adminMode) return <AdminPanel products={productCatalog} onProductsChange={updated=>{setProductCatalog(updated);setSelected(current=>updated.find(product=>product.id===current.id)||current);}} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
-  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} customerProfile={customerProfile} onGoogleSignIn={signInWithGoogle} onSignOut={signOut}/>
+  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} onGoogleSignIn={signInWithGoogle}/>
     {cashfreeReturn ? <main className="checkout-page"><section className="checkout-success" aria-live="polite"><span>{cashfreeReturn.status==="paid"?<Check size={23}/>:<ShieldCheck size={22}/>}</span><h2>{cashfreeReturn.status==="paid"?"Payment confirmed":cashfreeReturn.status==="verifying"?"Verifying your payment":cashfreeReturn.status==="pending"?"Payment is processing":"Payment needs confirmation"}</h2><p>{cashfreeReturn.status==="paid"?"Cashfree confirmed your payment. Your order is now being prepared.":cashfreeReturn.status==="verifying"?"We’re checking your payment securely with Cashfree.":cashfreeReturn.status==="pending"?"Cashfree has not confirmed the payment yet. Check again shortly.":cashfreeReturn.message||"If your account was charged, please contact the atelier with this order reference."}</p><small>Order reference: {cashfreeReturn.orderId}</small>{cashfreeReturn.status!=="paid"&&<button className="checkout-back-link" type="button" onClick={()=>setCashfreeReturn(current=>({...current,status:"verifying",message:""}))}>Check payment status</button>}<button className="story-cta checkout-submit" type="button" onClick={()=>{setCashfreeReturn(null);navigate("home");}}>Continue shopping <ArrowRight size={15}/></button></section></main> : <>
       {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
       {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
       {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
+      {page==="account"&&user&&<CustomerAccount user={user} customerProfile={customerProfile} productCatalog={productCatalog} onSignOut={signOut} onShop={()=>goShop()}/>}
       {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} user={user} customerProfile={customerProfile} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
         if(!supabase)return {error:"Online payment is unavailable because Supabase is not configured."};
         const {data:{session}}=await supabase.auth.getSession();

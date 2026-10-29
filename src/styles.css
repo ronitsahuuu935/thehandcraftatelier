@@ -271,3 +271,96 @@ html{scrollbar-width:none}html::-webkit-scrollbar{display:none;width:0;height:0}
 .account-signout{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:11px;border:1px solid #ead7d2;border-radius:8px;background:#fff8f5;color:#a65e51;font-size:11px;font-weight:500}
 .account-signout:hover{background:#fbece7}
 @media(max-width:620px){.header-actions .profile-trigger{display:flex!important}.account-backdrop{padding:calc(32px + 76px + 8px) 10px 14px}.account-panel{width:min(410px,100%);max-height:calc(100dvh - 128px);padding:19px;border-radius:14px}}
+
+.customer-account-page{display:grid;grid-template-columns:220px minmax(0,1fr) 300px;gap:16px;max-width:1600px;margin:0 auto;padding:20px 2.5% 48px;background:linear-gradient(135deg,#f8f6ee 0%,#f5f3eb 48%,#faf8f2 100%);color:#243832;min-height:calc(100vh - 186px)}
+.customer-account-sidebar,.customer-account-card,.customer-profile-hero{border:1px solid #e5e1d6;border-radius:10px;background:#fffefa}
+.customer-account-sidebar{display:flex;min-height:calc(100vh - 250px);flex-direction:column;padding:14px 12px;box-shadow:0 3px 12px #39382b06}
+.customer-account-sidebar nav{display:grid;gap:5px}
+.customer-account-sidebar nav button{display:flex;align-items:center;gap:13px;min-height:46px;padding:0 13px;border:0;border-radius:6px;background:transparent;color:#344640;text-align:left;font-size:12px}
+.customer-account-sidebar nav button:hover,.customer-account-sidebar nav button.active{background:#edf0e6;color:#344c39}
+.customer-account-sidebar nav button.active{box-shadow:inset 3px 0 #506447}
+.customer-account-sidebar-note{display:grid;justify-items:center;gap:4px;margin:auto 0 12px;padding:22px 6px 14px;border-top:1px solid #e9e5dc;color:#6d765a;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;line-height:1.2;text-align:center}
+.customer-account-sidebar-note em{font-weight:600}
+.customer-account-sidebar-note svg{margin-top:7px}
+.customer-account-logout{display:flex;align-items:center;gap:12px;padding:13px;border:0;border-top:1px solid #e9e5dc;background:transparent;color:#46554c;text-align:left;font-size:12px}
+.customer-account-main,.customer-account-aside{display:grid;align-content:start;gap:14px;min-width:0}
+.customer-profile-hero,.customer-account-card{overflow:hidden;box-shadow:0 3px 12px #39382b06}
+.customer-profile-banner{display:flex;min-height:112px;align-items:center;justify-content:space-between;gap:20px;padding:20px 25px;background:radial-gradient(ellipse at 15% 0%,#e9eddc 0,transparent 52%),linear-gradient(115deg,#f0f1e5,#f8f8ef 72%,#e9eddf)}
+.customer-profile-banner .eyebrow{color:#758368;font-size:9px;letter-spacing:.16em}
+.customer-profile-banner h1{margin:4px 0 2px;font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:500;line-height:1;color:#18352e}
+.customer-profile-banner p{margin:0;color:#66756d;font-size:12px}
+.customer-profile-flower{color:#8d9c78;font-size:48px;opacity:.7}
+.customer-profile-card{display:flex;align-items:center;gap:22px;min-height:172px;padding:22px 25px}
+.customer-profile-avatar{display:grid;width:102px;height:102px;flex:0 0 102px;place-items:center;border:1px solid #c9d1bc;border-radius:50%;background:linear-gradient(145deg,#eef0e5,#dfe7d6);color:#53684a;font-family:'Cormorant Garamond',serif;font-size:35px}
+.customer-profile-identity{min-width:0;flex:1}
+.customer-profile-name{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.customer-profile-name h2{margin:0;color:#203a34;font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600}
+.customer-profile-name>span{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:18px;background:#edf2e8;color:#486346;font-size:9px}
+.customer-profile-identity>p{display:flex;align-items:center;gap:7px;margin:8px 0;color:#66766e;font-size:12px;overflow-wrap:anywhere}
+.customer-profile-identity>small{display:flex;align-items:center;gap:6px;margin-top:12px;color:#8a9385;font-size:10px}
+.account-edit-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;padding:10px 13px;border:1px solid #dce3d3;border-radius:7px;background:#edf1e7;color:#3f5541;font-size:11px}
+.account-edit-button:hover{background:#e2e9db}
+.customer-account-card{padding:17px 18px}
+.customer-account-card-heading{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.customer-account-card-heading>span{display:grid;width:36px;height:36px;flex:0 0 36px;place-items:center;border-radius:50%;background:#eef0e6;color:#53694b}
+.customer-account-card-heading>div{min-width:0;flex:1}
+.customer-account-card-heading h2,.customer-quick-links>h2{margin:0;color:#203a34;font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600}
+.customer-account-card-heading p{margin:2px 0 0;color:#7a877f;font-size:10px}
+.customer-account-card-heading>button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:#45624c;font-size:10px;white-space:nowrap}
+.customer-order-list{display:grid}
+.account-order-row{display:grid;grid-template-columns:64px minmax(95px,.85fr) minmax(100px,1.2fr) auto auto;align-items:center;gap:12px;min-height:78px;padding:8px;border:1px solid #ece8df;border-bottom:0;color:#293c36}
+.account-order-row:first-child{border-radius:7px 7px 0 0}
+.account-order-row:last-child{border-bottom:1px solid #ece8df;border-radius:0 0 7px 7px}
+.account-order-row img{width:64px;height:64px;object-fit:cover;border-radius:7px;background:#f1eee5}
+.account-order-id,.account-order-items{display:flex;min-width:0;flex-direction:column;gap:5px}
+.account-order-id strong,.account-order-items span{color:#253a33;font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-order-id small,.account-order-items small{color:#879087;font-size:9px}
+.account-order-total{font-size:11px;white-space:nowrap}
+.account-order-status{padding:6px 9px;border-radius:20px;background:#edf2e8;color:#476647;font-size:9px;text-transform:capitalize;white-space:nowrap}
+.account-order-status.status-shipped,.account-order-status.status-processing{background:#e9f1f7;color:#4a6780}
+.account-order-status.status-cancelled,.account-order-status.status-rejected{background:#fbe9e4;color:#a85648}
+.account-orders-empty{display:grid;justify-items:center;gap:7px;padding:35px 14px;color:#758466;text-align:center}
+.account-orders-empty h3{margin:0;color:#283d35;font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:500}
+.account-orders-empty p{margin:0;color:#808b83;font-size:11px;line-height:1.5}
+.account-orders-empty .account-edit-button{margin-top:7px}
+.customer-account-aside{grid-auto-rows:min-content}
+.customer-quick-links>h2{margin-bottom:13px}
+.customer-quick-links>button{display:flex;width:100%;align-items:center;gap:10px;min-height:43px;padding:0 10px;border:1px solid #e9e5dc;border-radius:7px;background:#fffefa;color:#33463d;text-align:left;font-size:11px}
+.customer-quick-links>button+button{margin-top:7px}
+.customer-quick-links>button:hover{background:#f3f4ec}
+.customer-quick-links>button svg:first-child{color:#53694b}
+.customer-quick-links>button span{flex:1}
+.customer-address-card .customer-account-card-heading,.customer-address-summary .customer-account-card-heading{margin-bottom:11px}
+.customer-saved-address{padding:13px;border:1px solid #ebe7de;border-radius:7px;background:#fffefa;color:#34463e}
+.customer-saved-address strong{font-size:11px}
+.customer-saved-address p{margin:5px 0;color:#718078;font-size:10px;line-height:1.55;overflow-wrap:anywhere}
+.customer-saved-address small{color:#718078;font-size:10px}
+.customer-account-muted{margin:0;padding:12px;border-radius:7px;background:#f6f5ee;color:#77837a;font-size:10px;line-height:1.6}
+.customer-account-care{display:flex;align-items:center;gap:11px;padding:14px;border:1px solid #e1e7da;border-radius:9px;background:#eef1e7;color:#637554}
+.customer-account-care div{display:grid;gap:3px}
+.customer-account-care strong{color:#31493b;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600}
+.customer-account-care span{color:#68776d;font-size:10px;line-height:1.4}
+.customer-review-list{display:grid;gap:8px}
+.customer-review-item{display:flex;align-items:center;gap:13px;padding:10px;border:1px solid #ece8df;border-radius:8px;background:#fffefa}
+.customer-review-item img{width:58px;height:62px;flex:0 0 58px;object-fit:cover;border-radius:6px;background:#f1eee5}
+.customer-review-item>div{display:grid;min-width:0;flex:1;gap:5px}
+.customer-review-item strong{color:#2d423a;font-size:11px}
+.customer-review-item small{color:#829087;font-size:9px}
+.customer-review-message{margin:12px 0 0;padding:10px 12px;border-radius:7px;background:#eef2e8;color:#486047;font-size:11px;line-height:1.5}
+.customer-review-backdrop{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:18px;background:#17211d77;backdrop-filter:blur(3px)}
+.customer-review-dialog{position:relative;width:min(480px,100%);padding:27px;border:1px solid #e5ddd1;border-radius:13px;background:#fffdf9;box-shadow:0 24px 70px #17211d33;color:#293d35}
+.customer-review-close{position:absolute;top:14px;right:15px;width:32px;height:32px;border:1px solid #e9e4da;border-radius:50%;background:#fff;color:#53634b;font-size:21px;line-height:1}
+.customer-review-dialog>.eyebrow{color:#78896a;font-size:9px;letter-spacing:.14em}
+.customer-review-dialog h2{margin:8px 35px 5px 0;color:#213a32;font-family:'Cormorant Garamond',serif;font-size:29px;font-weight:500;line-height:1.1}
+.customer-review-dialog>p{margin:0 0 18px;color:#77837b;font-size:11px;line-height:1.5}
+.customer-review-rating-label,.customer-review-text-label{display:block;margin:15px 0 7px;color:#3d5047;font-size:11px;font-weight:500}
+.customer-review-stars{display:flex;gap:5px}
+.customer-review-stars button{display:grid;width:34px;height:34px;place-items:center;border:0;border-radius:5px;background:transparent;color:#bc805c}
+.customer-review-stars button:hover{background:#f7eee7}
+.customer-review-text-label textarea{display:block;width:100%;min-height:125px;margin-top:8px;padding:11px;border:1px solid #e6e0d6;border-radius:7px;background:#fffefa;color:#34463e;font:inherit;font-size:11px;line-height:1.55;resize:vertical}
+.customer-review-submit{width:100%;margin-top:15px;background:#43583d;color:#fff}
+.customer-review-submit:hover{background:#344831}
+.customer-review-submit:disabled{cursor:not-allowed;opacity:.55}
+@media(max-width:700px){.customer-review-dialog{padding:22px 18px}.customer-review-item{gap:9px}.customer-review-item img{width:48px;height:52px;flex-basis:48px}.customer-review-item strong{font-size:10px}.customer-review-item .account-edit-button{padding:8px;font-size:9px}}
+@media(max-width:1100px){.customer-account-page{grid-template-columns:190px minmax(0,1fr);padding-right:3%;padding-left:3%}.customer-account-aside{grid-column:2;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.customer-account-care{grid-column:1/-1}.account-order-row{grid-template-columns:56px minmax(80px,.8fr) minmax(80px,1fr) auto}.account-order-row img{width:56px;height:56px}.account-order-status{grid-column:2/-1;justify-self:start;margin-top:-4px}}
+@media(max-width:700px){.customer-account-page{grid-template-columns:1fr;gap:10px;padding:14px 4% 35px}.customer-account-sidebar{min-height:0;padding:8px;overflow:auto}.customer-account-sidebar nav{display:flex;gap:5px}.customer-account-sidebar nav button{justify-content:center;gap:7px;min-width:max-content;min-height:39px;padding:0 11px;font-size:10px}.customer-account-sidebar-note,.customer-account-logout{display:none}.customer-account-main{gap:10px}.customer-profile-banner{min-height:92px;padding:16px}.customer-profile-banner h1{font-size:34px}.customer-profile-flower{font-size:37px}.customer-profile-card{flex-wrap:wrap;gap:13px;padding:17px}.customer-profile-avatar{width:72px;height:72px;flex-basis:72px;font-size:27px}.customer-profile-name h2{font-size:21px}.customer-profile-identity{width:calc(100% - 90px);flex:auto}.customer-profile-identity>p{font-size:10px}.customer-profile-card>.account-edit-button{margin-left:85px}.customer-account-card{padding:14px}.customer-account-aside{grid-column:auto;grid-template-columns:1fr}.customer-account-care{grid-column:auto}.account-order-row{grid-template-columns:48px minmax(70px,1fr) minmax(0,1.2fr) auto;gap:8px;min-height:68px;padding:7px}.account-order-row img{width:48px;height:52px}.account-order-id strong,.account-order-items span{font-size:9px}.account-order-total{font-size:10px}.account-order-status{grid-column:2/-1;margin-top:-3px}.customer-account-card-heading h2{font-size:19px}}
