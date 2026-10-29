@@ -296,11 +296,18 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, authLoading,
     setSubmitError("");
     const details = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
-      const error = await onPlaceOrder(details);
-      if (error) setSubmitError(error);
-      else { setSubmitted(true); setActiveStep(4); }
+      const payment = await onPlaceOrder(details);
+      if (payment?.error) {
+        setSubmitError(payment.error);
+      } else if (!payment?.paymentSessionId || !window.Cashfree) {
+        setSubmitError("Cashfree checkout could not be loaded. Please refresh and try again.");
+      } else {
+        const cashfree = window.Cashfree({ mode: import.meta.env.VITE_CASHFREE_MODE === "sandbox" ? "sandbox" : "production" });
+        const result = await cashfree.checkout({ paymentSessionId: payment.paymentSessionId, redirectTarget: "_self" });
+        if (result?.error) setSubmitError(result.error.message || "Cashfree could not open the payment page. Please try again.");
+      }
     } catch {
-      setSubmitError("We could not save your order. Please try again.");
+      setSubmitError("We could not start the payment. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -322,9 +329,9 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, authLoading,
               <div className="checkout-section-heading checkout-subheading"><span><Truck size={20}/></span><div><h2>Shipping method</h2><p>Thoughtful packing, delivered with care</p></div></div>
               <label className="checkout-choice selected"><input type="radio" name="shipping_method" value="standard" defaultChecked/><span><b>Standard delivery</b><small>5–7 business days</small></span><strong>Complimentary</strong><Leaf size={16}/></label>
             </section>
-            {activeStep===2&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><CreditCard size={20}/></span><div><h2>Payment method</h2><p>Choose how you’d like to pay</p></div></div><label className="checkout-payment-choice selected"><input type="radio" name="payment_method" value="Cash on delivery" defaultChecked/><span><b>Cash on delivery</b><small>Pay when your handmade order arrives</small></span><Check size={18}/></label><div className="checkout-secure-note"><ShieldCheck size={18}/><span>Your order details are sent securely. We’ll contact you to confirm payment and delivery.</span></div><p className="checkout-payment-unavailable">Online payments are not available at checkout yet.</p></section>}
-            {activeStep===3&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><Check size={20}/></span><div><h2>Review your order</h2><p>Check your delivery details before placing the order</p></div></div><div className="checkout-review-card"><b>{reviewDetails?.customer_name}</b><span>{reviewDetails?.email} · {reviewDetails?.phone}</span><span>{[reviewDetails?.address,reviewDetails?.address_line2,reviewDetails?.city,reviewDetails?.state,reviewDetails?.postal_code].filter(Boolean).join(", ")}</span><button type="button" onClick={()=>setActiveStep(1)}>Edit address</button></div><div className="checkout-review-card"><b>Delivery & payment</b><span>Standard delivery · 5–7 business days</span><span>Cash on delivery</span><input type="hidden" name="payment_method" value="Cash on delivery"/><button type="button" onClick={()=>setActiveStep(2)}>Edit payment</button></div></section>}
-            <div className="checkout-step-actions">{activeStep===1?<button className="checkout-back-link" type="button" onClick={onBackToCart}><ArrowLeft size={15}/> Back to cart</button>:<button className="checkout-back-link" type="button" onClick={()=>setActiveStep(activeStep-1)}><ArrowLeft size={15}/> Back</button>}{activeStep===1&&<button className="story-cta checkout-submit" type="submit">Continue to Payment <ArrowRight size={15}/></button>}{activeStep===2&&<button className="story-cta checkout-submit" type="button" onClick={()=>setActiveStep(3)}>Review Order <ArrowRight size={15}/></button>}{activeStep===3&&<button className="story-cta checkout-submit" type="submit" disabled={submitting}>{submitting?"Placing order…":"Place COD order"} <ArrowRight size={15}/></button>}</div>
+            {activeStep===2&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><CreditCard size={20}/></span><div><h2>Payment method</h2><p>Pay securely through Cashfree</p></div></div><div className="checkout-payment-choice selected"><span className="checkout-cashfree-mark">C</span><span><b>Online payment</b><small>UPI, cards, net banking and other available methods</small></span><ShieldCheck size={18}/></div><div className="checkout-secure-note"><ShieldCheck size={18}/><span>Your payment is processed securely by Cashfree. We only mark your order paid after Cashfree confirms it.</span></div></section>}
+            {activeStep===3&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><Check size={20}/></span><div><h2>Review your order</h2><p>Check your delivery details before continuing to payment</p></div></div><div className="checkout-review-card"><b>{reviewDetails?.customer_name}</b><span>{reviewDetails?.email} · {reviewDetails?.phone}</span><span>{[reviewDetails?.address,reviewDetails?.address_line2,reviewDetails?.city,reviewDetails?.state,reviewDetails?.postal_code].filter(Boolean).join(", ")}</span><button type="button" onClick={()=>setActiveStep(1)}>Edit address</button></div><div className="checkout-review-card"><b>Delivery & payment</b><span>Standard delivery · 5–7 business days</span><span>Online payment via Cashfree</span><input type="hidden" name="payment_method" value="Cashfree"/><button type="button" onClick={()=>setActiveStep(2)}>Edit payment</button></div></section>}
+            <div className="checkout-step-actions">{activeStep===1?<button className="checkout-back-link" type="button" onClick={onBackToCart}><ArrowLeft size={15}/> Back to cart</button>:<button className="checkout-back-link" type="button" onClick={()=>setActiveStep(activeStep-1)}><ArrowLeft size={15}/> Back</button>}{activeStep===1&&<button className="story-cta checkout-submit" type="submit">Continue to Payment <ArrowRight size={15}/></button>}{activeStep===2&&<button className="story-cta checkout-submit" type="button" onClick={()=>setActiveStep(3)}>Review Order <ArrowRight size={15}/></button>}{activeStep===3&&<button className="story-cta checkout-submit" type="submit" disabled={submitting}>{submitting?"Connecting to Cashfree…":"Pay securely with Cashfree"} <ArrowRight size={15}/></button>}</div>
             {submitError&&<p className="checkout-order-error" role="alert">{submitError}</p>}
           </form>}
         </section>
@@ -354,12 +361,16 @@ function App() {
   const [checkoutFromBag,setCheckoutFromBag] = useState(false);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(Boolean(supabase));
+  const [cashfreeReturn, setCashfreeReturn] = useState(() => {
+    const orderId = new URLSearchParams(window.location.search).get("order_id");
+    return orderId ? { orderId, status: "verifying" } : null;
+  });
   const restorePendingCheckout = () => {
     const pending = sessionStorage.getItem(PENDING_CHECKOUT_KEY);
     if (!pending) return;
     try {
       const item = JSON.parse(pending);
-      if (item?.id) {
+      if (item?.id || item?.items?.length) {
         setCheckoutItem(item);
         setPage("checkout");
       }
@@ -388,6 +399,34 @@ function App() {
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+  useEffect(() => {
+    if (!cashfreeReturn || cashfreeReturn.status !== "verifying" || authLoading) return;
+    let active = true;
+    const verifyPayment = async () => {
+      try {
+        if (!supabase) throw new Error("Payment verification is unavailable. Contact the atelier with your Cashfree order reference.");
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) throw new Error("Sign in again to verify this payment.");
+        const response = await fetch("/api/payments/cashfree/verify-order", {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ orderId: cashfreeReturn.orderId })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "We could not verify this payment yet.");
+        if (!active) return;
+        setCashfreeReturn({ ...result, orderId: cashfreeReturn.orderId });
+        if (result.status === "paid") setCart([]);
+      } catch (error) {
+        if (active) setCashfreeReturn({ orderId: cashfreeReturn.orderId, status: "error", message: error.message });
+      } finally {
+        const cleanUrl = `${window.location.pathname}${window.location.hash}`;
+        window.history.replaceState(null, "", cleanUrl);
+      }
+    };
+    verifyPayment();
+    return () => { active = false; };
+  }, [authLoading, cashfreeReturn?.orderId, cashfreeReturn?.status]);
   const signInWithGoogle = async () => {
     if (!supabase) {
       setToast(true);
@@ -500,45 +539,27 @@ function App() {
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
   if (adminMode) return <AdminPanel products={productCatalog} onProductsChange={updated=>{setProductCatalog(updated);setSelected(current=>updated.find(product=>product.id===current.id)||current);}} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
   return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} onGoogleSignIn={signInWithGoogle} onSignOut={signOut}/>
-    {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
-    {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
-    {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
-    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
-      if(!supabase)return "Order placement is unavailable because Supabase is not configured.";
-      const checkoutItems=checkoutItem.items||[checkoutItem];
-      const orderItems=checkoutItems.map(product=>({product_id:product.id,name:product.name,unit_price:Number(product.price),quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}));
-      const total=orderItems.reduce((sum,product)=>sum+product.unit_price*product.quantity,0);
-      const {data:customer,error:customerError}=await supabase.from("customers").upsert({
-        auth_user_id:user.id,
-        full_name:String(details.customer_name||"").trim(),
-        email:String(details.email||"").trim(),
-        phone:String(details.phone||"").trim()
-      },{onConflict:"auth_user_id"}).select("id").single();
-      if(customerError||!customer)return "We could not save your customer details: "+(customerError?.message||"Please try again.");
-      const {error}=await supabase.from("orders").insert({
-        customer_id:customer.id,
-        subtotal:total,
-        shipping_cost:0,
-        total,
-        recipient_name:String(details.customer_name||"").trim(),
-        recipient_email:String(details.email||"").trim(),
-        recipient_phone:String(details.phone||"").trim(),
-        shipping_address_line1:String(details.address||"").trim(),
-        shipping_address_line2:String(details.address_line2||"").trim()||null,
-        shipping_city:String(details.city||"").trim(),
-        shipping_state:String(details.state||"").trim()||null,
-        shipping_postal_code:String(details.postal_code||"").trim(),
-        shipping_country:"India",
-        payment_method:String(details.payment_method||"Cash on delivery"),
-        items:orderItems
-      });
-      if(!error)setCart([]);
-      return error?"We could not save your order: "+error.message:null;
-    }} user={user} onGoogleSignIn={signInWithGoogle}/>}
+    {cashfreeReturn ? <main className="checkout-page"><section className="checkout-success" aria-live="polite"><span>{cashfreeReturn.status==="paid"?<Check size={23}/>:<ShieldCheck size={22}/>}</span><h2>{cashfreeReturn.status==="paid"?"Payment confirmed":cashfreeReturn.status==="verifying"?"Verifying your payment":cashfreeReturn.status==="pending"?"Payment is processing":"Payment needs confirmation"}</h2><p>{cashfreeReturn.status==="paid"?"Cashfree confirmed your payment. Your order is now being prepared.":cashfreeReturn.status==="verifying"?"We’re checking your payment securely with Cashfree.":cashfreeReturn.status==="pending"?"Cashfree has not confirmed the payment yet. Check again shortly.":cashfreeReturn.message||"If your account was charged, please contact the atelier with this order reference."}</p><small>Order reference: {cashfreeReturn.orderId}</small>{cashfreeReturn.status!=="paid"&&<button className="checkout-back-link" type="button" onClick={()=>setCashfreeReturn(current=>({...current,status:"verifying",message:""}))}>Check payment status</button>}<button className="story-cta checkout-submit" type="button" onClick={()=>{setCashfreeReturn(null);navigate("home");}}>Continue shopping <ArrowRight size={15}/></button></section></main> : <>
+      {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
+      {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
+      {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
+      {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
+        if(!supabase)return {error:"Online payment is unavailable because Supabase is not configured."};
+        const {data:{session}}=await supabase.auth.getSession();
+        if(!session?.access_token)return {error:"Your sign-in has expired. Sign in again to continue with payment."};
+        const response=await fetch("/api/payments/cashfree/create-order",{
+          method:"POST",
+          headers:{"content-type":"application/json",authorization:`Bearer ${session.access_token}`},
+          body:JSON.stringify({details,items:(checkoutItem.items||[checkoutItem]).map(product=>({product_id:product.id,quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}))})
+        });
+        const result=await response.json().catch(()=>({}));
+        return response.ok?result:{error:result.error||"Cashfree could not start the payment. Please try again."};
+      }} user={user} onGoogleSignIn={signInWithGoogle}/>}
+      {bagOpen&&<><button className="cart-backdrop" aria-label="Close shopping bag" onClick={()=>setBagOpen(false)}/><CartDrawer cart={cart} onClose={()=>setBagOpen(false)} onRemove={removeFromCart} onQuantityChange={changeCartQuantity} onCheckout={checkoutCart}/></>}
+      {toast&&<div className="cart-toast" role="status"><ShoppingBag size={16}/><span>Added to your bag</span><button onClick={()=>setToast(false)}>Dismiss</button></div>}
+    </>}
     <Footer goShop={goShop}/>
     <FloatingSocials/>
-    {bagOpen&&<><button className="cart-backdrop" aria-label="Close shopping bag" onClick={()=>setBagOpen(false)}/><CartDrawer cart={cart} onClose={()=>setBagOpen(false)} onRemove={removeFromCart} onQuantityChange={changeCartQuantity} onCheckout={checkoutCart}/></>}
-    {toast&&<div className="cart-toast" role="status"><ShoppingBag size={16}/><span>Added to your bag</span><button onClick={()=>setToast(false)}>Dismiss</button></div>}
   </>;
 }
 createRoot(document.getElementById("root")).render(<App/>);

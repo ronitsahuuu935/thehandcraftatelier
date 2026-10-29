@@ -201,6 +201,9 @@ html{scrollbar-width:none}html::-webkit-scrollbar{display:none;width:0;height:0}
 .checkout-choice small,.checkout-payment-choice small{color:#758079;font-size:10px}
 .checkout-choice strong{font-size:10px;font-weight:500}
 .checkout-choice>svg:last-child,.checkout-payment-choice>svg{color:#748363}
+.checkout-cashfree-mark{display:grid!important;width:30px;height:30px;flex:0 0 30px!important;place-items:center;border-radius:50%;background:#e8eee1;color:#40543a;font-size:16px;font-weight:700}
+.checkout-success>small{display:block;margin:14px 0;color:#748078;font-size:10px;overflow-wrap:anywhere}
+.checkout-success .checkout-back-link{display:block;margin:5px auto 12px}
 .checkout-secure-note{display:flex;align-items:center;gap:10px;margin-top:15px;padding:12px;border-radius:7px;background:#f0f2e8;color:#51624a;font-size:11px;line-height:1.55}
 .checkout-payment-unavailable{margin:14px 0 0;color:#78827c;font-size:10px}
 .checkout-review-card{position:relative;display:flex;flex-direction:column;gap:6px;margin:10px 0;padding:15px;border:1px solid #e3e1d7;border-radius:7px;background:#fffefa;color:#31413b;font-size:11px;line-height:1.45}
