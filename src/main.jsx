@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck, Phone, Mail, LogOut, Package, ChevronRight } from "lucide-react";
+import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck, Phone, Mail, LogOut, Package } from "lucide-react";
 import "./styles.css";
 import { googleMapsApiKey, productStorageBucket, supabase } from "./lib/supabase";
 import AdminPanel from "./AdminPanel";
@@ -109,30 +109,40 @@ function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onS
       }
       setOrdersLoading(true);
       setOrdersError("");
-      const { data, error } = await supabase.from("orders")
-        .select("id,items,total,status,payment_status,refund_status,created_at")
-        .eq("customer_id", customerProfile.id)
-        .order("created_at", { ascending: false })
-        .limit(100);
-      if (!active) return;
-      if (error) {
-        console.error("Unable to load customer orders.", error);
-        setOrdersError("We couldn't load your orders right now.");
-        setOrders([]);
-      } else {
-        setOrders((data || []).map(order => ({ ...order, items: Array.isArray(order.items) ? order.items : [] })));
-        const { data: reviews, error: reviewsError } = await supabase.from("product_reviews").select("order_id,product_id").eq("customer_id", customerProfile.id);
-        if (!active) return;
-        if (reviewsError) {
-          console.error("Unable to load the customer's submitted reviews.", reviewsError);
-          setReviewedPurchases([]);
-          if (["PGRST205", "42P01", "42501"].includes(reviewsError.code)) setReviewSetupError("Run supabase/migrations/20261029230000_verified_product_reviews.sql in the Supabase SQL Editor to enable verified reviews.");
-        } else {
-          setReviewSetupError("");
-          setReviewedPurchases((reviews || []).map(review => `${review.order_id}:${review.product_id}`));
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          setOrdersError("Sign in again to view your order history.");
+          setOrdersLoading(false);
+          return;
         }
+        const response = await fetch("/api/customer-orders", { headers: { authorization: `Bearer ${session.access_token}` } });
+        const result = await response.json().catch(() => ({}));
+        if (!active) return;
+        if (!response.ok) {
+          console.error("Unable to load customer orders.", result.error);
+          setOrdersError(result.error || "We couldn't load your orders right now.");
+          setOrders([]);
+        } else {
+          setOrders((result.orders || []).map(order => ({ ...order, items: Array.isArray(order.items) ? order.items : [] })));
+          const { data: reviews, error: reviewsError } = await supabase.from("product_reviews").select("order_id,product_id").eq("customer_id", customerProfile.id);
+          if (!active) return;
+          if (reviewsError) {
+            console.error("Unable to load the customer's submitted reviews.", reviewsError);
+            setReviewedPurchases([]);
+            if (["PGRST205", "42P01", "42501"].includes(reviewsError.code)) setReviewSetupError("Run supabase/migrations/20261029230000_verified_product_reviews.sql in the Supabase SQL Editor to enable verified reviews.");
+          } else {
+            setReviewSetupError("");
+            setReviewedPurchases((reviews || []).map(review => `${review.order_id}:${review.product_id}`));
+          }
+        }
+      } catch (error) {
+        if (!active) return;
+        console.error("Unable to load customer account orders.", error);
+        setOrdersError("We couldn't load your orders right now. Please refresh and try again.");
+        setOrders([]);
       }
-      setOrdersLoading(false);
+      if (active) setOrdersLoading(false);
     };
     loadOrders();
     return () => { active = false; };
@@ -225,7 +235,7 @@ function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onS
       </section>
       {section === "addresses" ? <section className="customer-account-card customer-address-card"><div className="customer-account-card-heading"><span><MapPin size={19}/></span><div><h2>Shipping address</h2><p>Your saved delivery details</p></div></div>{address ? <div className="customer-saved-address"><strong>{name}</strong><p>{address}</p>{phone !== "Not added yet" && <small>{phone}</small>}</div> : <div className="account-orders-empty"><MapPin size={24}/><h3>No saved address yet</h3><p>Your delivery address will be saved here after checkout.</p></div>}</section> : section === "reviews" ? <section className="customer-account-card customer-reviews-card"><div className="customer-account-card-heading"><span><Star size={19}/></span><div><h2>Verified purchase reviews</h2><p>Only products in your successfully paid orders are eligible.</p></div></div>{renderReviews()}{reviewMessage&&<p className="customer-review-message" role="status">{reviewMessage}</p>}</section> : <section className="customer-account-card customer-orders-card"><div className="customer-account-card-heading"><span><Package size={19}/></span><div><h2>{section === "orders" ? "All your orders" : "Recent Orders"}</h2><p>View your latest orders and their status.</p></div><button onClick={() => setSection("orders")}>View all orders <ArrowRight size={14}/></button></div>{renderOrders()}</section>}
     </div>
-    <aside className="customer-account-aside"><section className="customer-account-card customer-quick-links"><h2>Quick Links</h2>{[{label:"My Orders",id:"orders",icon:Package},{label:"Addresses",id:"addresses",icon:MapPin},{label:"Continue shopping",id:"shop",icon:ShoppingBag}].map(item=>{const Icon=item.icon;return <button key={item.id} onClick={()=>item.id==="shop"?onShop():setSection(item.id)}><Icon size={17}/><span>{item.label}</span><ChevronRight size={16}/></button>})}<button onClick={onSignOut}><LogOut size={17}/><span>Log out</span><ChevronRight size={16}/></button></section><section className="customer-account-card customer-address-summary"><div className="customer-account-card-heading"><span><MapPin size={18}/></span><div><h2>Shipping Address</h2></div><button onClick={() => setSection("addresses")}>View</button></div>{address ? <div className="customer-saved-address"><strong>{name}</strong><p>{address}</p>{phone !== "Not added yet" && <small>{phone}</small>}</div> : <p className="customer-account-muted">No address saved. It will appear here after checkout.</p>}</section><section className="customer-account-care"><Leaf size={18}/><div><strong>Love handmade?</strong><span>Thank you for supporting our little atelier.</span></div></section></aside>
+    <aside className="customer-account-aside"><section className="customer-account-card customer-address-summary"><div className="customer-account-card-heading"><span><MapPin size={18}/></span><div><h2>Shipping Address</h2></div><button onClick={() => setSection("addresses")}>View</button></div>{address ? <div className="customer-saved-address"><strong>{name}</strong><p>{address}</p>{phone !== "Not added yet" && <small>{phone}</small>}</div> : <p className="customer-account-muted">No address saved. It will appear here after checkout.</p>}</section><section className="customer-account-care"><Leaf size={18}/><div><strong>Love handmade?</strong><span>Thank you for supporting our little atelier.</span></div></section></aside>
     {reviewing&&<div className="customer-review-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget&&!reviewBusy)setReviewing(null);}}><form className="customer-review-dialog" role="dialog" aria-modal="true" aria-labelledby="customer-review-title" onSubmit={submitReview}><button className="customer-review-close" type="button" aria-label="Close review form" onClick={()=>setReviewing(null)}>×</button><span className="eyebrow">VERIFIED PURCHASE</span><h2 id="customer-review-title">Review {reviewing.product.name}</h2><p>Your review is linked to order #{String(reviewing.order.id).slice(0, 8)}.</p><label className="customer-review-rating-label">Your rating</label><div className="customer-review-stars" role="group" aria-label="Rating from 1 to 5 stars">{[1,2,3,4,5].map(value=><button type="button" key={value} aria-label={`${value} star${value===1?"":"s"}`} aria-pressed={reviewRating===value} onClick={()=>setReviewRating(value)}><Star size={25} fill={reviewRating>=value?"currentColor":"none"}/></button>)}</div><label className="customer-review-text-label">Your review<textarea value={reviewText} onChange={event=>setReviewText(event.target.value)} minLength={5} maxLength={2000} required placeholder="Share what you loved about this handmade piece."/></label>{reviewMessage&&<p className="customer-review-message" role="alert">{reviewMessage}</p>}<button className="account-edit-button customer-review-submit" disabled={reviewBusy||reviewText.trim().length<5}>{reviewBusy?"Submitting…":"Submit verified review"}</button></form></div>}
   </main>;
 }
