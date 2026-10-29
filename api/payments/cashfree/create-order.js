@@ -65,7 +65,12 @@ export default async function createCashfreeOrder(request, response) {
     auth_user_id: user.id,
     full_name: fullName,
     email,
-    phone
+    phone,
+    address_line1: address,
+    address_line2: clean(details.address_line2) || null,
+    city,
+    state,
+    postal_code: postalCode
   }, { onConflict: "auth_user_id" }).select("id").single();
   if (customerError || !customer) {
     console.error("Cashfree checkout could not save customer", customerError?.message);
@@ -73,27 +78,22 @@ export default async function createCashfreeOrder(request, response) {
   }
 
   const addressLine2 = clean(details.address_line2);
-  const fullAddress = [address, addressLine2, state].filter(Boolean).join(", ");
   const { data: order, error: orderError } = await admin.from("orders").insert({
-    customer_id: user.id,
-    customer_name: fullName,
-    email,
-    phone,
-    address: fullAddress,
-    city,
-    postal_code: postalCode,
+    customer_id: customer.id,
     items: orderItems,
     subtotal: total,
     shipping_cost: 0,
     total,
     payment_method: "Cashfree",
     payment_status: "pending",
-    status: "Pending payment",
+    status: "pending",
     recipient_name: fullName,
     recipient_email: email,
     recipient_phone: phone,
     shipping_address_line1: address,
+    shipping_address_line2: addressLine2 || null,
     shipping_city: city,
+    shipping_state: state,
     shipping_postal_code: postalCode,
     shipping_country: "India"
   }).select("id").single();
@@ -131,13 +131,13 @@ export default async function createCashfreeOrder(request, response) {
     });
   } catch (error) {
     console.error("Cashfree create-order request failed", error.message);
-    await admin.from("orders").update({ status: "Payment initialization failed" }).eq("id", order.id);
+    await admin.from("orders").update({ status: "pending" }).eq("id", order.id);
     return response.status(502).json({ error: "Cashfree could not be reached. Your order was not charged; please retry." });
   }
   const gatewayOrder = await gatewayResponse.json().catch(() => ({}));
   if (!gatewayResponse.ok || !gatewayOrder.payment_session_id) {
     console.error("Cashfree rejected create-order request", { status: gatewayResponse.status, code: gatewayOrder.code || null });
-    await admin.from("orders").update({ status: "Payment initialization failed" }).eq("id", order.id);
+    await admin.from("orders").update({ status: "pending" }).eq("id", order.id);
     return response.status(502).json({ error: "Cashfree could not start the payment. Please check your details and retry." });
   }
 

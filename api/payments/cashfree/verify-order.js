@@ -56,7 +56,7 @@ export default async function verifyCashfreeOrder(request, response) {
 
   const gatewayStatus = String(gatewayOrder.order_status || "").toUpperCase();
   if (gatewayStatus === "PAID") {
-    const { error: updateError } = await admin.from("orders").update({ payment_status: "paid", status: "Processing" }).eq("id", order.id);
+    const { error: updateError } = await admin.from("orders").update({ payment_status: "paid", status: "confirmed" }).eq("id", order.id);
     if (updateError) {
       console.error("Could not save verified Cashfree payment", { orderId, message: updateError.message });
       return response.status(500).json({ error: "Payment is confirmed, but we could not update your order. Contact the atelier with your order reference." });
@@ -64,7 +64,7 @@ export default async function verifyCashfreeOrder(request, response) {
     return response.status(200).json({ status: "paid", orderId, amount: Number(order.total) });
   }
   if (["EXPIRED", "TERMINATED"].includes(gatewayStatus)) {
-    await admin.from("orders").update({ payment_status: "failed", status: "Payment failed" }).eq("id", order.id).neq("payment_status", "paid");
+    await admin.from("orders").update({ payment_status: "failed", status: "cancelled" }).eq("id", order.id).neq("payment_status", "paid");
     return response.status(200).json({ status: "failed", orderId, message: "Cashfree reports this payment session expired or failed." });
   }
   return response.status(200).json({ status: "pending", orderId, message: "Cashfree is still processing this payment." });

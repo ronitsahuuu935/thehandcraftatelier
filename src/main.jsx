@@ -57,8 +57,9 @@ const money = n => "₹" + n.toLocaleString("en-IN");
 const ADMIN_HASH = "#12345Rsadmin";
 const PENDING_CHECKOUT_KEY = "pending-checkout";
 
-function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, onGoogleSignIn, onSignOut }) {
+function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, customerProfile, onGoogleSignIn, onSignOut }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   return <header className="site-header">
     <div className="announcement">A little love, in every stitch. Complimentary shipping on orders ₹2,000+</div>
     <div className="brandbar">
@@ -66,7 +67,8 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <button className="wordmark" onClick={() => navigate("home")}><span>The Hand Craft Atelier</span><small>HANDMADE · HEARTFELT · FOREVER</small></button>
       <div className="search-inline"><Search size={17}/><input placeholder="Find something lovely" aria-label="Search products" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value && page === "product") navigate("shop"); }} /></div>
       <div className="header-actions">
-        <button className="icon-btn" aria-label={user ? "Sign out" : "Sign in with Google"} title={user ? `Sign out ${user.email || ""}` : "Sign in with Google"} onClick={user ? onSignOut : onGoogleSignIn}><UserRound/></button>
+        <button className="icon-btn" aria-label={user ? "Open your account" : "Sign in with Google"} title={user ? "Open your account" : "Sign in with Google"} onClick={() => user ? setProfileOpen(value => !value) : onGoogleSignIn}><UserRound/></button>
+        {profileOpen&&user&&<div className="profile-popover" role="dialog" aria-label="Your account"><strong>{customerProfile?.full_name||user.user_metadata?.full_name||"Your account"}</strong><small>{user.email}</small>{customerProfile?.address_line1&&<p>{[customerProfile.address_line1,customerProfile.city,customerProfile.postal_code].filter(Boolean).join(", ")}</p>}<button type="button" onClick={()=>{setProfileOpen(false);navigate("checkout");}}>View saved checkout details</button><button type="button" onClick={onSignOut}>Sign out</button></div>}
         <button className="icon-btn" aria-label="Wishlist"><Heart/></button>
         <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}><ShoppingBag/><span>{cartCount}</span></button>
       </div>
@@ -227,7 +229,7 @@ function GoogleSignInScreen({ onGoogleSignIn }) {
   </section>;
 }
 
-function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, authLoading, onGoogleSignIn }) {
+function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProfile, authLoading, onGoogleSignIn }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -237,9 +239,22 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, authLoading,
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [pin, setPin] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [fullName, setFullName] = useState(user.user_metadata?.full_name || "");
+  const [phone, setPhone] = useState("");
   const [locationStatus, setLocationStatus] = useState("");
   const checkoutItems = item.items || [item];
   const orderTotal = checkoutItems.reduce((total, product) => total + Number(product.price || 0) * (product.quantity || 1), 0);
+  useEffect(() => {
+    if (!customerProfile) return;
+    setFullName(customerProfile.full_name || user.user_metadata?.full_name || "");
+    setPhone(customerProfile.phone || "");
+    setAddress(customerProfile.address_line1 || "");
+    setAddressLine2(customerProfile.address_line2 || "");
+    setCity(customerProfile.city || "");
+    setState(customerProfile.state || "");
+    setPin(customerProfile.postal_code || "");
+  }, [customerProfile]);
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
       setLocationStatus("Location access is not supported by this browser.");
@@ -324,7 +339,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, authLoading,
             <section className="checkout-step-panel" hidden={activeStep!==1}>
               <div className="checkout-section-heading"><span><Truck size={21}/></span><div><h2>Shipping address</h2><p>Enter your delivery details</p></div></div>
               <button className="checkout-location" type="button" onClick={useCurrentLocation}><MapPin size={14}/> Use my current location</button>{locationStatus&&<small className="checkout-location-status" role="status">{locationStatus}</small>}
-              <div className="checkout-fields"><label>Full name <i>*</i><input name="customer_name" required autoComplete="name" defaultValue={user.user_metadata?.full_name||""} placeholder="Your full name"/></label><label>Phone number <i>*</i><input name="phone" required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Email address <i>*</i><input name="email" required type="email" autoComplete="email" defaultValue={user.email||""} placeholder="you@example.com"/></label><label>Address line 1 <i>*</i><input name="address" required autoComplete="address-line1" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>Address line 2 <small>(optional)</small><input name="address_line2" autoComplete="address-line2" placeholder="Apartment, suite, etc."/></label><label>City <i>*</i><input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>State <i>*</i><select name="state" required autoComplete="address-level1" value={state} onChange={event=>setState(event.target.value)}><option value="" disabled>Select state or union territory</option>{INDIAN_STATES_AND_UTS.map(value=><option key={value} value={value}>{value}</option>)}</select></label><label>PIN code <i>*</i><input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="6-digit PIN" value={pin} onChange={event=>setPin(event.target.value)}/></label></div>
+              <div className="checkout-fields"><label>Full name <i>*</i><input name="customer_name" required autoComplete="name" value={fullName} onChange={event=>setFullName(event.target.value)} placeholder="Your full name"/></label><label>Phone number <i>*</i><input name="phone" required type="tel" autoComplete="tel" value={phone} onChange={event=>setPhone(event.target.value)} placeholder="+91 00000 00000"/></label><label>Email address <i>*</i><input name="email" required type="email" autoComplete="email" value={user.email||""} readOnly/></label><label>Address line 1 <i>*</i><input name="address" required autoComplete="address-line1" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>Address line 2 <small>(optional)</small><input name="address_line2" autoComplete="address-line2" placeholder="Apartment, suite, etc." value={addressLine2} onChange={event=>setAddressLine2(event.target.value)}/></label><label>City <i>*</i><input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>State <i>*</i><select name="state" required autoComplete="address-level1" value={state} onChange={event=>setState(event.target.value)}><option value="" disabled>Select state or union territory</option>{INDIAN_STATES_AND_UTS.map(value=><option key={value} value={value}>{value}</option>)}</select></label><label>PIN code <i>*</i><input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="6-digit PIN" value={pin} onChange={event=>setPin(event.target.value)}/></label></div>
               <label className="checkout-billing-check"><input type="checkbox" defaultChecked/> Use this address for billing as well</label>
               <div className="checkout-section-heading checkout-subheading"><span><Truck size={20}/></span><div><h2>Shipping method</h2><p>Thoughtful packing, delivered with care</p></div></div>
               <label className="checkout-choice selected"><input type="radio" name="shipping_method" value="standard" defaultChecked/><span><b>Standard delivery</b><small>5–7 business days</small></span><strong>Complimentary</strong><Leaf size={16}/></label>
@@ -360,6 +375,7 @@ function App() {
   const [checkoutItem,setCheckoutItem] = useState(null);
   const [checkoutFromBag,setCheckoutFromBag] = useState(false);
   const [user, setUser] = useState(null);
+  const [customerProfile, setCustomerProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(Boolean(supabase));
   const [cashfreeReturn, setCashfreeReturn] = useState(() => {
     const orderId = new URLSearchParams(window.location.search).get("order_id");
@@ -399,6 +415,19 @@ function App() {
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+  useEffect(() => {
+    if (!supabase || !user) {
+      setCustomerProfile(null);
+      return;
+    }
+    let active = true;
+    supabase.from("customers").select("full_name,email,phone,address_line1,address_line2,city,state,postal_code").eq("auth_user_id", user.id).maybeSingle()
+      .then(({ data, error }) => {
+        if (error) console.error("Unable to load the saved customer profile.", error);
+        if (active) setCustomerProfile(data || null);
+      });
+    return () => { active = false; };
+  }, [user]);
   useEffect(() => {
     if (!cashfreeReturn || cashfreeReturn.status !== "verifying" || authLoading) return;
     let active = true;
@@ -538,12 +567,12 @@ function App() {
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
   if (adminMode) return <AdminPanel products={productCatalog} onProductsChange={updated=>{setProductCatalog(updated);setSelected(current=>updated.find(product=>product.id===current.id)||current);}} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
-  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} onGoogleSignIn={signInWithGoogle} onSignOut={signOut}/>
+  return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} customerProfile={customerProfile} onGoogleSignIn={signInWithGoogle} onSignOut={signOut}/>
     {cashfreeReturn ? <main className="checkout-page"><section className="checkout-success" aria-live="polite"><span>{cashfreeReturn.status==="paid"?<Check size={23}/>:<ShieldCheck size={22}/>}</span><h2>{cashfreeReturn.status==="paid"?"Payment confirmed":cashfreeReturn.status==="verifying"?"Verifying your payment":cashfreeReturn.status==="pending"?"Payment is processing":"Payment needs confirmation"}</h2><p>{cashfreeReturn.status==="paid"?"Cashfree confirmed your payment. Your order is now being prepared.":cashfreeReturn.status==="verifying"?"We’re checking your payment securely with Cashfree.":cashfreeReturn.status==="pending"?"Cashfree has not confirmed the payment yet. Check again shortly.":cashfreeReturn.message||"If your account was charged, please contact the atelier with this order reference."}</p><small>Order reference: {cashfreeReturn.orderId}</small>{cashfreeReturn.status!=="paid"&&<button className="checkout-back-link" type="button" onClick={()=>setCashfreeReturn(current=>({...current,status:"verifying",message:""}))}>Check payment status</button>}<button className="story-cta checkout-submit" type="button" onClick={()=>{setCashfreeReturn(null);navigate("home");}}>Continue shopping <ArrowRight size={15}/></button></section></main> : <>
       {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
       {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
       {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
-      {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
+      {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} user={user} customerProfile={customerProfile} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
         if(!supabase)return {error:"Online payment is unavailable because Supabase is not configured."};
         const {data:{session}}=await supabase.auth.getSession();
         if(!session?.access_token)return {error:"Your sign-in has expired. Sign in again to continue with payment."};

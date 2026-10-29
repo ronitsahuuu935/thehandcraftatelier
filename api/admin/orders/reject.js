@@ -46,7 +46,7 @@ export default async function rejectOrder(request, response) {
     return response.status(409).json({ error: "This order has already shipped or been delivered. Use the returns process instead." });
   }
   if (currentStatus === "rejected") {
-    return response.status(200).json({ status: "Rejected", refundStatus: currentRefund, alreadyRejected: true });
+    return response.status(200).json({ status: "cancelled", refundStatus: currentRefund, alreadyRejected: true });
   }
 
   const paymentStatus = String(order.payment_status || "pending").toLowerCase();
@@ -88,7 +88,7 @@ export default async function rejectOrder(request, response) {
   }
 
   const update = {
-    status: "Rejected",
+    status: "cancelled",
     rejection_reason: reason,
     rejected_at: new Date().toISOString(),
     refund_status: refundStatus,
@@ -99,5 +99,5 @@ export default async function rejectOrder(request, response) {
     console.error("Could not save order rejection", { orderId, refundId: cashfreeRefundId, message: updateError.message });
     return response.status(500).json({ error: "The refund request was sent, but the rejection could not be saved. Contact support before retrying." });
   }
-  return response.status(200).json({ status: "Rejected", refundStatus, refundId: cashfreeRefundId });
+  return response.status(200).json({ status: "cancelled", refundStatus, refundId: cashfreeRefundId });
 }

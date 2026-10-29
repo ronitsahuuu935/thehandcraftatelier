@@ -89,7 +89,7 @@ export default async function cashfreeWebhook(request, response) {
   if (paymentStatus === "SUCCESS") {
     const { error } = await admin.from("orders").update({
       payment_status: "paid",
-      status: "Processing",
+      status: "confirmed",
       cashfree_payment_id: String(event.data?.payment?.cf_payment_id || "") || null
     }).eq("id", order.id);
     if (error) {
@@ -97,7 +97,7 @@ export default async function cashfreeWebhook(request, response) {
       return response.status(500).json({ error: "Could not save payment status" });
     }
   } else if (String(order.payment_status).toLowerCase() !== "paid") {
-    const { error } = await admin.from("orders").update({ payment_status: "failed", status: "Payment failed" }).eq("id", order.id);
+    const { error } = await admin.from("orders").update({ payment_status: "failed", status: "cancelled" }).eq("id", order.id);
     if (error) {
       console.error("Cashfree webhook could not save failed payment", { orderId, message: error.message });
       return response.status(500).json({ error: "Could not save payment status" });
