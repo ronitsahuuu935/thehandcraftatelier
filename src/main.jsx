@@ -356,21 +356,34 @@ function App() {
 
     let active = true;
     const loadProductImages = async () => {
-      const { data, error } = await supabase.storage.from(productStorageBucket).list("", { limit: 100 });
-      if (error) {
-        console.error("Unable to load product images from Supabase Storage.", error);
-        return;
+      let catalog = products;
+      const { data: rows, error: catalogError } = await supabase
+        .from("products")
+        .select("id,name,price,category,image_url,gallery,tag,description,stock_quantity")
+        .order("id");
+
+      if (catalogError) {
+        console.warn("Unable to load the products table; using the built-in catalog until the admin schema is applied.", catalogError);
+      } else if (rows?.length) {
+        catalog = rows.map(row => {
+          const image = row.image_url || `${PRODUCT_IMG}p${row.id}.webp`;
+          return {
+            ...row,
+            image,
+            gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [{ src: image }],
+            stock_quantity: row.stock_quantity ?? null
+          };
+        });
       }
 
+      const { data, error } = await supabase.storage.from(productStorageBucket).list("", { limit: 100 });
+      if (error) console.error("Unable to load product images from Supabase Storage.", error);
       const availableFiles = new Set((data || []).map(file => file.name));
-      const withStorageImages = products.map(product => {
+      const withStorageImages = catalog.map(product => {
         const gallery = product.gallery.map(image => {
           const fileName = image.src.replace(PRODUCT_IMG, "");
           if (!availableFiles.has(fileName)) return image;
-          return {
-            ...image,
-            src: supabase.storage.from(productStorageBucket).getPublicUrl(fileName).data.publicUrl
-          };
+          return { ...image, src: supabase.storage.from(productStorageBucket).getPublicUrl(fileName).data.publicUrl };
         });
         const imageFileName = product.image.replace(PRODUCT_IMG, "");
         return {
@@ -406,7 +419,7 @@ function App() {
   const removeFromCart = index => setCart(old => old.filter((_, itemIndex) => itemIndex !== index));
   const changeCartQuantity = (index, delta) => setCart(old => old.map((item, itemIndex) => itemIndex === index ? {...item, quantity:Math.max(1,(item.quantity || 1) + delta)} : item));
   useEffect(()=>{ if(!toast) return; const t=setTimeout(()=>setToast(false),3000); return ()=>clearTimeout(t); },[toast,cart.length]);
-  if (adminMode) return <AdminPanel products={productCatalog} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
+  if (adminMode) return <AdminPanel products={productCatalog} onProductsChange={updated=>{setProductCatalog(updated);setSelected(current=>updated.find(product=>product.id===current.id)||current);}} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
   return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} user={user} onGoogleSignIn={signInWithGoogle} onSignOut={signOut}/>
     {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
     {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}

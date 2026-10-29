@@ -144,3 +144,17 @@
 .admin-lowstock-panel{grid-column:3;grid-row:2}
 .admin-recent-panel{grid-column:span 2;grid-row:2 / span 2}
 .admin-avatar{object-fit:cover;overflow:hidden}
+.admin-db-error{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:0 0 16px;padding:12px 14px;border:1px solid #e4b5a8;border-radius:7px;background:#fff1eb;color:#873e2d;font-size:11px;line-height:1.55}
+.admin-db-error button{flex:none;border:0;background:transparent;color:inherit;font-size:20px;line-height:1}
+.admin-modal-backdrop{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:22px;background:#1c211ab8}
+.admin-product-editor{position:relative;width:min(100%,560px);max-height:min(90vh,820px);overflow:auto;padding:30px;background:#fffdf9;border:1px solid var(--admin-line);border-radius:12px;box-shadow:0 24px 80px #0004;color:var(--admin-ink)}
+.admin-product-editor>.eyebrow{color:#718064;font-size:10px;letter-spacing:.14em}
+.admin-product-editor h2{margin:6px 0 4px;font-family:"Cormorant Garamond",serif;font-size:34px;font-weight:500}
+.admin-product-editor>p{margin:0 0 18px;color:var(--admin-muted);font-size:11px}
+.admin-product-editor label{display:block;margin:12px 0;color:#56594f;font-size:11px}
+.admin-product-editor input,.admin-product-editor textarea{display:block;width:100%;min-height:40px;margin-top:6px;padding:9px 10px;border:1px solid var(--admin-line);border-radius:6px;background:#fff;color:var(--admin-ink);font-size:12px}
+.admin-product-editor textarea{min-height:78px;resize:vertical}
+.admin-product-editor label small{display:block;margin-top:4px;color:var(--admin-muted);font-size:9px}
+.admin-modal-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:0;border-radius:50%;background:#f1eee7;color:#45483f;font-size:23px;line-height:1}
+.admin-editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+@media(max-width:520px){.admin-product-editor{padding:24px 18px}.admin-product-editor .admin-form-grid{grid-template-columns:1fr}}
