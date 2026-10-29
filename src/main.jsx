@@ -452,8 +452,15 @@ function App() {
       const checkoutItems=checkoutItem.items||[checkoutItem];
       const orderItems=checkoutItems.map(product=>({product_id:product.id,name:product.name,unit_price:Number(product.price),quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}));
       const total=orderItems.reduce((sum,product)=>sum+product.unit_price*product.quantity,0);
+      const {data:customer,error:customerError}=await supabase.from("customers").upsert({
+        auth_user_id:user.id,
+        full_name:String(details.customer_name||"").trim(),
+        email:String(details.email||"").trim(),
+        phone:String(details.phone||"").trim()
+      },{onConflict:"auth_user_id"}).select("id").single();
+      if(customerError||!customer)return "We could not save your customer details: "+(customerError?.message||"Please try again.");
       const {error}=await supabase.from("orders").insert({
-        customer_id:user.id,
+        customer_id:customer.id,
         subtotal:total,
         shipping_cost:0,
         total,
