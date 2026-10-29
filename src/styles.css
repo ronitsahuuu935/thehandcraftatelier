@@ -151,3 +151,5 @@ html{scrollbar-width:none}html::-webkit-scrollbar{display:none;width:0;height:0}
 .admin-placeholder-card p{margin:0 auto 24px;max-width:360px;color:var(--muted);font-size:13px;line-height:1.7}
 .admin-placeholder-card .story-cta{border:0}
 @media(max-width:620px){.admin-placeholder-card{padding:42px 24px}.admin-placeholder-card h1{font-size:44px}}
+
+.checkout-order-error{margin:14px 0;padding:11px 13px;border:1px solid #e4b5a8;border-radius:6px;background:#fff1eb;color:#873e2d;font-size:12px;line-height:1.5}

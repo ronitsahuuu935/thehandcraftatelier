@@ -17,6 +17,13 @@
 .admin-top-actions{display:flex;align-items:center;gap:10px;font-size:13px}
 .admin-notifications{position:relative;border:0;background:transparent;padding:6px;color:var(--admin-ink)}
 .admin-notifications i{position:absolute;right:4px;top:4px;width:7px;height:7px;border-radius:50%;background:#c84e38}
+.admin-notification-wrap{position:relative;display:flex;align-items:center}
+.admin-notification-popover{position:absolute;z-index:80;top:calc(100% + 14px);right:-84px;width:min(360px,calc(100vw - 28px));max-height:420px;overflow:auto;padding:14px;border:1px solid var(--admin-line);border-radius:10px;background:#fffdf9;box-shadow:0 18px 45px #2223;color:var(--admin-ink)}
+.admin-notification-popover h3{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:500}
+.admin-notification-popover>button{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:4px;padding:10px 2px;border:0;border-top:1px solid var(--admin-line);background:transparent;text-align:left;color:inherit}
+.admin-notification-popover>button:hover{background:#f5f2e9}
+.admin-notification-popover b{font-size:11px}
+.admin-notification-popover span,.admin-notification-popover small,.admin-notification-popover p{font-size:10px;color:var(--admin-muted);line-height:1.45}
 .admin-avatar{width:36px;height:36px;border-radius:50%;background:#536247;color:white;display:grid;place-items:center;font-size:15px}
 .admin-user-name{font-weight:500}
 .admin-store-link{display:flex;align-items:center;gap:6px;margin-left:10px;padding:8px 10px;border:1px solid var(--admin-line);border-radius:7px;background:transparent;color:var(--admin-ink);font-size:11px}
@@ -158,3 +165,5 @@
 .admin-modal-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:0;border-radius:50%;background:#f1eee7;color:#45483f;font-size:23px;line-height:1}
 .admin-editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
 @media(max-width:520px){.admin-product-editor{padding:24px 18px}.admin-product-editor .admin-form-grid{grid-template-columns:1fr}}
+
+.admin-table-card .admin-toolbar select:focus,.admin-table-card .admin-toolbar select:focus-visible{outline:none;box-shadow:none;border-color:var(--admin-line)}

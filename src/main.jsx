@@ -77,12 +77,12 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
   </header>;
 }
 
-function CartDrawer({ cart, onClose, onRemove, onQuantityChange }) {
+function CartDrawer({ cart, onClose, onRemove, onQuantityChange, onCheckout }) {
   const subtotal = cart.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
   return <aside className="cart-drawer" aria-label="Shopping bag">
     <div className="cart-drawer-head"><div><span className="eyebrow">YOUR ATELIER BAG</span><h2>Your bag <small>({cart.reduce((n, item) => n + (item.quantity || 1), 0)})</small></h2></div><button className="cart-close" aria-label="Close shopping bag" onClick={onClose}><X size={20}/></button></div>
     {cart.length===0 ? <div className="cart-empty"><ShoppingBag size={30}/><p>Your bag is waiting for something lovely.</p><button className="story-cta" onClick={onClose}>Continue shopping <ArrowRight size={15}/></button></div> :
-      <><div className="cart-items">{cart.map((item,index)=><article className="cart-item" key={`${item.id}-${item.size||""}-${item.personalization||""}-${index}`}><img src={item.image} alt={item.name}/><div className="cart-item-info"><h3>{item.name}</h3>{item.size&&<small>Size: {item.size}</small>}{item.personalization&&<small>Personalized: {item.personalization}</small>}<strong>{money(item.price)}</strong><div className="cart-item-actions"><div className="quantity"><button aria-label="Decrease quantity" onClick={()=>onQuantityChange(index,-1)}><Minus size={13}/></button><span>{item.quantity||1}</span><button aria-label="Increase quantity" onClick={()=>onQuantityChange(index,1)}><Plus size={13}/></button></div><button className="cart-remove" onClick={()=>onRemove(index)}>Remove</button></div></div></article>)}</div><div className="cart-summary"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><small>Shipping calculated at checkout. Complimentary shipping above ₹2,000.</small><button className="story-cta cart-checkout">Proceed to checkout <ArrowRight size={15}/></button></div></>}
+      <><div className="cart-items">{cart.map((item,index)=><article className="cart-item" key={`${item.id}-${item.size||""}-${item.personalization||""}-${index}`}><img src={item.image} alt={item.name}/><div className="cart-item-info"><h3>{item.name}</h3>{item.size&&<small>Size: {item.size}</small>}{item.personalization&&<small>Personalized: {item.personalization}</small>}<strong>{money(item.price)}</strong><div className="cart-item-actions"><div className="quantity"><button aria-label="Decrease quantity" onClick={()=>onQuantityChange(index,-1)}><Minus size={13}/></button><span>{item.quantity||1}</span><button aria-label="Increase quantity" onClick={()=>onQuantityChange(index,1)}><Plus size={13}/></button></div><button className="cart-remove" onClick={()=>onRemove(index)}>Remove</button></div></div></article>)}</div><div className="cart-summary"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><small>Shipping calculated at checkout. Complimentary shipping above ₹2,000.</small><button className="story-cta cart-checkout" onClick={onCheckout}>Proceed to checkout <ArrowRight size={15}/></button></div></>}
   </aside>;
 }
 
@@ -225,11 +225,14 @@ function GoogleSignInScreen({ onGoogleSignIn }) {
 
 function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [pin, setPin] = useState("");
   const [locationStatus, setLocationStatus] = useState("");
-  const quantity = item.quantity || 1;
+  const checkoutItems = item.items || [item];
+  const orderTotal = checkoutItems.reduce((total, product) => total + Number(product.price || 0) * (product.quantity || 1), 0);
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
       setLocationStatus("Location access is not supported by this browser.");
@@ -270,13 +273,28 @@ function Checkout({ item, onBack, onPlaceOrder, user, onGoogleSignIn }) {
       setLocationStatus(message);
     }, { enableHighAccuracy: true, timeout: 10000 });
   };
+  const submitOrder = async event => {
+    event.preventDefault();
+    setSubmitting(true);
+    setSubmitError("");
+    const details = Object.fromEntries(new FormData(event.currentTarget).entries());
+    try {
+      const error = await onPlaceOrder(details);
+      if (error) setSubmitError(error);
+      else setSubmitted(true);
+    } catch {
+      setSubmitError("We could not save your order. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return <main className="checkout-page">
     {user && <div className="checkout-heading"><span className="eyebrow">A THOUGHTFUL CHECKOUT</span><h1>Complete your order</h1><p>Your handmade piece is almost on its way.</p></div>}
     {!user ? <GoogleSignInScreen onGoogleSignIn={onGoogleSignIn}/> :
     submitted ? <section className="checkout-success"><span>✓</span><h2>Thank you for your order.</h2><p>We have received your details and will be in touch shortly.</p><button className="story-cta" onClick={onBack}>Continue shopping <ArrowRight size={15}/></button></section> :
-      <form className="checkout-layout" onSubmit={e=>{e.preventDefault();setSubmitted(true);onPlaceOrder();}}>
-        <section className="checkout-form"><h2>Delivery details</h2><button className="text-link" type="button" onClick={useCurrentLocation}>Use my current location <ArrowRight size={15}/></button>{locationStatus&&<small role="status">{locationStatus}</small>}<div className="checkout-fields"><label>Full name<input required autoComplete="name" placeholder="Your full name"/></label><label>Email address<input required type="email" autoComplete="email" placeholder="you@example.com"/></label><label>Phone number<input required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Address<input required autoComplete="street-address" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>City<input required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>PIN code<input required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="000000" value={pin} onChange={event=>setPin(event.target.value)}/></label></div><h2 className="payment-title">Payment</h2><div className="payment-note">Cash on delivery and payment instructions will be confirmed with you after placing the order.</div><button className="story-cta checkout-submit" type="submit">Place order <ArrowRight size={15}/></button></section>
-        <aside className="checkout-summary"><h2>Order summary</h2><div className="checkout-product"><img src={item.image} alt={item.name}/><div><h3>{item.name}</h3>{item.size&&<small>Size: {item.size}</small>}{item.personalization&&<small>Personalized: {item.personalization}</small>}<p>{money(item.price)} × {quantity}</p></div></div><div className="checkout-total"><span>Subtotal</span><strong>{money(item.price*quantity)}</strong></div><small>Complimentary shipping on orders above ₹2,000.</small></aside>
+      <form className="checkout-layout" onSubmit={submitOrder}>
+        <section className="checkout-form"><h2>Delivery details</h2><button className="text-link" type="button" onClick={useCurrentLocation}>Use my current location <ArrowRight size={15}/></button>{locationStatus&&<small role="status">{locationStatus}</small>}<div className="checkout-fields"><label>Full name<input name="customer_name" required autoComplete="name" placeholder="Your full name"/></label><label>Email address<input name="email" required type="email" autoComplete="email" placeholder="you@example.com"/></label><label>Phone number<input name="phone" required type="tel" autoComplete="tel" placeholder="+91 00000 00000"/></label><label>Address<input name="address" required autoComplete="street-address" placeholder="House number and street" value={address} onChange={event=>setAddress(event.target.value)}/></label><label>City<input name="city" required autoComplete="address-level2" placeholder="Your city" value={city} onChange={event=>setCity(event.target.value)}/></label><label>PIN code<input name="postal_code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="postal-code" placeholder="000000" value={pin} onChange={event=>setPin(event.target.value)}/></label></div><h2 className="payment-title">Payment</h2><div className="payment-note">Cash on delivery and payment instructions will be confirmed with you after placing the order.</div>{submitError&&<p className="checkout-order-error" role="alert">{submitError}</p>}<button className="story-cta checkout-submit" type="submit" disabled={submitting}>{submitting?"Placing order…":"Place order"} <ArrowRight size={15}/></button></section>
+        <aside className="checkout-summary"><h2>Order summary</h2>{checkoutItems.map((product,index)=><div className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<p>{money(product.price)} × {product.quantity||1}</p></div></div>)}<div className="checkout-total"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div><small>Complimentary shipping on orders above ₹2,000.</small></aside>
       </form>}
   </main>;
 }
@@ -407,7 +425,8 @@ function App() {
   const navigate = (next,product) => { if(product) setSelected(product); setPage(next); window.scrollTo({top:0,behavior:"smooth"}); };
   const goShop = (cat="All pieces") => { setCategory(cat); navigate("shop"); };
   const goSection = id => { setPage("home"); setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:"smooth"}),80); };
-  const buyNow = product => { setCheckoutItem(product); setBagOpen(false); navigate("checkout"); };
+  const buyNow = product => { setCheckoutItem({items:[product]}); setBagOpen(false); navigate("checkout"); };
+  const checkoutCart = () => { setCheckoutItem({items:cart}); setBagOpen(false); navigate("checkout"); };
   const add = product => {
     setCart(old => {
       const match = old.findIndex(item => item.id === product.id && item.size === product.size && item.personalization === product.personalization);
@@ -424,10 +443,18 @@ function App() {
     {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog}/>}
     {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog}/>}
     {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog}/>}
-    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onPlaceOrder={()=>{}} user={user} onGoogleSignIn={signInWithGoogle}/>}
+    {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} onBack={()=>navigate("home")} onPlaceOrder={async details=>{
+      if(!supabase)return "Order placement is unavailable because Supabase is not configured.";
+      const checkoutItems=checkoutItem.items||[checkoutItem];
+      const orderItems=checkoutItems.map(product=>({product_id:product.id,name:product.name,unit_price:Number(product.price),quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}));
+      const total=orderItems.reduce((sum,product)=>sum+product.unit_price*product.quantity,0);
+      const {error}=await supabase.from("orders").insert({customer_id:user.id,customer_name:String(details.customer_name||"").trim(),email:String(details.email||"").trim(),phone:String(details.phone||"").trim(),address:String(details.address||"").trim(),city:String(details.city||"").trim(),postal_code:String(details.postal_code||"").trim(),items:orderItems,total,payment_method:"Cash on delivery",status:"Pending confirmation"});
+      if(!error)setCart([]);
+      return error?"We could not save your order: "+error.message:null;
+    }} user={user} onGoogleSignIn={signInWithGoogle}/>}
     <Footer goShop={goShop}/>
     <FloatingSocials/>
-    {bagOpen&&<><button className="cart-backdrop" aria-label="Close shopping bag" onClick={()=>setBagOpen(false)}/><CartDrawer cart={cart} onClose={()=>setBagOpen(false)} onRemove={removeFromCart} onQuantityChange={changeCartQuantity}/></>}
+    {bagOpen&&<><button className="cart-backdrop" aria-label="Close shopping bag" onClick={()=>setBagOpen(false)}/><CartDrawer cart={cart} onClose={()=>setBagOpen(false)} onRemove={removeFromCart} onQuantityChange={changeCartQuantity} onCheckout={checkoutCart}/></>}
     {toast&&<div className="cart-toast" role="status"><ShoppingBag size={16}/><span>Added to your bag</span><button onClick={()=>setToast(false)}>Dismiss</button></div>}
   </>;
 }
