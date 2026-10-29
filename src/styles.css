@@ -270,7 +270,7 @@ html{scrollbar-width:none}html::-webkit-scrollbar{display:none;width:0;height:0}
 .account-empty-address{margin:0;color:#747e77;font-size:11px;line-height:1.6}
 .account-signout{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:11px;border:1px solid #ead7d2;border-radius:8px;background:#fff8f5;color:#a65e51;font-size:11px;font-weight:500}
 .account-signout:hover{background:#fbece7}
-@media(max-width:620px){.header-actions .profile-trigger{display:flex!important}.account-backdrop{padding:calc(32px + 76px + 8px) 10px 14px}.account-panel{width:min(410px,100%);max-height:calc(100dvh - 128px);padding:19px;border-radius:14px}}
+@media(max-width:620px){.header-actions .profile-trigger{display:flex!important}.account-backdrop{padding:calc(32px + 76px + 8px) 10px 14px}.account-panel{width:min(410px,100%);max-height:calc(100dvh - 128px);padding:19px;border-radius:14px}.account-order-actions{align-items:flex-start}}
 
 .customer-account-page{display:grid;grid-template-columns:220px minmax(0,1fr) 300px;gap:16px;max-width:1600px;margin:0 auto;padding:20px 2.5% 48px;background:linear-gradient(135deg,#f8f6ee 0%,#f5f3eb 48%,#faf8f2 100%);color:#243832;min-height:calc(100vh - 186px)}
 .customer-account-sidebar,.customer-account-card,.customer-profile-hero{border:1px solid #e5e1d6;border-radius:10px;background:#fffefa}
@@ -319,6 +319,7 @@ html{scrollbar-width:none}html::-webkit-scrollbar{display:none;width:0;height:0}
 .account-order-status{padding:6px 9px;border-radius:20px;background:#edf2e8;color:#476647;font-size:9px;text-transform:capitalize;white-space:nowrap}
 .account-order-status.status-shipped,.account-order-status.status-processing{background:#e9f1f7;color:#4a6780}
 .account-order-status.status-cancelled,.account-order-status.status-rejected{background:#fbe9e4;color:#a85648}
+.account-order-actions{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.account-received-button{padding:7px 9px;border:1px solid #cbd9c1;border-radius:6px;background:#eef3e9;color:#456047;font-size:9px;white-space:nowrap}.account-received-button:hover{background:#e2ebdc}.account-received-button:disabled{cursor:wait;opacity:.65}.customer-delivery-message{margin:0 0 12px;padding:10px 12px;border-radius:7px;background:#eef2e8;color:#486047;font-size:11px;line-height:1.5}
 .account-orders-empty{display:grid;justify-items:center;gap:7px;padding:35px 14px;color:#758466;text-align:center}
 .account-orders-empty h3{margin:0;color:#283d35;font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:500}
 .account-orders-empty p{margin:0;color:#808b83;font-size:11px;line-height:1.5}

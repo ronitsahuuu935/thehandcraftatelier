@@ -93,6 +93,8 @@ function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onS
   const [reviewText, setReviewText] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
   const [reviewBusy, setReviewBusy] = useState(false);
+  const [deliveryBusy, setDeliveryBusy] = useState("");
+  const [deliveryMessage, setDeliveryMessage] = useState("");
   const name = customerProfile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Your account";
   const email = customerProfile?.email || user?.email || "Not added yet";
   const phone = customerProfile?.phone || user?.phone || "Not added yet";
@@ -162,6 +164,28 @@ function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onS
       return product && !reviewedPurchases.includes(key) ? { order, item, product, key } : null;
     }).filter(Boolean));
   const uniqueEligibleReviews = eligibleReviews.filter((candidate, index) => eligibleReviews.findIndex(value => value.key === candidate.key) === index);
+  const markPackageReceived = async order => {
+    if (!supabase || deliveryBusy) return;
+    setDeliveryBusy(order.id);
+    setDeliveryMessage("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Sign in again to update your order.");
+      const response = await fetch("/api/customer-orders", {
+        method: "PATCH",
+        headers: { "content-type": "application/json", authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ orderId: order.id })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "We could not update this order.");
+      setOrders(current => current.map(item => item.id === order.id ? { ...item, status: "delivered" } : item));
+      setDeliveryMessage("Thank you. Your package has been marked as received.");
+    } catch (error) {
+      setDeliveryMessage(error instanceof Error ? error.message : "We could not update this order.");
+    } finally {
+      setDeliveryBusy("");
+    }
+  };
   const submitReview = async event => {
     event.preventDefault();
     if (!reviewing || !supabase) return;
@@ -202,7 +226,7 @@ function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onS
     : ordersError
       ? <div className="account-orders-empty"><Package size={24}/><h3>Orders unavailable</h3><p>{ordersError}</p></div>
       : orders.length
-        ? <div className="account-order-list">{(section === "orders" ? orders : orders.slice(0, 5)).map(order => {
+        ? <>{deliveryMessage && <p className="customer-delivery-message" role="status">{deliveryMessage}</p>}<div className="account-order-list">{(section === "orders" ? orders : orders.slice(0, 5)).map(order => {
           const firstItem = order.items[0];
           const product = productCatalog.find(item => String(item.id) === String(firstItem?.product_id));
           const orderName = firstItem?.name || "Handcrafted order";
@@ -213,9 +237,9 @@ function CustomerAccount({ user, customerProfile, productCatalog, onSignOut, onS
             <div className="account-order-id"><strong>#{String(order.id).slice(0, 8)}</strong><small>{new Date(order.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</small></div>
             <div className="account-order-items"><span>{orderName}{order.items.length > 1 ? ` + ${order.items.length - 1} more` : ""}</span><small>{itemCount} {itemCount === 1 ? "item" : "items"}</small></div>
             <strong className="account-order-total">{money(Number(order.total || 0))}</strong>
-            <span className={`account-order-status status-${status.toLowerCase().replaceAll(" ", "-")}`}>{status}</span>
+            <div className="account-order-actions"><span className={`account-order-status status-${status.toLowerCase().replaceAll(" ", "-")}`}>{status}</span>{String(order.status || "").toLowerCase() === "shipped" && <button className="account-received-button" type="button" onClick={() => markPackageReceived(order)} disabled={deliveryBusy === order.id}>{deliveryBusy === order.id ? "Updating…" : "Package received"}</button>}</div>
           </article>;
-        })}</div>
+        })}</div></>
         : <div className="account-orders-empty"><Package size={24}/><h3>No orders yet</h3><p>Your orders will appear here after you place one.</p><button className="account-edit-button" onClick={onShop}>Explore the collection <ArrowRight size={15}/></button></div>;
 
   return <main className="customer-account-page">
