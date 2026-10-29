@@ -127,10 +127,10 @@ function AdminPanel({products=[],onProductsChange,onExit}){
   if(!supabase||!sessionUser)return;
   let active=true;
   const loadOrders=async()=>{
-   const {data,error}=await supabase.from("orders").select("id,recipient_name,recipient_email,recipient_phone,shipping_address_line1,shipping_city,shipping_postal_code,items,total,payment_method,payment_status,cashfree_order_id,cashfree_refund_id,refund_status,rejection_reason,status,created_at").order("created_at",{ascending:false}).limit(30);
+   const {data,error}=await supabase.from("orders").select("id,recipient_name,recipient_email,recipient_phone,shipping_address_line1,shipping_city,shipping_postal_code,items,total,payment_method,payment_status,cashfree_order_id,cashfree_refund_id,refund_status,rejection_reason,status,created_at").neq("status","Rejected").order("created_at",{ascending:false}).limit(30);
    if(!active)return;
    if(error){setCatalogError("Could not load sales notifications. Apply the latest Supabase migration, then refresh. Details: "+error.message);return;}
-   setOrders((data||[]).map(order=>({...order,name:order.recipient_name,email:order.recipient_email,phone:order.recipient_phone,address:order.shipping_address_line1,city:order.shipping_city,postal_code:order.shipping_postal_code,date:new Date(order.created_at).toLocaleDateString(),method:order.payment_method,total:Number(order.total),items:Array.isArray(order.items)?order.items:[]})));
+   setOrders((data||[]).filter(order=>String(order.status||"").toLowerCase()!=="rejected").map(order=>({...order,name:order.recipient_name,email:order.recipient_email,phone:order.recipient_phone,address:order.shipping_address_line1,city:order.shipping_city,postal_code:order.shipping_postal_code,date:new Date(order.created_at).toLocaleDateString(),method:order.payment_method,total:Number(order.total),items:Array.isArray(order.items)?order.items:[]})));
   };
   loadOrders();
   const timer=window.setInterval(loadOrders,30000);
@@ -150,7 +150,7 @@ function AdminPanel({products=[],onProductsChange,onExit}){
    const response=await fetch("/api/admin/orders/reject",{method:"POST",headers:{"content-type":"application/json",authorization:`Bearer ${session.access_token}`},body:JSON.stringify({orderId:rejectingOrder.id,reason:rejectionReason.trim()})});
    const result=await response.json().catch(()=>({}));
    if(!response.ok)throw new Error(result.error||"Could not reject this order.");
-   setOrders(current=>current.map(order=>order.id===rejectingOrder.id?{...order,status:result.status||"Rejected",refund_status:result.refundStatus||"not_required",cashfree_refund_id:result.refundId||order.cashfree_refund_id,rejection_reason:rejectionReason.trim()}:order));
+   setOrders(current=>current.filter(order=>order.id!==rejectingOrder.id));
    setRejectingOrder(null);
    setNotice(result.refundStatus==="manual_required"?"Order rejected. A manual refund is required for this paid COD order.":result.refundStatus&&result.refundStatus!=="not_required"?`Order rejected. Refund status: ${result.refundStatus}.`:"Order rejected. No refund was needed because no online payment was captured.");
   }catch(error){setRejectionError(error instanceof Error?error.message:"Could not reject this order. Please try again.");}
@@ -158,7 +158,7 @@ function AdminPanel({products=[],onProductsChange,onExit}){
  };
  if(!authReady)return <div className="admin-login-screen"><div className="admin-login-card"><span className="admin-login-mark"><Leaf size={25}/></span><p>THE HANDCRAFT ATELIER</p><h1>Opening your atelier…</h1></div></div>;
  if(!sessionUser)return <main className="admin-login-screen"><form className="admin-login-card" onSubmit={handleAdminLogin}><span className="admin-login-mark"><Leaf size={25}/></span><p className="admin-login-eyebrow">THE HANDCRAFT ATELIER</p><h1>Welcome back</h1><p className="admin-login-subtitle">Sign in to access your atelier dashboard.</p><label>Username<input value={loginName} onChange={e=>setLoginName(e.target.value)} autoComplete="username" required placeholder="Your admin email" type="email"/></label><label>Password<span className="admin-password-field"><input value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} autoComplete="current-password" required placeholder="Enter your password" type={showPassword?"text":"password"}/><button type="button" onClick={()=>setShowPassword(value=>!value)} aria-label={showPassword?"Hide password":"Show password"} aria-pressed={showPassword}>{showPassword?<EyeOff size={18}/>:<Eye size={18}/>}</button></span></label>{loginError&&<p className="admin-login-error" role="alert">{loginError}</p>}<button className="admin-primary-button" disabled={loginBusy}>{loginBusy?"Signing in…":"Sign in"}</button><small>Use the administrator account created in Supabase Auth.</small></form></main>;
- const shownOrders=orders.filter(r=>match(r,["id","name","email","status","method"]));
+ const shownOrders=orders.filter(r=>String(r.status||"").toLowerCase()!=="rejected"&&match(r,["id","name","email","status","method"]));
  const setPageTo=id=>{setPage(id);setQuery("");setMenu(false);setNotice("");};
  const heading=(action,onAction)=><div className="admin-page-heading"><div><h1>{page[0].toUpperCase()+page.slice(1).replaceAll("-"," ") } <Leaf size={21}/></h1><p>{copy[page]}</p></div>{action&&<button className="admin-primary-button" onClick={onAction}><Plus size={16}/>{action}</button>}</div>;
  const metrics=children=><div className="admin-metrics">{children}</div>;

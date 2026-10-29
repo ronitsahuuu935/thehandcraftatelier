@@ -59,7 +59,7 @@ export default async function createCashfreeOrder(request, response) {
     });
   }
   const total = Math.round(orderItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0) * 100) / 100;
-  if (!Number.isFinite(total) || total < 1) return response.status(400).json({ error: "The order total is not valid for online payment." });
+  if (!Number.isFinite(total) || total < 200) return response.status(400).json({ error: "The minimum order total for online payment is ₹200." });
 
   const { data: customer, error: customerError } = await admin.from("customers").upsert({
     auth_user_id: user.id,

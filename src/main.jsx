@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck } from "lucide-react";
+import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck, Phone, Mail, LogOut } from "lucide-react";
 import "./styles.css";
 import { googleMapsApiKey, productStorageBucket, supabase } from "./lib/supabase";
 import AdminPanel from "./AdminPanel";
@@ -60,6 +60,16 @@ const PENDING_CHECKOUT_KEY = "pending-checkout";
 function Header({ page, navigate, goShop, goSection, cartCount, search, setSearch, onBag, user, customerProfile, onGoogleSignIn, onSignOut }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  useEffect(() => {
+    if (!profileOpen) return;
+    const closeOnEscape = event => { if (event.key === "Escape") setProfileOpen(false); };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [profileOpen]);
+  const profileName = customerProfile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || "Your account";
+  const profileEmail = customerProfile?.email || user?.email || "Not added yet";
+  const profilePhone = customerProfile?.phone || user?.phone || "Not added yet";
+  const hasAddress = Boolean(customerProfile?.address_line1 || customerProfile?.city || customerProfile?.state || customerProfile?.postal_code);
   return <header className="site-header">
     <div className="announcement">A little love, in every stitch. Complimentary shipping on orders ₹2,000+</div>
     <div className="brandbar">
@@ -67,8 +77,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <button className="wordmark" onClick={() => navigate("home")}><span>The Hand Craft Atelier</span><small>HANDMADE · HEARTFELT · FOREVER</small></button>
       <div className="search-inline"><Search size={17}/><input placeholder="Find something lovely" aria-label="Search products" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value && page === "product") navigate("shop"); }} /></div>
       <div className="header-actions">
-        <button className="icon-btn" aria-label={user ? "Open your account" : "Sign in with Google"} title={user ? "Open your account" : "Sign in with Google"} onClick={() => user ? setProfileOpen(value => !value) : onGoogleSignIn}><UserRound/></button>
-        {profileOpen&&user&&<div className="profile-popover" role="dialog" aria-label="Your account"><strong>{customerProfile?.full_name||user.user_metadata?.full_name||"Your account"}</strong><small>{user.email}</small>{customerProfile?.address_line1&&<p>{[customerProfile.address_line1,customerProfile.city,customerProfile.postal_code].filter(Boolean).join(", ")}</p>}<button type="button" onClick={()=>{setProfileOpen(false);navigate("checkout");}}>View saved checkout details</button><button type="button" onClick={onSignOut}>Sign out</button></div>}
+        <button className={user ? "icon-btn profile-trigger signed-in" : "icon-btn profile-trigger"} aria-label={user ? "Open your account details" : "Sign in with Google"} title={user ? "Your account" : "Sign in with Google"} aria-haspopup={user ? "dialog" : undefined} aria-expanded={user ? profileOpen : undefined} onClick={() => user ? setProfileOpen(value => !value) : onGoogleSignIn}><UserRound/></button>
         <button className="icon-btn" aria-label="Wishlist"><Heart/></button>
         <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}><ShoppingBag/><span>{cartCount}</span></button>
       </div>
@@ -80,6 +89,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, search, setSearc
       <button onClick={() => {goShop("Personalized");setMenuOpen(false)}}>Personalized</button>
       <button onClick={() => {goSection("story");setMenuOpen(false)}}>Our Story</button>
     </nav>
+    {profileOpen&&user&&<div className="account-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setProfileOpen(false);}}><section className="account-panel" role="dialog" aria-modal="true" aria-labelledby="account-title"><div className="account-panel-heading"><span className="account-avatar"><UserRound size={22}/></span><div><small>THE HANDCRAFT ATELIER</small><h2 id="account-title">Your account</h2></div><button className="account-close" type="button" aria-label="Close account details" onClick={()=>setProfileOpen(false)}><X size={18}/></button></div><div className="account-welcome"><strong>{profileName}</strong><span>Your personal and delivery details</span></div><section className="account-detail-section" aria-label="Contact details"><h3>Contact details</h3><div className="account-detail-row"><Mail size={16}/><div><small>Email address</small><span>{profileEmail}</span></div></div><div className="account-detail-row"><Phone size={16}/><div><small>Phone number</small><span>{profilePhone}</span></div></div></section><section className="account-detail-section" aria-label="Delivery address"><h3>Delivery address</h3>{hasAddress?<><div className="account-detail-row"><MapPin size={16}/><div><small>Address</small><span>{[customerProfile?.address_line1,customerProfile?.address_line2].filter(Boolean).join(", ")||"Not added yet"}</span></div></div><div className="account-address-grid"><div><small>City</small><span>{customerProfile?.city||"Not added yet"}</span></div><div><small>State / UT</small><span>{customerProfile?.state||"Not added yet"}</span></div><div><small>PIN code</small><span>{customerProfile?.postal_code||"Not added yet"}</span></div></div></>:<p className="account-empty-address">No delivery address saved yet. Your details will appear here after checkout.</p>}</section><button className="account-signout" type="button" onClick={()=>{setProfileOpen(false);onSignOut();}}><LogOut size={16}/> Sign out</button></section></div>}
   </header>;
 }
 
@@ -307,6 +317,10 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
       return;
     }
     if (activeStep !== 3) return;
+    if (orderTotal < 200) {
+      setSubmitError("The minimum order total for online payment is ₹200.");
+      return;
+    }
     setSubmitting(true);
     setSubmitError("");
     const details = Object.fromEntries(new FormData(event.currentTarget).entries());
