@@ -13,7 +13,7 @@ const SOCIAL = {
   whatsapp: "https://wa.me/7877642926"
 };
 const images = {
-  logo: IMG + "logo.png",
+  logo: IMG + "logo.webp",
   heroBg: IMG + "hero-bg.webp",
   needle: IMG + "needle.webp",
   artisan: IMG + "model.webp",
