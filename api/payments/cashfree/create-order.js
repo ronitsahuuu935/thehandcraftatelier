@@ -34,7 +34,7 @@ export default async function createCashfreeOrder(request, response) {
   if (!productIds.length) return response.status(400).json({ error: "The cart contains an invalid product." });
   const admin = getAdminClient(config);
   const { data: products, error: productsError } = await admin.from("products")
-    .select("id,name,price,category")
+    .select("id,name,price,category,sizes,gallery")
     .in("id", productIds);
   if (productsError) {
     console.error("Cashfree checkout could not load catalog prices", productsError.message);
@@ -48,13 +48,20 @@ export default async function createCashfreeOrder(request, response) {
     if (!product || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
       return response.status(400).json({ error: "A product in your cart is unavailable or has an invalid quantity." });
     }
+    const selectedSize = clean(item.size);
+    const availableSizes = Array.isArray(product.sizes) && product.sizes.length ? product.sizes : ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+    if (selectedSize && !availableSizes.includes(selectedSize)) return response.status(400).json({ error: "The selected size is not available for this product." });
+    const selectedColor = clean(item.color);
+    const availableColors = [...new Set((Array.isArray(product.gallery) ? product.gallery : []).map(image => clean(image?.color)).filter(Boolean))];
+    if (selectedColor && availableColors.length && !availableColors.includes(selectedColor)) return response.status(400).json({ error: "The selected color is not available for this product." });
     orderItems.push({
       product_id: product.id,
       name: product.name,
       category: product.category,
       unit_price: Number(product.price),
       quantity,
-      size: clean(item.size) || null,
+      size: selectedSize || null,
+      color: selectedColor || null,
       personalization: clean(item.personalization) || null
     });
   }

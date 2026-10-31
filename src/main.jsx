@@ -29,8 +29,7 @@ const images = {
   whatsapp: IMG + "whatsapp.webp"
 };
 const CATEGORIES = ["Shirts", "Tops & Tees", "Kids", "Personalized"];
-const ADULT_SIZES = ["S", "M", "L", "XL"];
-const KIDS_SIZES = ["2-3 yrs", "4-5 yrs", "6-7 yrs"];
+const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 const INDIAN_STATES_AND_UTS = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
   "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
@@ -66,7 +65,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, wishlistCount, s
       <button className="wordmark" onClick={() => navigate("home")}><span>The Hand Craft Atelier</span><small>HANDMADE · HEARTFELT · FOREVER</small></button>
       <div className="search-inline"><Search size={17}/><input placeholder="Find something lovely" aria-label="Search products" value={search} onChange={e => { setSearch(e.target.value); if (e.target.value && page === "product") navigate("shop"); }} /></div>
       <div className="header-actions">
-        <button className={user ? "icon-btn profile-trigger signed-in" : "icon-btn profile-trigger"} aria-label={user ? "Open your account" : "Sign in with Google"} title={user ? "My profile" : "Sign in with Google"} onClick={() => user ? navigate("account") : onGoogleSignIn}><UserRound/></button>
+        <button className={user ? "icon-btn profile-trigger signed-in" : "icon-btn profile-trigger"} aria-label={user ? "Open your account" : "Sign in to your account"} title={user ? "My profile" : "Sign in to your account"} onClick={() => navigate("account")}><UserRound/></button>
         <button className="icon-btn wishlist-header-button" aria-label="Open wishlist" title="Wishlist" onClick={onWishlist}><Heart/><span>{wishlistCount}</span></button>
         <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}><ShoppingBag/><span>{cartCount}</span></button>
       </div>
@@ -76,7 +75,6 @@ function Header({ page, navigate, goShop, goSection, cartCount, wishlistCount, s
       <button className={page === "shop" ? "active" : ""} onClick={() => {goShop();setMenuOpen(false)}}>Shop</button>
       <button onClick={() => {goShop("Shirts");setMenuOpen(false)}}>Shirts</button>
       <button onClick={() => {goShop("Personalized");setMenuOpen(false)}}>Personalized</button>
-      <button onClick={() => {goSection("story");setMenuOpen(false)}}>Our Story</button>
     </nav>
   </header>;
 }
@@ -269,7 +267,7 @@ function CartDrawer({ cart, onClose, onRemove, onQuantityChange, onCheckout }) {
   return <aside className="cart-drawer" aria-label="Shopping bag">
     <div className="cart-drawer-head"><div><span className="eyebrow">YOUR ATELIER BAG</span><h2>Your bag <small>({cart.reduce((n, item) => n + (item.quantity || 1), 0)})</small></h2></div><button className="cart-close" aria-label="Close shopping bag" onClick={onClose}><X size={20}/></button></div>
     {cart.length===0 ? <div className="cart-empty"><ShoppingBag size={30}/><p>Your bag is waiting for something lovely.</p><button className="story-cta" onClick={onClose}>Continue shopping <ArrowRight size={15}/></button></div> :
-      <><div className="cart-items">{cart.map((item,index)=><article className="cart-item" key={`${item.id}-${item.size||""}-${item.personalization||""}-${index}`}><img src={item.image} alt={item.name}/><div className="cart-item-info"><h3>{item.name}</h3>{item.size&&<small>Size: {item.size}</small>}{item.personalization&&<small>Personalized: {item.personalization}</small>}<strong>{money(item.price)}</strong><div className="cart-item-actions"><div className="quantity"><button aria-label="Decrease quantity" onClick={()=>onQuantityChange(index,-1)}><Minus size={13}/></button><span>{item.quantity||1}</span><button aria-label="Increase quantity" onClick={()=>onQuantityChange(index,1)}><Plus size={13}/></button></div><button className="cart-remove" onClick={()=>onRemove(index)}>Remove</button></div></div></article>)}</div><div className="cart-summary"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><small>Shipping calculated at checkout. Complimentary shipping above ₹2,000.</small><button className="story-cta cart-checkout" onClick={onCheckout}>Proceed to checkout <ArrowRight size={15}/></button></div></>}
+      <><div className="cart-items">{cart.map((item,index)=><article className="cart-item" key={`${item.id}-${item.size||""}-${item.color||""}-${item.personalization||""}-${index}`}><img src={item.image} alt={item.name}/><div className="cart-item-info"><h3>{item.name}</h3>{item.size&&<small>Size: {item.size}</small>}{item.color&&<small>Color: {item.color}</small>}{item.personalization&&<small>Personalized: {item.personalization}</small>}<strong>{money(item.price)}</strong><div className="cart-item-actions"><div className="quantity"><button aria-label="Decrease quantity" onClick={()=>onQuantityChange(index,-1)}><Minus size={13}/></button><span>{item.quantity||1}</span><button aria-label="Increase quantity" onClick={()=>onQuantityChange(index,1)}><Plus size={13}/></button></div><button className="cart-remove" onClick={()=>onRemove(index)}>Remove</button></div></div></article>)}</div><div className="cart-summary"><div><span>Subtotal</span><strong>{money(subtotal)}</strong></div><small>Shipping calculated at checkout. Complimentary shipping above ₹2,000.</small><button className="story-cta cart-checkout" onClick={onCheckout}>Proceed to checkout <ArrowRight size={15}/></button></div></>}
   </aside>;
 }
 
@@ -292,8 +290,8 @@ function Footer({ goShop }) {
       <div className="footer-brand"><h3>The Hand Craft Atelier</h3><p className="tagline">Handmade · Heartfelt · Forever</p><p>Thoughtful keepsakes, stitched slowly. For the little moments and the people who mean everything.</p></div>
       <div><h4>EXPLORE</h4><a href="#shop" onClick={e=>{e.preventDefault();goShop()}}>Shop all</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Shirts")}}>Shirts</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Personalized")}}>Personalized</a></div>
       <div><h4>HERE TO HELP</h4><a>Contact us</a><a href="/policies/shipping.html" target="_blank" rel="noopener noreferrer">Shipping policy</a><a href="/policies/refund.html" target="_blank" rel="noopener noreferrer">Refund policy</a><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></div>
-      <div><h4>THE ATELIER</h4><a>Our story</a><a>Made slowly. Kept forever.</a></div>
     </section>
+    <div className="mobile-social-links"><a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer"><img src={images.instagram} alt=""/>Instagram</a><a href={SOCIAL.whatsapp} target="_blank" rel="noopener noreferrer"><img src={images.whatsapp} alt=""/>WhatsApp</a></div>
     <div className="legal"><span>© 2026 The Hand Craft Atelier. All lovingly reserved.</span></div>
   </footer>;
 }
@@ -328,7 +326,6 @@ function Home({ onOpen, onAdd, goShop, search, productCatalog, isWishlisted, onT
       ].map(([name,img])=><button className="category-card" key={name} onClick={()=>goShop(name)}><img src={img} alt=""/><span>{name}<small>Shop now ↗</small></span></button>)}
     </section>
     <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FROM THE ATELIER</span><h2>Featured Pieces</h2><p>Thoughtfully stitched designs from the collection.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
-    <section className="story-split" id="story"><div className="story-image"><img src={images.artisan} alt="Woman in a linen co-ord set standing among pink flowers" loading="lazy"/></div><div className="story-copy"><span className="story-leaf story-leaf-top">⌁</span><span className="eyebrow">A SLOWER KIND OF BEAUTY <i/></span><h2>More Than Just<br/>Products</h2><p>Every piece is a result of patience, skill and a deep love for traditional craftsmanship. Made slowly, to be treasured for years.</p><div className="story-benefits"><div><span><Leaf size={25} strokeWidth={1.6}/></span><strong>HANDCRAFTED<br/>WITH CARE</strong></div><div><span><Heart size={25} strokeWidth={1.6}/></span><strong>TIMELESS<br/>DESIGNS</strong></div><div><span><Leaf size={25} strokeWidth={1.6}/></span><strong>SUPPORTS<br/>ARTISANS</strong></div></div><button className="story-cta" onClick={()=>goShop()}>Shop the collection <ArrowRight size={17}/></button><span className="story-leaf story-leaf-bottom">⌁</span></div></section>
     <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FRESH FROM THE ATELIER</span><h2>New Arrivals</h2><p>Fresh designs for your special moments.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(4,8).length ? visible.slice(4,8) : visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
     <section className="testimonial">
       <div className="testimonial-copy"><span className="eyebrow"><Leaf size={24}/>OUR PROMISE</span><h2>Made with <em>thoughtful</em> detail</h2><blockquote><span className="quote-mark">“</span><span>Every piece is stitched slowly, with care in every detail.<br/>Made to be worn, gifted, and kept close.</span></blockquote><p className="testimonial-author"><span className="author-mark"><Leaf size={18}/></span> Handmade, heartfelt, forever</p></div>
@@ -363,26 +360,29 @@ function Shop({ onOpen, onAdd, search, category, setCategory, productCatalog, is
         {filtered.length===0&&<div className="empty-state">No pieces match those filters. Try clearing your filters.</div>}
       </section>
     </div>
-    <section className="gift-banner"><img src={images.gift} alt="Hand-embroidered hoop with a hand holding coral flowers on peach fabric" style={{objectPosition:"50% 58%"}} loading="lazy"/><div><span className="eyebrow">GIVE SOMETHING MEANINGFUL</span><h2>The Perfect Gift</h2><p>Thoughtful. Handmade. Meaningful.</p><button className="btn primary" onClick={()=>{setCategory("Personalized");window.scrollTo({top:450,behavior:"smooth"})}}>Explore gifts <ArrowRight size={15}/></button></div></section>
+    <section className="gift-banner"><img src={images.gift} alt="Hand-embroidered hoop with a hand holding coral flowers on peach fabric" style={{objectPosition:"50% 58%"}} loading="lazy"/><div><span className="eyebrow">GIVE SOMETHING MEANINGFUL</span><h2>The Perfect Gift</h2><p>Thoughtful. Handmade. Meaningful.</p></div></section>
   </main>;
 }
 
 function ProductDetail({ product, onAdd, onBuyNow, navigate, goShop, productCatalog, isWishlisted, onToggleWishlist }) {
-  const sizes = product.category === "Kids" ? KIDS_SIZES : ADULT_SIZES;
-  const [size,setSize] = useState(sizes[Math.min(1,sizes.length-1)]);
+  const sizes = Array.isArray(product.sizes)&&product.sizes.length?product.sizes:AVAILABLE_SIZES;
+  const colorOptions = [...new Set((product.gallery||[]).map(image=>String(image.color||"").trim()).filter(Boolean))];
+  const [size,setSize] = useState(sizes[0]);
+  const [color,setColor] = useState(colorOptions[0]||"");
   const [qty,setQty] = useState(1);
   const [activeTab,setActiveTab] = useState("Details");
   const [personalization,setPersonalization] = useState("");
   const gallery = product.gallery;
-  const [active,setActive] = useState(0);
+  const [active,setActive] = useState(Math.max(0,product.gallery.findIndex(image=>color&&String(image.color||"").trim()===color)));
   return <main className="detail-page">
     <div className="breadcrumbs">Home <span>/</span> Shop <span>/</span> {product.name}</div>
-    <div className="detail-layout"><div className={"detail-gallery"+(gallery.length>1?"":" single")}>{gallery.length>1&&<div className="thumbs">{gallery.map((src,i)=><button key={src.src} className={i===active?"chosen":""} aria-label={"View image "+(i+1)} onClick={()=>setActive(i)}><img src={src.src} alt="" style={{objectFit:src.contain?"contain":"cover"}}/></button>)}</div>}<div className="detail-main-image"><img src={gallery[active].src} alt={product.name} style={{objectFit:gallery[active].contain?"contain":"cover"}}/></div></div>
+    <div className="detail-layout"><div className={"detail-gallery"+(gallery.length>1?"":" single")}>{gallery.length>1&&<div className="thumbs">{gallery.map((src,i)=><button key={`${src.src}-${i}`} className={i===active?"chosen":""} aria-label={src.color?`View ${src.color} image`:`View image ${i+1}`} onClick={()=>{setActive(i);if(src.color)setColor(src.color);}}><img src={src.src} alt="" style={{objectFit:src.contain?"contain":"cover"}}/></button>)}</div>}<div className="detail-main-image"><img src={gallery[active]?.src||product.image} alt={product.name} style={{objectFit:gallery[active]?.contain?"contain":"cover"}}/></div></div>
       <div className="detail-info"><span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span><div className="detail-title-row"><h1>{product.name}</h1><button className={"wishlist detail-wishlist "+(isWishlisted(product.id)?"liked":"")} aria-label={isWishlisted(product.id)?"Remove from wishlist":"Add to wishlist"} onClick={()=>onToggleWishlist(product)}><Heart size={20} fill={isWishlisted(product.id)?"currentColor":"none"}/></button></div><p className="product-craft-note">Hand-embroidered with care</p><div className="detail-price">{money(product.price)}</div><p className="detail-description">Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear.</p>
         <div className="option-label">Size</div><div className="size-options">{sizes.map(s=><button key={s} className={size===s?"selected":""} onClick={()=>setSize(s)}>{s}</button>)}</div>
+        {colorOptions.length>0&&<><div className="option-label color-option-label">Color <strong>{color}</strong></div><div className="color-options">{colorOptions.map(name=><button type="button" key={name} className={color===name?"selected":""} onClick={()=>{setColor(name);const imageIndex=gallery.findIndex(image=>String(image.color||"").trim()===name);if(imageIndex>=0)setActive(imageIndex);}}>{name}</button>)}</div></>}
         <label className="personal-label">Personalization <span>Optional</span><input value={personalization} onChange={e=>setPersonalization(e.target.value)} placeholder="Add a name or short message"/></label>
         <div className="option-label">Quantity</div><div className="quantity"><button onClick={()=>setQty(Math.max(1,qty-1))}><Minus size={14}/></button><span>{qty}</span><button onClick={()=>setQty(qty+1)}><Plus size={14}/></button></div>
-        <button className="btn primary add-large" onClick={()=>onAdd({...product,quantity:qty,size,personalization})}>Add to bag — {money(product.price*qty)}</button><button className="btn secondary buy-large" onClick={()=>onBuyNow({...product,quantity:qty,size,personalization})}>Buy now</button>
+        <button className="btn primary add-large" onClick={()=>onAdd({...product,quantity:qty,size,color:color||null,personalization})}>Add to bag — {money(product.price*qty)}</button><button className="btn secondary buy-large" onClick={()=>onBuyNow({...product,quantity:qty,size,color:color||null,personalization})}>Buy now</button>
         <div className="trust-row"><span>♡ Handmade with care</span><span>♧ Dispatch in 5–7 days</span><span>✧ Free shipping above ₹2,000</span></div>
         <div className="detail-tabs">{["Details","Shipping","Care"].map(t=><button key={t} className={activeTab===t?"selected":""} onClick={()=>setActiveTab(t)}>{t}</button>)}</div>
         <div className="tab-content">{activeTab==="Details"?"Soft, breathable fabric with hand embroidery in cotton thread. Each piece is finished by hand, so small variations make it yours.":activeTab==="Shipping"?"Carefully packed and dispatched in 5–7 business days. Complimentary shipping on orders above ₹2,000.":"Gentle hand wash in cold water. Do not wring or bleach. Dry in shade and iron on the reverse side."}</div>
@@ -424,14 +424,14 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
   const [state, setState] = useState("");
   const [pin, setPin] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
-  const [fullName, setFullName] = useState(user.user_metadata?.full_name || "");
+  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || "");
   const [phone, setPhone] = useState("");
   const [locationStatus, setLocationStatus] = useState("");
   const checkoutItems = item.items || [item];
   const orderTotal = checkoutItems.reduce((total, product) => total + Number(product.price || 0) * (product.quantity || 1), 0);
   useEffect(() => {
     if (!customerProfile) return;
-    setFullName(customerProfile.full_name || user.user_metadata?.full_name || "");
+    setFullName(customerProfile.full_name || user?.user_metadata?.full_name || "");
     setPhone(customerProfile.phone || "");
     setAddress(customerProfile.address_line1 || "");
     setAddressLine2(customerProfile.address_line2 || "");
@@ -538,7 +538,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
             {submitError&&<p className="checkout-order-error" role="alert">{submitError}</p>}
           </form>}
         </section>
-        <aside className="checkout-summary"><div className="checkout-summary-heading"><span><Leaf size={19}/></span><div><h2>Order summary</h2><p>Review your items and total amount</p></div></div><div className="checkout-summary-items">{checkoutItems.map((product,index)=><article className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<small>Qty: {product.quantity||1}</small></div><strong>{money(Number(product.price)*(product.quantity||1))}</strong></article>)}</div><div className="checkout-cost-row"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div><div className="checkout-cost-row"><span>Shipping</span><strong>Complimentary</strong></div><div className="checkout-total"><span>Total</span><strong>{money(orderTotal)}</strong></div><div className="checkout-thankyou"><Leaf size={20}/><div><b>Every piece tells a story…</b><span>Thank you for supporting handmade. 💚</span></div><Leaf size={20}/></div></aside>
+        <aside className="checkout-summary"><div className="checkout-summary-heading"><span><Leaf size={19}/></span><div><h2>Order summary</h2><p>Review your items and total amount</p></div></div><div className="checkout-summary-items">{checkoutItems.map((product,index)=><article className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.color&&<small>Color: {product.color}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<small>Qty: {product.quantity||1}</small></div><strong>{money(Number(product.price)*(product.quantity||1))}</strong></article>)}</div><div className="checkout-cost-row"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div><div className="checkout-cost-row"><span>Shipping</span><strong>Complimentary</strong></div><div className="checkout-total"><span>Total</span><strong>{money(orderTotal)}</strong></div><div className="checkout-thankyou"><Leaf size={20}/><div><b>Every piece tells a story…</b><span>Thank you for supporting handmade. 💚</span></div><Leaf size={20}/></div></aside>
       </div>
     </>}
   </main>;
@@ -682,7 +682,7 @@ function App() {
       let catalog = products;
       const { data: rows, error: catalogError } = await supabase
         .from("products")
-        .select("id,name,price,category,image_url,gallery,tag,description,stock_quantity")
+        .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
         .order("id");
 
       if (catalogError) {
@@ -694,6 +694,7 @@ function App() {
             ...row,
             image,
             gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [{ src: image }],
+            sizes: Array.isArray(row.sizes) && row.sizes.length ? row.sizes : AVAILABLE_SIZES,
             stock_quantity: row.stock_quantity ?? null
           };
         });
@@ -750,7 +751,7 @@ function App() {
   const returnToCart = () => { if(checkoutFromBag){setPage("home");setBagOpen(true);window.scrollTo({top:0,behavior:"smooth"});}else navigate("home"); };
   const add = product => {
     setCart(old => {
-      const match = old.findIndex(item => item.id === product.id && item.size === product.size && item.personalization === product.personalization);
+      const match = old.findIndex(item => item.id === product.id && item.size === product.size && item.color === product.color && item.personalization === product.personalization);
       if(match < 0) return [...old, {...product, quantity: product.quantity || 1}];
       return old.map((item,index) => index === match ? {...item, quantity:(item.quantity || 1) + (product.quantity || 1)} : item);
     });
@@ -770,7 +771,7 @@ function App() {
       {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
       {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
       {page==="wishlist"&&<Wishlist products={wishlistProducts} onOpen={p=>navigate("product",p)} onAdd={add} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist} onShop={()=>goShop()}/>}
-      {page==="account"&&user&&<CustomerAccount user={user} customerProfile={customerProfile} productCatalog={productCatalog} onSignOut={signOut} onShop={()=>goShop()}/>}
+      {page==="account"&&(user?<CustomerAccount user={user} customerProfile={customerProfile} productCatalog={productCatalog} onSignOut={signOut} onShop={()=>goShop()}/>:<main className="account-signin-page"><GoogleSignInScreen onGoogleSignIn={signInWithGoogle}/></main>)}
       {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} user={user} customerProfile={customerProfile} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
         if(!supabase)return {error:"Online payment is unavailable because Supabase is not configured."};
         const {data:{session}}=await supabase.auth.getSession();
@@ -778,7 +779,7 @@ function App() {
         const response=await fetch("/api/payments/cashfree/create-order",{
           method:"POST",
           headers:{"content-type":"application/json",authorization:`Bearer ${session.access_token}`},
-          body:JSON.stringify({details,items:(checkoutItem.items||[checkoutItem]).map(product=>({product_id:product.id,quantity:product.quantity||1,size:product.size||null,personalization:product.personalization||null}))})
+          body:JSON.stringify({details,items:(checkoutItem.items||[checkoutItem]).map(product=>({product_id:product.id,quantity:product.quantity||1,size:product.size||null,color:product.color||null,personalization:product.personalization||null}))})
         });
         const result=await response.json().catch(()=>({}));
         return response.ok?result:{error:result.error||"Cashfree could not start the payment. Please try again."};

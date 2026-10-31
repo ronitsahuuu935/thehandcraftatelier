@@ -8,11 +8,37 @@ export const config = {
 };
 
 function readRawBody(request) {
+  // Cashfree signs the exact request bytes, so only use raw string or Buffer bodies.
+  if (Buffer.isBuffer(request.rawBody)) return Promise.resolve(request.rawBody.toString("utf8"));
+  if (typeof request.rawBody === "string") return Promise.resolve(request.rawBody);
+  if (Buffer.isBuffer(request.body)) return Promise.resolve(request.body.toString("utf8"));
+  if (typeof request.body === "string") return Promise.resolve(request.body);
+
   return new Promise((resolve, reject) => {
     const chunks = [];
-    request.on("data", chunk => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
-    request.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-    request.on("error", reject);
+    let settled = false;
+    const finish = error => {
+      if (settled) return;
+      settled = true;
+      request.off("data", onData);
+      request.off("end", onEnd);
+      request.off("error", onError);
+      if (error) reject(error);
+      else resolve(Buffer.concat(chunks).toString("utf8"));
+    };
+    const onData = chunk => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const onEnd = () => finish();
+    const onError = error => finish(error);
+
+    if (request.readableEnded || request.complete) {
+      const remaining = request.read?.();
+      if (remaining) onData(remaining);
+      finish();
+      return;
+    }
+    request.on("data", onData);
+    request.once("end", onEnd);
+    request.once("error", onError);
   });
 }
 
@@ -32,16 +58,20 @@ export default async function cashfreeWebhook(request, response) {
     return response.status(405).json({ error: "Method not allowed" });
   }
 
-  const config = getCashfreeConfig();
-  const secret = config?.secret;
   const timestamp = request.headers["x-webhook-timestamp"];
   const receivedSignature = request.headers["x-webhook-signature"];
-  const rawBody = await readRawBody(request);
 
+  // Cashfree's dashboard connectivity test may send an unsigned probe. Acknowledge
+  // it immediately, but never process an event unless its signature is verified.
   if (typeof timestamp !== "string" || typeof receivedSignature !== "string") {
     console.warn("Cashfree webhook connectivity probe received without signature; no event was processed.");
     return response.status(200).json({ received: true, verified: false });
   }
+
+  const config = getCashfreeConfig();
+  const secret = config?.secret;
+  const rawBody = await readRawBody(request);
+  if (!rawBody) return response.status(400).json({ error: "Missing raw webhook payload" });
 
   if (!secret) {
     console.error("CASHFREE_SECRET_KEY is not configured.");

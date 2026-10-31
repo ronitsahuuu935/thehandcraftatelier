@@ -8,6 +8,7 @@ create table if not exists public.products (
   category text not null,
   image_url text,
   gallery jsonb not null default '[]'::jsonb,
+  sizes jsonb not null default '["XS","S","M","L","XL","XXL","XXXL"]'::jsonb,
   tag text,
   description text,
   stock_quantity integer not null default 0,
@@ -20,6 +21,7 @@ create table if not exists public.products (
 alter table public.products
   add column if not exists image_url text,
   add column if not exists gallery jsonb not null default '[]'::jsonb,
+  add column if not exists sizes jsonb not null default '["XS","S","M","L","XL","XXL","XXXL"]'::jsonb,
   add column if not exists tag text,
   add column if not exists description text,
   add column if not exists stock_quantity integer;
