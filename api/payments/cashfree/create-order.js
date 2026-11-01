@@ -70,14 +70,20 @@ export default async function createCashfreeOrder(request, response) {
   let discount = 0;
   if (coupon) {
     const couponCode = clean(details.coupon_code).toUpperCase();
-    const normalizedCouponCode = clean(coupon.code).toUpperCase();
-    const rawCouponType = clean(coupon.type).toLowerCase();
-    const normalizedCouponType = rawCouponType === "fixed amount" ? "Fixed Amount" : rawCouponType === "percentage" ? "Percentage" : "";
-    const couponValue = Number(coupon.value);
-    if (!couponCode || normalizedCouponCode !== couponCode || !normalizedCouponType || !Number.isFinite(couponValue) || couponValue <= 0) {
+    const { data: savedCoupon, error: couponError } = await admin.from("discounts")
+      .select("code,type,value,valid_from,valid_until")
+      .eq("code", couponCode)
+      .maybeSingle();
+    if (couponError) {
+      console.error("Cashfree checkout could not verify discount", couponError.message);
+      return response.status(500).json({ error: "We could not verify the coupon. Please try again." });
+    }
+    const couponValue = Number(savedCoupon?.value);
+    const today = new Date().toISOString().slice(0, 10);
+    if (!couponCode || !savedCoupon || (savedCoupon.valid_from && savedCoupon.valid_from > today) || (savedCoupon.valid_until && savedCoupon.valid_until < today) || !["Percentage", "Fixed Amount"].includes(savedCoupon.type) || !Number.isFinite(couponValue) || couponValue <= 0) {
       return response.status(400).json({ error: "The coupon details are invalid. Please apply the coupon again." });
     }
-    discount = normalizedCouponType === "Percentage" ? subtotal * Math.min(couponValue, 100) / 100 : Math.min(couponValue, subtotal);
+    discount = savedCoupon.type === "Percentage" ? subtotal * Math.min(couponValue, 100) / 100 : Math.min(couponValue, subtotal);
   }
   const total = Math.round((subtotal - discount) * 100) / 100;
   if (!Number.isFinite(total) || total < 200) return response.status(400).json({ error: "The minimum order total for online payment is ₹200." });

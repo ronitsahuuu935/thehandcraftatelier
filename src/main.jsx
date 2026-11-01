@@ -435,28 +435,26 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
   const orderTotal = checkoutItems.reduce((total, product) => total + Number(product.price || 0) * (product.quantity || 1), 0);
   const discountAmount = appliedCoupon ? Math.min(orderTotal, appliedCoupon.type === "Percentage" ? orderTotal * appliedCoupon.value / 100 : appliedCoupon.value) : 0;
   const payableTotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
-    let discounts = [];
-    try { discounts = JSON.parse(localStorage.getItem(DISCOUNTS_STORAGE_KEY) || "[]"); } catch (error) { console.error("Could not load saved discounts.", error); }
-    const discount = discounts.find(value => {
-      const savedCode = String(value.code || "").trim().toUpperCase();
-      const status = String(value.status || "active").trim().toLowerCase();
-      return savedCode === code && status === "active";
-    });
+    const { data: discount, error } = supabase
+      ? await supabase.from("discounts").select("code,name,type,value,valid_from,valid_until").eq("code", code).maybeSingle()
+      : { data: null, error: new Error("Supabase is not configured.") };
+    if (error) console.error("Could not load shared discount.", error.message);
     if (!discount) {
       setAppliedCoupon(null);
-      setCouponMessage("That coupon code is not valid.");
+      setCouponMessage(error ? "Discount service is unavailable. Please try again." : "That coupon code is not valid.");
       return;
     }
-    if (discount.until && discount.until !== "No expiry" && discount.until < new Date().toISOString().slice(0, 10)) {
+    const today = new Date().toISOString().slice(0, 10);
+    if ((discount.valid_from && discount.valid_from > today) || (discount.valid_until && discount.valid_until < today)) {
       setAppliedCoupon(null);
-      setCouponMessage("That coupon has expired.");
+      setCouponMessage(discount.valid_from && discount.valid_from > today ? "That coupon is not active yet." : "That coupon has expired.");
       return;
     }
     const rawType = String(discount.type || "").trim().toLowerCase();
     const type = rawType === "fixed amount" ? "Fixed Amount" : rawType === "percentage" ? "Percentage" : "";
-    const value = Number(discount.value) || Number.parseFloat(String(discount.value || discount.displayValue).replace(/[^\d.-]/g, ""));
+    const value = Number(discount.value);
     if (!type || !Number.isFinite(value) || value <= 0) {
       setAppliedCoupon(null);
       setCouponMessage("That coupon has an invalid discount value.");
