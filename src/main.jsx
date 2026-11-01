@@ -55,6 +55,7 @@ const products = [
 const money = n => "₹" + n.toLocaleString("en-IN");
 const ADMIN_HASH = "#12345Rsadmin";
 const PENDING_CHECKOUT_KEY = "pending-checkout";
+const DISCOUNTS_STORAGE_KEY = "atelier-discounts";
 
 function Header({ page, navigate, goShop, goSection, cartCount, wishlistCount, search, setSearch, onBag, onWishlist, user, onGoogleSignIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -427,9 +428,38 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || "");
   const [phone, setPhone] = useState("");
   const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponMessage, setCouponMessage] = useState("");
   const [locationStatus, setLocationStatus] = useState("");
   const checkoutItems = item.items || [item];
   const orderTotal = checkoutItems.reduce((total, product) => total + Number(product.price || 0) * (product.quantity || 1), 0);
+  const discountAmount = appliedCoupon ? Math.min(orderTotal, appliedCoupon.type === "Percentage" ? orderTotal * appliedCoupon.value / 100 : appliedCoupon.value) : 0;
+  const payableTotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
+  const applyCoupon = () => {
+    const code = couponCode.trim().toUpperCase();
+    let discounts = [];
+    try { discounts = JSON.parse(localStorage.getItem(DISCOUNTS_STORAGE_KEY) || "[]"); } catch (error) { console.error("Could not load saved discounts.", error); }
+    const discount = discounts.find(value => value.code === code && value.status === "Active");
+    if (!discount) {
+      setAppliedCoupon(null);
+      setCouponMessage("That coupon code is not valid.");
+      return;
+    }
+    if (discount.until !== "No expiry" && discount.until < new Date().toISOString().slice(0, 10)) {
+      setAppliedCoupon(null);
+      setCouponMessage("That coupon has expired.");
+      return;
+    }
+    const value = Number(discount.value) || Number.parseFloat(String(discount.value));
+    if (!Number.isFinite(value) || value <= 0) {
+      setAppliedCoupon(null);
+      setCouponMessage("That coupon has an invalid discount value.");
+      return;
+    }
+    setAppliedCoupon({ ...discount, value });
+    setCouponMessage(`${discount.code} applied successfully.`);
+  };
+  const removeCoupon = () => { setAppliedCoupon(null); setCouponMessage(""); setCouponCode(""); };
   useEffect(() => {
     if (!customerProfile) return;
     setFullName(customerProfile.full_name || user?.user_metadata?.full_name || "");
@@ -492,7 +522,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
       return;
     }
     if (activeStep !== 3) return;
-    if (orderTotal < 200) {
+    if (payableTotal < 200) {
       setSubmitError("The minimum order total for online payment is ₹200.");
       return;
     }
@@ -500,7 +530,7 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
     setSubmitError("");
     const details = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
-      const payment = await onPlaceOrder(details);
+      const payment = await onPlaceOrder(details, appliedCoupon ? { ...appliedCoupon, discountAmount } : null);
       if (payment?.error) {
         setSubmitError(payment.error);
       } else if (!payment?.paymentSessionId || !window.Cashfree) {
@@ -535,12 +565,12 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
             </section>
             {activeStep===2&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><CreditCard size={20}/></span><div><h2>Payment method</h2><p>Pay securely through Cashfree</p></div></div><div className="checkout-payment-choice selected"><span className="checkout-cashfree-mark">C</span><span><b>Online payment</b><small>UPI, cards, net banking and other available methods</small></span><ShieldCheck size={18}/></div><div className="checkout-secure-note"><ShieldCheck size={18}/><span>Your payment is processed securely by Cashfree. We only mark your order paid after Cashfree confirms it.</span></div></section>}
             {activeStep===3&&<section className="checkout-step-panel"><div className="checkout-section-heading"><span><Check size={20}/></span><div><h2>Review your order</h2><p>Check your delivery details before continuing to payment</p></div></div><div className="checkout-review-card"><b>{reviewDetails?.customer_name}</b><span>{reviewDetails?.email} · {reviewDetails?.phone}</span><span>{[reviewDetails?.address,reviewDetails?.address_line2,reviewDetails?.city,reviewDetails?.state,reviewDetails?.postal_code].filter(Boolean).join(", ")}</span><button type="button" onClick={()=>setActiveStep(1)}>Edit address</button></div><div className="checkout-review-card"><b>Delivery & payment</b><span>Standard delivery · 5–7 business days</span><span>Online payment via Cashfree</span><input type="hidden" name="payment_method" value="Cashfree"/><button type="button" onClick={()=>setActiveStep(2)}>Edit payment</button></div></section>}
-            <input type="hidden" name="coupon_code" value={couponCode}/>
+            <input type="hidden" name="coupon_code" value={appliedCoupon?.code || ""}/>
             <div className="checkout-step-actions">{activeStep===1?<button className="checkout-back-link" type="button" onClick={onBackToCart}><ArrowLeft size={15}/> Back to cart</button>:<button className="checkout-back-link" type="button" onClick={()=>setActiveStep(activeStep-1)}><ArrowLeft size={15}/> Back</button>}{activeStep===1&&<button className="story-cta checkout-submit" type="submit">Continue to Payment <ArrowRight size={15}/></button>}{activeStep===2&&<button className="story-cta checkout-submit" type="button" onClick={()=>setActiveStep(3)}>Review Order <ArrowRight size={15}/></button>}{activeStep===3&&<button className="story-cta checkout-submit" type="submit" disabled={submitting}>{submitting?"Connecting to Cashfree…":"Pay securely with Cashfree"} <ArrowRight size={15}/></button>}</div>
             {submitError&&<p className="checkout-order-error" role="alert">{submitError}</p>}
           </form>}
         </section>
-        <aside className="checkout-summary"><div className="checkout-summary-heading"><span><Leaf size={19}/></span><div><h2>Order summary</h2><p>Review your items and total amount</p></div></div><div className="checkout-summary-items">{checkoutItems.map((product,index)=><article className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.color&&<small>Color: {product.color}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<small>Qty: {product.quantity||1}</small></div><strong>{money(Number(product.price)*(product.quantity||1))}</strong></article>)}</div><div className="checkout-coupon"><label htmlFor="checkout-coupon-code">Have a coupon code?</label><input id="checkout-coupon-code" value={couponCode} onChange={event=>setCouponCode(event.target.value)} placeholder="Enter coupon code" autoComplete="off"/></div><div className="checkout-cost-row"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div><div className="checkout-cost-row"><span>Shipping</span><strong>Complimentary</strong></div><div className="checkout-total"><span>Total</span><strong>{money(orderTotal)}</strong></div><div className="checkout-thankyou"><Leaf size={20}/><div><b>Every piece tells a story…</b><span>Thank you for supporting handmade. 💚</span></div><Leaf size={20}/></div></aside>
+        <aside className="checkout-summary"><div className="checkout-summary-heading"><span><Leaf size={19}/></span><div><h2>Order summary</h2><p>Review your items and total amount</p></div></div><div className="checkout-summary-items">{checkoutItems.map((product,index)=><article className="checkout-product" key={`${product.id}-${index}`}><img src={product.image} alt={product.name}/><div><h3>{product.name}</h3>{product.size&&<small>Size: {product.size}</small>}{product.color&&<small>Color: {product.color}</small>}{product.personalization&&<small>Personalized: {product.personalization}</small>}<small>Qty: {product.quantity||1}</small></div><strong>{money(Number(product.price)*(product.quantity||1))}</strong></article>)}</div><div className="checkout-coupon"><label htmlFor="checkout-coupon-code">Have a coupon code?</label><div className="checkout-coupon-row"><input id="checkout-coupon-code" value={couponCode} onChange={event=>{setCouponCode(event.target.value);setCouponMessage("");}} placeholder="Enter coupon code" autoComplete="off"/>{appliedCoupon?<button type="button" onClick={removeCoupon}>Remove</button>:<button type="button" onClick={applyCoupon}>Apply</button>}</div>{couponMessage&&<small className={appliedCoupon?"checkout-coupon-success":"checkout-coupon-error"} role="status">{couponMessage}</small>}</div><div className="checkout-cost-row"><span>Subtotal</span><strong>{money(orderTotal)}</strong></div>{appliedCoupon&&<div className="checkout-cost-row checkout-discount-row"><span>Discount ({appliedCoupon.code})</span><strong>-{money(discountAmount)}</strong></div>}<div className="checkout-cost-row"><span>Shipping</span><strong>Complimentary</strong></div><div className="checkout-total"><span>Total</span><strong>{money(payableTotal)}</strong></div><div className="checkout-thankyou"><Leaf size={20}/><div><b>Every piece tells a story…</b><span>Thank you for supporting handmade. 💚</span></div><Leaf size={20}/></div></aside>
       </div>
     </>}
   </main>;
@@ -774,14 +804,14 @@ function App() {
       {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
       {page==="wishlist"&&<Wishlist products={wishlistProducts} onOpen={p=>navigate("product",p)} onAdd={add} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist} onShop={()=>goShop()}/>}
       {page==="account"&&(user?<CustomerAccount user={user} customerProfile={customerProfile} productCatalog={productCatalog} onSignOut={signOut} onShop={()=>goShop()}/>:<main className="account-signin-page"><GoogleSignInScreen onGoogleSignIn={signInWithGoogle}/></main>)}
-      {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} user={user} customerProfile={customerProfile} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async details=>{
+      {page==="checkout"&&checkoutItem&&<Checkout item={checkoutItem} user={user} customerProfile={customerProfile} authLoading={authLoading} onBack={()=>navigate("home")} onBackToCart={returnToCart} onPlaceOrder={async (details,coupon)=>{
         if(!supabase)return {error:"Online payment is unavailable because Supabase is not configured."};
         const {data:{session}}=await supabase.auth.getSession();
         if(!session?.access_token)return {error:"Your sign-in has expired. Sign in again to continue with payment."};
         const response=await fetch("/api/payments/cashfree/create-order",{
           method:"POST",
           headers:{"content-type":"application/json",authorization:`Bearer ${session.access_token}`},
-          body:JSON.stringify({details,items:(checkoutItem.items||[checkoutItem]).map(product=>({product_id:product.id,quantity:product.quantity||1,size:product.size||null,color:product.color||null,personalization:product.personalization||null}))})
+          body:JSON.stringify({details,coupon,items:(checkoutItem.items||[checkoutItem]).map(product=>({product_id:product.id,quantity:product.quantity||1,size:product.size||null,color:product.color||null,personalization:product.personalization||null}))})
         });
         const result=await response.json().catch(()=>({}));
         return response.ok?result:{error:result.error||"Cashfree could not start the payment. Please try again."};

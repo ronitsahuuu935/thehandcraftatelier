@@ -17,6 +17,7 @@ export default async function createCashfreeOrder(request, response) {
   let body = request.body || {};
   try { if (typeof body === "string") body = JSON.parse(body || "{}"); } catch { return response.status(400).json({ error: "Invalid checkout details." }); }
   const details = body.details || {};
+  const coupon = body.coupon && typeof body.coupon === "object" ? body.coupon : null;
   const items = Array.isArray(body.items) ? body.items : [];
   const fullName = clean(details.customer_name);
   const email = clean(details.email).toLowerCase();
@@ -65,7 +66,17 @@ export default async function createCashfreeOrder(request, response) {
       personalization: clean(item.personalization) || null
     });
   }
-  const total = Math.round(orderItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0) * 100) / 100;
+  const subtotal = Math.round(orderItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0) * 100) / 100;
+  let discount = 0;
+  if (coupon) {
+    const couponCode = clean(details.coupon_code).toUpperCase();
+    const couponValue = Number(coupon.value);
+    if (!couponCode || coupon.code !== couponCode || !["Percentage", "Fixed Amount"].includes(coupon.type) || !Number.isFinite(couponValue) || couponValue <= 0) {
+      return response.status(400).json({ error: "The coupon details are invalid. Please apply the coupon again." });
+    }
+    discount = coupon.type === "Percentage" ? subtotal * Math.min(couponValue, 100) / 100 : Math.min(couponValue, subtotal);
+  }
+  const total = Math.round((subtotal - discount) * 100) / 100;
   if (!Number.isFinite(total) || total < 200) return response.status(400).json({ error: "The minimum order total for online payment is ₹200." });
 
   const { data: customer, error: customerError } = await admin.from("customers").upsert({
@@ -88,7 +99,7 @@ export default async function createCashfreeOrder(request, response) {
   const { data: order, error: orderError } = await admin.from("orders").insert({
     customer_id: customer.id,
     items: orderItems,
-    subtotal: total,
+    subtotal,
     shipping_cost: 0,
     total,
     payment_method: "Cashfree",
