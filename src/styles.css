@@ -228,6 +228,10 @@ html{scrollbar-width:none}html::-webkit-scrollbar{display:none;width:0;height:0}
 .checkout-product small{font-size:9px}
 .checkout-product p{margin:5px 0 0;font-size:10px}
 .checkout-product>strong{align-self:flex-start;white-space:nowrap;font-size:11px;font-weight:600}
+.checkout-coupon{margin:16px 0 12px;padding:13px;border:1px solid #e3e1d7;border-radius:7px;background:#f8f8f1}
+.checkout-coupon label{display:block;margin-bottom:7px;color:#59645e;font-size:10px}
+.checkout-coupon input{width:100%;height:36px;border:1px solid #deddd3;border-radius:5px;background:#fffefa;padding:0 10px;color:var(--ink);font-size:11px}
+.checkout-coupon input:focus{border-color:#748366;outline:none;box-shadow:0 0 0 2px #53644918}
 .checkout-cost-row{display:flex;justify-content:space-between;margin:10px 0;color:#59645e;font-size:11px}
 .checkout-cost-row strong{font-weight:500}
 .checkout-total{align-items:center;margin:13px 0;padding-top:13px;border-top:1px solid #d9d9cf;font-size:15px}
