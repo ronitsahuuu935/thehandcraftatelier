@@ -439,24 +439,24 @@ function Checkout({ item, onBack, onBackToCart, onPlaceOrder, user, customerProf
     const code = couponCode.trim().toUpperCase();
     let discounts = [];
     try { discounts = JSON.parse(localStorage.getItem(DISCOUNTS_STORAGE_KEY) || "[]"); } catch (error) { console.error("Could not load saved discounts.", error); }
-    const discount = discounts.find(value => value.code === code && value.status === "Active");
+    const discount = discounts.find(value => String(value.code || "").trim().toUpperCase() === code && String(value.status || "").toLowerCase() === "active");
     if (!discount) {
       setAppliedCoupon(null);
       setCouponMessage("That coupon code is not valid.");
       return;
     }
-    if (discount.until !== "No expiry" && discount.until < new Date().toISOString().slice(0, 10)) {
+    if (discount.until && discount.until !== "No expiry" && discount.until < new Date().toISOString().slice(0, 10)) {
       setAppliedCoupon(null);
       setCouponMessage("That coupon has expired.");
       return;
     }
-    const value = Number(discount.value) || Number.parseFloat(String(discount.value));
+    const value = Number(discount.value) || Number.parseFloat(String(discount.value || discount.displayValue));
     if (!Number.isFinite(value) || value <= 0) {
       setAppliedCoupon(null);
       setCouponMessage("That coupon has an invalid discount value.");
       return;
     }
-    setAppliedCoupon({ ...discount, value });
+    setAppliedCoupon({ ...discount, code, type: String(discount.type || "").trim(), value });
     setCouponMessage(`${discount.code} applied successfully.`);
   };
   const removeCoupon = () => { setAppliedCoupon(null); setCouponMessage(""); setCouponCode(""); };
