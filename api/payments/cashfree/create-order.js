@@ -70,11 +70,14 @@ export default async function createCashfreeOrder(request, response) {
   let discount = 0;
   if (coupon) {
     const couponCode = clean(details.coupon_code).toUpperCase();
+    const normalizedCouponCode = clean(coupon.code).toUpperCase();
+    const rawCouponType = clean(coupon.type).toLowerCase();
+    const normalizedCouponType = rawCouponType === "fixed amount" ? "Fixed Amount" : rawCouponType === "percentage" ? "Percentage" : "";
     const couponValue = Number(coupon.value);
-    if (!couponCode || coupon.code !== couponCode || !["Percentage", "Fixed Amount"].includes(coupon.type) || !Number.isFinite(couponValue) || couponValue <= 0) {
+    if (!couponCode || normalizedCouponCode !== couponCode || !normalizedCouponType || !Number.isFinite(couponValue) || couponValue <= 0) {
       return response.status(400).json({ error: "The coupon details are invalid. Please apply the coupon again." });
     }
-    discount = coupon.type === "Percentage" ? subtotal * Math.min(couponValue, 100) / 100 : Math.min(couponValue, subtotal);
+    discount = normalizedCouponType === "Percentage" ? subtotal * Math.min(couponValue, 100) / 100 : Math.min(couponValue, subtotal);
   }
   const total = Math.round((subtotal - discount) * 100) / 100;
   if (!Number.isFinite(total) || total < 200) return response.status(400).json({ error: "The minimum order total for online payment is ₹200." });
