@@ -62,13 +62,21 @@ function AdminPanel({products=[],onProductsChange,onExit}){
  },[]);
  const saveDiscount=async discount=>{
   if(supabase){
-   if(editingDiscount && editingDiscount.code!==discount.code){const {error:deleteError}=await supabase.from("discounts").delete().eq("code",editingDiscount.code);if(deleteError){console.error("Could not replace the previous shared discount code.",deleteError.message);setNotice("Could not update the shared discount code.");return false;}}
+   if(editingDiscount && editingDiscount.code!==discount.code){const deleted=await deleteSharedDiscount(editingDiscount.code);if(!deleted){setNotice("Could not update the shared discount code.");return false;}}
    const {error}=await supabase.from("discounts").upsert(discountToRow(discount),{onConflict:"code"});if(error){console.error("Could not save shared discount.",error.message);setNotice("Could not save the shared discount. Apply the discounts migration in Supabase.");return false;}
   }
   return true;
  };
+ const deleteSharedDiscount=async code=>{
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session?.access_token){setNotice("Your admin session has expired. Sign in again.");return false;}
+  const response=await fetch(`/api/admin/discounts?code=${encodeURIComponent(code)}`,{method:"DELETE",headers:{authorization:`Bearer ${session.access_token}`}});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok){console.error("Could not delete shared discount.",result.error||response.statusText);return false;}
+  return true;
+ };
  const deleteDiscount=async discount=>{
-  if(supabase){const {error}=await supabase.from("discounts").delete().eq("code",discount.code);if(error){console.error("Could not delete shared discount.",error.message);setNotice("Could not delete the shared discount.");return;}}
+  if(supabase&&!await deleteSharedDiscount(discount.code)){setNotice("Could not delete the shared discount.");return;}
   setDiscounts(current=>current.filter(existing=>existing.code!==discount.code));
   if(editingDiscount?.code===discount.code)setEditingDiscount(null);
   setNotice("Discount deleted.");
