@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowUpRight, Camera, Gift, Heart, Leaf, Mail, MessageCircle, Phone, Send, UserRound } from "lucide-react";
+import { ArrowUpRight, Gift, Heart, Leaf, Mail, MessageCircle, Send, UserRound } from "lucide-react";
 import "./contact.css";
 
 export default function ContactUs({ contact }) {
@@ -37,9 +37,9 @@ export default function ContactUs({ contact }) {
       <aside className="contact-details" aria-labelledby="contact-details-title">
         <h2 id="contact-details-title">Get in Touch</h2>
         <div className="contact-direct-links">
-          {[{title:"Email Us", Icon:Mail, detail:contact.email, href:`mailto:${contact.email}`}, {title:"WhatsApp", Icon:MessageCircle, detail:contact.phoneLabel, href:contact.whatsapp, external:true}, {title:"Call Us", Icon:Phone, detail:contact.phoneLabel, href:`tel:${contact.phone}`}].map(({title, Icon, detail, href, external}) => <a className="contact-direct-link" key={title} href={href} {...(external ? {target:"_blank", rel:"noopener noreferrer"} : {})}><span className="contact-icon"><Icon size={28} strokeWidth={1.6} aria-hidden="true"/></span><span><strong>{title}</strong><span>{detail}</span></span><ArrowUpRight size={17} aria-hidden="true"/></a>)}
+          {[{title:"Email Us", image:"/images/mail.webp", detail:contact.email, href:`mailto:${contact.email}`}, {title:"WhatsApp", image:"/images/whatsapp.webp", detail:contact.phoneLabel, href:contact.whatsapp, external:true}, {title:"Call Us", image:"/images/call.webp", detail:contact.phoneLabel, href:`tel:${contact.phone}`}].map(({title, image, detail, href, external}) => <a className="contact-direct-link" key={title} href={href} {...(external ? {target:"_blank", rel:"noopener noreferrer"} : {})}><span className="contact-icon"><img src={image} alt="" width="38" height="38"/></span><span><strong>{title}</strong><span>{detail}</span></span><ArrowUpRight size={17} aria-hidden="true"/></a>)}
         </div>
-        <section className="contact-instagram"><div className="contact-panel-heading"><Leaf aria-hidden="true"/><h2>Connect With Us</h2><Leaf aria-hidden="true"/></div><a href={contact.instagram} target="_blank" rel="noopener noreferrer"><Camera size={34} strokeWidth={1.5} aria-hidden="true"/><span>Follow us on Instagram<strong>@thehandcraftatelier</strong></span><ArrowUpRight size={22} aria-hidden="true"/></a><span className="contact-lace" aria-hidden="true"/></section>
+        <section className="contact-instagram"><div className="contact-panel-heading"><Leaf aria-hidden="true"/><h2>Connect With Us</h2><Leaf aria-hidden="true"/></div><a href={contact.instagram} target="_blank" rel="noopener noreferrer"><img className="contact-instagram-logo" src="/images/instagram.webp" alt="" width="40" height="40"/><span>Follow us on Instagram<strong>@thehandcraftatelier</strong></span><ArrowUpRight size={22} aria-hidden="true"/></a><span className="contact-lace" aria-hidden="true"/></section>
         <p className="contact-personal-note">Small stitches, thoughtful conversations.<br/><Heart size={18} aria-hidden="true"/></p>
       </aside>
     </div>
