@@ -2,15 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Search, UserRound, Heart, Leaf, ShoppingBag, Menu, X, ArrowRight, ArrowLeft, Star, SlidersHorizontal, Plus, Minus, ChevronDown, Truck, CreditCard, Check, MapPin, ShieldCheck, Phone, Mail, LogOut, Package } from "lucide-react";
 import "./styles.css";
+import "./story.css";
 import { googleMapsApiKey, productStorageBucket, supabase } from "./lib/supabase";
 import AdminPanel from "./AdminPanel";
+import OurStory from "./OurStory";
+import ContactUs from "./ContactUs";
+import DesignGallery from "./DesignGallery";
 
-const IMG = "/images/";           // site images (from assets/)
+const IMG = "/images/";           // site images (from public/images/)
 const PRODUCT_IMG = "/products/"; // product photos (from products/)
-// TODO: put your real Instagram profile and WhatsApp number here (e.g. "https://wa.me/919XXXXXXXXX")
 const SOCIAL = {
   instagram: "https://www.instagram.com/thehandcraftatelier?utm_source=ig_web_button_share_sheet&vrfl=ZDNlZDc0MzIxNw==",
-  whatsapp: "https://wa.me/7877642926"
+  whatsapp: "https://wa.me/917877642926",
+  phone: "+917877642926",
+  phoneLabel: "+91 78776 42926",
+  email: "ronitsahuuu935@gmail.com"
 };
 const images = {
   logo: IMG + "logo.webp",
@@ -76,6 +82,7 @@ function Header({ page, navigate, goShop, goSection, cartCount, wishlistCount, s
       <button className={page === "shop" ? "active" : ""} onClick={() => {goShop();setMenuOpen(false)}}>Shop</button>
       <button onClick={() => {goShop("Shirts");setMenuOpen(false)}}>Shirts</button>
       <button onClick={() => {goShop("Personalized");setMenuOpen(false)}}>Personalized</button>
+      <button className={page === "story" ? "active" : ""} onClick={() => {navigate("story");setMenuOpen(false)}}>Our Story</button>
     </nav>
   </header>;
 }
@@ -279,7 +286,7 @@ function FloatingSocials() {
   </>;
 }
 
-function Footer({ goShop }) {
+function Footer({ goShop, navigate }) {
   const [phone, setPhone] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   return <footer>
@@ -289,8 +296,8 @@ function Footer({ goShop }) {
     </section>
     <section className="footer-main">
       <div className="footer-brand"><h3>The Hand Craft Atelier</h3><p className="tagline">Handmade · Heartfelt · Forever</p><p>Thoughtful keepsakes, stitched slowly. For the little moments and the people who mean everything.</p></div>
-      <div><h4>EXPLORE</h4><a href="#shop" onClick={e=>{e.preventDefault();goShop()}}>Shop all</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Shirts")}}>Shirts</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Personalized")}}>Personalized</a></div>
-      <div><h4>HERE TO HELP</h4><a>Contact us</a><a href="/policies/shipping.html" target="_blank" rel="noopener noreferrer">Shipping policy</a><a href="/policies/refund.html" target="_blank" rel="noopener noreferrer">Refund policy</a><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></div>
+      <div><h4>EXPLORE</h4><a href="#our-story" onClick={e=>{e.preventDefault();navigate("story")}}>Our Story</a><a href="#shop" onClick={e=>{e.preventDefault();goShop()}}>Shop all</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Shirts")}}>Shirts</a><a href="#shop" onClick={e=>{e.preventDefault();goShop("Personalized")}}>Personalized</a></div>
+      <div><h4>HERE TO HELP</h4><a href="#contact" onClick={e=>{e.preventDefault();navigate("contact")}}>Contact us</a><a href="/policies/shipping.html" target="_blank" rel="noopener noreferrer">Shipping policy</a><a href="/policies/refund.html" target="_blank" rel="noopener noreferrer">Refund policy</a><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></div>
     </section>
     <div className="mobile-social-links"><a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer"><img src={images.instagram} alt=""/>Instagram</a><a href={SOCIAL.whatsapp} target="_blank" rel="noopener noreferrer"><img src={images.whatsapp} alt=""/>WhatsApp</a></div>
     <div className="legal"><span>© 2026 The Hand Craft Atelier. All lovingly reserved.</span></div>
@@ -312,7 +319,7 @@ function ProductGrid({ items, onOpen, onAdd, isWishlisted, onToggleWishlist }) {
   return <div className="product-grid">{items.map(p=><ProductCard key={p.id} product={p} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted(p.id)} onToggleWishlist={onToggleWishlist}/>)}</div>;
 }
 
-function Home({ onOpen, onAdd, goShop, search, productCatalog, isWishlisted, onToggleWishlist }) {
+function Home({ onOpen, onAdd, goShop, navigate, search, productCatalog, isWishlisted, onToggleWishlist }) {
   const visible = productCatalog.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
   return <main>
     <section className="hero">
@@ -328,11 +335,12 @@ function Home({ onOpen, onAdd, goShop, search, productCatalog, isWishlisted, onT
     </section>
     <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FROM THE ATELIER</span><h2>Featured Pieces</h2><p>Thoughtfully stitched designs from the collection.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
     <section className="section-wrap"><div className="section-heading"><div><span className="eyebrow">FRESH FROM THE ATELIER</span><h2>New Arrivals</h2><p>Fresh designs for your special moments.</p></div><button className="text-link" onClick={()=>goShop()}>View all <ArrowRight size={15}/></button></div><ProductGrid items={visible.slice(4,8).length ? visible.slice(4,8) : visible.slice(0,4)} onOpen={onOpen} onAdd={onAdd} isWishlisted={isWishlisted} onToggleWishlist={onToggleWishlist}/></section>
+    <DesignGallery goShop={goShop}/>
     <section className="testimonial">
       <div className="testimonial-copy"><span className="eyebrow"><Leaf size={24}/>OUR PROMISE</span><h2>Made with <em>thoughtful</em> detail</h2><blockquote><span className="quote-mark">“</span><span>Every piece is stitched slowly, with care in every detail.<br/>Made to be worn, gifted, and kept close.</span></blockquote><p className="testimonial-author"><span className="author-mark"><Leaf size={18}/></span> Handmade, heartfelt, forever</p></div>
       <div className="testimonial-art"><img src={images.floralEmbroideryHoop} alt="Floral embroidery hoop" loading="lazy"/></div>
     </section>
-    <section className="journal-strip" id="journal"><img src={images.journal2} alt="Hand-embroidered hoop with tiny birds and flowers on turquoise fabric" style={{objectPosition:"center 52%"}} loading="lazy"/><div><span className="eyebrow">NOTES FROM THE ATELIER <i/></span><h2>Made to be <em>kept close.</em></h2><p>Thoughtful gifts, little rituals, and the beauty of making things slowly.</p><button className="story-cta" onClick={()=>goShop()}>Discover more <ArrowRight size={15}/></button></div><div className="journal-decoration" aria-hidden="true"/><Leaf className="journal-sprig sprig-left" aria-hidden="true"/><Leaf className="journal-sprig sprig-right" aria-hidden="true"/><span className="journal-heart" aria-hidden="true">♡</span></section>
+    <section className="journal-strip" id="journal"><img src={images.journal2} alt="Hand-embroidered hoop with tiny birds and flowers on turquoise fabric" style={{objectPosition:"center 52%"}} loading="lazy"/><div><span className="eyebrow">NOTES FROM THE ATELIER <i/></span><h2>Made to be <em>kept close.</em></h2><p>Thoughtful gifts, little rituals, and the beauty of making things slowly.</p><button className="story-cta" onClick={()=>navigate("story")}>Our story <ArrowRight size={15}/></button></div><div className="journal-decoration" aria-hidden="true"/><Leaf className="journal-sprig sprig-left" aria-hidden="true"/><Leaf className="journal-sprig sprig-right" aria-hidden="true"/><span className="journal-heart" aria-hidden="true">♡</span></section>
   </main>;
 }
 
@@ -589,7 +597,16 @@ function App() {
     window.addEventListener("hashchange", syncAdminRoute);
     return () => window.removeEventListener("hashchange", syncAdminRoute);
   }, []);
-  const [page,setPage] = useState("home");
+  const [page,setPage] = useState(() => window.location.hash === "#contact" ? "contact" : window.location.hash === "#our-story" ? "story" : "home");
+  useEffect(() => {
+    const syncInfoRoute = () => {
+      if (window.location.hash === "#our-story") setPage("story");
+      else if (window.location.hash === "#contact") setPage("contact");
+      else setPage(current => ["story", "contact"].includes(current) ? "home" : current);
+    };
+    window.addEventListener("hashchange", syncInfoRoute);
+    return () => window.removeEventListener("hashchange", syncInfoRoute);
+  }, []);
   const [selected,setSelected] = useState(products[0]);
   const [cart,setCart] = useState([]);
   const [wishlistIds,setWishlistIds] = useState(() => {
@@ -768,7 +785,10 @@ function App() {
     loadProductImages();
     return () => { active = false; };
   }, []);
-  const navigate = (next,product) => { if(product) setSelected(product); setPage(next); window.scrollTo({top:0,behavior:"smooth"}); };
+  const navigate = (next,product) => { if(product) setSelected(product);
+    const hash = next === "story" ? "#our-story" : next === "contact" ? "#contact" : "";
+    if (["#our-story", "#contact"].includes(window.location.hash) || hash) window.history.pushState(null, "", window.location.pathname + window.location.search + hash);
+    setPage(next); window.scrollTo({top:0,behavior:"smooth"}); };
   const goShop = (cat="All pieces") => { setCategory(cat); navigate("shop"); };
   const goSection = id => { setPage("home"); setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:"smooth"}),80); };
   const startCheckout = (items, fromBag = false) => {
@@ -803,7 +823,9 @@ function App() {
   if (adminMode) return <AdminPanel products={productCatalog} onProductsChange={updated=>{setProductCatalog(updated);setSelected(current=>updated.find(product=>product.id===current.id)||current);}} onExit={() => { window.history.replaceState(null, "", window.location.pathname + window.location.search); setAdminMode(false); }} />;
   return <><Header page={page} navigate={navigate} goShop={goShop} goSection={goSection} cartCount={cart.reduce((n,p)=>n+(p.quantity||1),0)} wishlistCount={wishlistIds.length} search={search} setSearch={setSearch} onBag={()=>setBagOpen(true)} onWishlist={()=>navigate("wishlist")} user={user} onGoogleSignIn={signInWithGoogle}/>
     {cashfreeReturn ? <main className="checkout-page"><section className="checkout-success" aria-live="polite"><span>{cashfreeReturn.status==="paid"?<Check size={23}/>:<ShieldCheck size={22}/>}</span><h2>{cashfreeReturn.status==="paid"?"Payment confirmed":cashfreeReturn.status==="verifying"?"Verifying your payment":cashfreeReturn.status==="pending"?"Payment is processing":"Payment needs confirmation"}</h2><p>{cashfreeReturn.status==="paid"?"Cashfree confirmed your payment. Your order is now being prepared.":cashfreeReturn.status==="verifying"?"We’re checking your payment securely with Cashfree.":cashfreeReturn.status==="pending"?"Cashfree has not confirmed the payment yet. Check again shortly.":cashfreeReturn.message||"If your account was charged, please contact the atelier with this order reference."}</p><small>Order reference: {cashfreeReturn.orderId}</small>{cashfreeReturn.status!=="paid"&&<button className="checkout-back-link" type="button" onClick={()=>setCashfreeReturn(current=>({...current,status:"verifying",message:""}))}>Check payment status</button>}<button className="story-cta checkout-submit" type="button" onClick={()=>{setCashfreeReturn(null);navigate("home");}}>Continue shopping <ArrowRight size={15}/></button></section></main> : <>
-      {page==="home"&&<Home onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
+      {page==="home"&&<Home navigate={navigate} onOpen={p=>navigate("product",p)} onAdd={add} goShop={goShop} search={search} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
+      {page==="story"&&<OurStory goShop={goShop}/>}
+      {page==="contact"&&<ContactUs contact={SOCIAL}/>}
       {page==="shop"&&<Shop onOpen={p=>navigate("product",p)} onAdd={add} search={search} category={category} setCategory={setCategory} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
       {page==="product"&&<ProductDetail key={selected.id} product={selected} onAdd={add} onBuyNow={buyNow} navigate={navigate} goShop={goShop} productCatalog={productCatalog} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist}/>}
       {page==="wishlist"&&<Wishlist products={wishlistProducts} onOpen={p=>navigate("product",p)} onAdd={add} isWishlisted={isWishlisted} onToggleWishlist={toggleWishlist} onShop={()=>goShop()}/>}
@@ -823,7 +845,7 @@ function App() {
       {bagOpen&&<><button className="cart-backdrop" aria-label="Close shopping bag" onClick={()=>setBagOpen(false)}/><CartDrawer cart={cart} onClose={()=>setBagOpen(false)} onRemove={removeFromCart} onQuantityChange={changeCartQuantity} onCheckout={checkoutCart}/></>}
       {toast&&<div className="cart-toast" role="status"><ShoppingBag size={16}/><span>Added to your bag</span><button onClick={()=>setToast(false)}>Dismiss</button></div>}
     </>}
-    <Footer goShop={goShop}/>
+    <Footer goShop={goShop} navigate={navigate}/>
     <FloatingSocials/>
   </>;
 }
