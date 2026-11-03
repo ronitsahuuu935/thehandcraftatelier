@@ -3,8 +3,8 @@ import { getAdminClient, getCashfreeConfig } from "../../../src/lib/cashfree-ser
 
 export const config = {
   api: {
-    bodyParser: false
-  }
+    bodyParser: false,
+  },
 };
 
 function readRawBody(request) {
@@ -17,7 +17,7 @@ function readRawBody(request) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let settled = false;
-    const finish = error => {
+    const finish = (error) => {
       if (settled) return;
       settled = true;
       request.off("data", onData);
@@ -26,9 +26,9 @@ function readRawBody(request) {
       if (error) reject(error);
       else resolve(Buffer.concat(chunks).toString("utf8"));
     };
-    const onData = chunk => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const onData = (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     const onEnd = () => finish();
-    const onError = error => finish(error);
+    const onError = (error) => finish(error);
 
     if (request.readableEnded || request.complete) {
       const remaining = request.read?.();
@@ -45,7 +45,10 @@ function readRawBody(request) {
 function signaturesMatch(expected, received) {
   const expectedBuffer = Buffer.from(expected);
   const receivedBuffer = Buffer.from(received);
-  return expectedBuffer.length === receivedBuffer.length && crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
+  return (
+    expectedBuffer.length === receivedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+  );
 }
 
 export default async function cashfreeWebhook(request, response) {
@@ -64,7 +67,9 @@ export default async function cashfreeWebhook(request, response) {
   // Cashfree's dashboard connectivity test may send an unsigned probe. Acknowledge
   // it immediately, but never process an event unless its signature is verified.
   if (typeof timestamp !== "string" || typeof receivedSignature !== "string") {
-    console.warn("Cashfree webhook connectivity probe received without signature; no event was processed.");
+    console.warn(
+      "Cashfree webhook connectivity probe received without signature; no event was processed.",
+    );
     return response.status(200).json({ received: true, verified: false });
   }
 
@@ -101,35 +106,57 @@ export default async function cashfreeWebhook(request, response) {
   }
 
   const admin = getAdminClient(config);
-  const { data: order, error: orderError } = await admin.from("orders")
+  const { data: order, error: orderError } = await admin
+    .from("orders")
     .select("id,total,payment_status")
     .eq("cashfree_order_id", orderId)
     .maybeSingle();
   if (orderError) {
-    console.error("Cashfree webhook could not load order", { orderId, message: orderError.message });
+    console.error("Cashfree webhook could not load order", {
+      orderId,
+      message: orderError.message,
+    });
     return response.status(500).json({ error: "Could not process payment notification" });
   }
   if (!order) return response.status(200).json({ received: true, processed: false });
 
-  const gatewayAmount = Number(event.data?.payment?.payment_amount ?? event.data?.order?.order_amount);
+  const gatewayAmount = Number(
+    event.data?.payment?.payment_amount ?? event.data?.order?.order_amount,
+  );
   if (!Number.isFinite(gatewayAmount) || Math.abs(gatewayAmount - Number(order.total)) >= 0.01) {
-    console.error("Cashfree webhook amount mismatch", { orderId, expected: order.total, received: gatewayAmount });
+    console.error("Cashfree webhook amount mismatch", {
+      orderId,
+      expected: order.total,
+      received: gatewayAmount,
+    });
     return response.status(400).json({ error: "Payment amount mismatch" });
   }
   if (paymentStatus === "SUCCESS") {
-    const { error } = await admin.from("orders").update({
-      payment_status: "paid",
-      status: "confirmed",
-      cashfree_payment_id: String(event.data?.payment?.cf_payment_id || "") || null
-    }).eq("id", order.id);
+    const { error } = await admin
+      .from("orders")
+      .update({
+        payment_status: "paid",
+        status: "confirmed",
+        cashfree_payment_id: String(event.data?.payment?.cf_payment_id || "") || null,
+      })
+      .eq("id", order.id);
     if (error) {
-      console.error("Cashfree webhook could not save successful payment", { orderId, message: error.message });
+      console.error("Cashfree webhook could not save successful payment", {
+        orderId,
+        message: error.message,
+      });
       return response.status(500).json({ error: "Could not save payment status" });
     }
   } else if (String(order.payment_status).toLowerCase() !== "paid") {
-    const { error } = await admin.from("orders").update({ payment_status: "failed", status: "cancelled" }).eq("id", order.id);
+    const { error } = await admin
+      .from("orders")
+      .update({ payment_status: "failed", status: "cancelled" })
+      .eq("id", order.id);
     if (error) {
-      console.error("Cashfree webhook could not save failed payment", { orderId, message: error.message });
+      console.error("Cashfree webhook could not save failed payment", {
+        orderId,
+        message: error.message,
+      });
       return response.status(500).json({ error: "Could not save payment status" });
     }
   }

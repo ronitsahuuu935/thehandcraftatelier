@@ -1,0 +1,43 @@
+import { imageUrl } from "./media.js";
+
+const names = [
+  "Little black bird",
+  "Palm tree",
+  "Woodland bear",
+  "Little fox",
+  "Floral garland",
+  "Woodland squirrel",
+  "Garden crane",
+  "Moonlit branches",
+  "Little garden",
+  "Butterfly and bloom",
+  "Little elephant",
+  "Woodland deer",
+  "Pink blossom stem",
+  "Rose bouquet",
+  "Golden feather",
+  "Little blue bird",
+  "Bird in flight",
+  "Fern leaf",
+  "Rose sprig",
+  "Botanical stem",
+  "Bird on a branch",
+  "Autumn leaf",
+  "Peacock garden",
+  "Delicate wildflowers",
+  "Floral initial",
+  "Butterfly in blue",
+  "Woodland butterfly",
+  "Little sheep",
+  "Desert camel",
+  "Little giraffe",
+  "Horse portrait",
+  "Tree of blooms",
+  "Garden songbird",
+];
+
+export const designs = names.map((name, index) => ({
+  id: index + 1,
+  name,
+  src: imageUrl(`/images/design-${index + 1}.${index === 32 ? "jpg" : "webp"}`),
+}));

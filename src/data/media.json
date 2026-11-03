@@ -1,0 +1,502 @@
+{
+  "/images/call.webp": {
+    "src": "/media/images/call.webp",
+    "width": 1400,
+    "height": 933
+  },
+  "/images/d1-wreath.webp": {
+    "src": "/media/images/d1-wreath.webp",
+    "width": 638,
+    "height": 480
+  },
+  "/images/d6-960.webp": {
+    "src": "/media/images/d6-960.webp",
+    "width": 964,
+    "height": 1280
+  },
+  "/images/d9-960.webp": {
+    "src": "/media/images/d9-960.webp",
+    "width": 964,
+    "height": 1280
+  },
+  "/images/design-1.webp": {
+    "src": "/media/images/design-1.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-10.webp": {
+    "src": "/media/images/design-10.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-11.webp": {
+    "src": "/media/images/design-11.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-12.webp": {
+    "src": "/media/images/design-12.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-13.webp": {
+    "src": "/media/images/design-13.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-14.webp": {
+    "src": "/media/images/design-14.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-15.webp": {
+    "src": "/media/images/design-15.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-16.webp": {
+    "src": "/media/images/design-16.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-17.webp": {
+    "src": "/media/images/design-17.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-18.webp": {
+    "src": "/media/images/design-18.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-19.webp": {
+    "src": "/media/images/design-19.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-2.webp": {
+    "src": "/media/images/design-2.webp",
+    "width": 787,
+    "height": 1400
+  },
+  "/images/design-20.webp": {
+    "src": "/media/images/design-20.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-21.webp": {
+    "src": "/media/images/design-21.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-22.webp": {
+    "src": "/media/images/design-22.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-23.webp": {
+    "src": "/media/images/design-23.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-24.webp": {
+    "src": "/media/images/design-24.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-25.webp": {
+    "src": "/media/images/design-25.webp",
+    "width": 1063,
+    "height": 1400
+  },
+  "/images/design-26.webp": {
+    "src": "/media/images/design-26.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-27.webp": {
+    "src": "/media/images/design-27.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-28.webp": {
+    "src": "/media/images/design-28.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-29.webp": {
+    "src": "/media/images/design-29.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-3.webp": {
+    "src": "/media/images/design-3.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-30.webp": {
+    "src": "/media/images/design-30.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-31.webp": {
+    "src": "/media/images/design-31.webp",
+    "width": 1080,
+    "height": 1049
+  },
+  "/images/design-32.webp": {
+    "src": "/media/images/design-32.webp",
+    "width": 500,
+    "height": 500
+  },
+  "/images/design-33.jpg": {
+    "src": "/media/images/design-33.webp",
+    "width": 736,
+    "height": 1308
+  },
+  "/images/design-4.webp": {
+    "src": "/media/images/design-4.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-5.webp": {
+    "src": "/media/images/design-5.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-6.webp": {
+    "src": "/media/images/design-6.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-7.webp": {
+    "src": "/media/images/design-7.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-8.webp": {
+    "src": "/media/images/design-8.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/images/design-9.webp": {
+    "src": "/media/images/design-9.webp",
+    "width": 1400,
+    "height": 1054
+  },
+  "/images/Floral_Embroidery_Hoop.webp": {
+    "src": "/media/images/Floral_Embroidery_Hoop.webp",
+    "width": 1400,
+    "height": 933
+  },
+  "/images/G_logo.webp": {
+    "src": "/media/images/G_logo.webp",
+    "width": 1254,
+    "height": 1254
+  },
+  "/images/hero-bg.webp": {
+    "src": "/media/images/hero-bg.webp",
+    "width": 1400,
+    "height": 933
+  },
+  "/images/instagram.webp": {
+    "src": "/media/images/instagram.webp",
+    "width": 114,
+    "height": 128
+  },
+  "/images/logo.webp": {
+    "src": "/media/images/logo.webp",
+    "width": 1254,
+    "height": 1254
+  },
+  "/images/mail.webp": {
+    "src": "/media/images/mail.webp",
+    "width": 1400,
+    "height": 933
+  },
+  "/images/model.webp": {
+    "src": "/media/images/model.webp",
+    "width": 933,
+    "height": 1400
+  },
+  "/images/needle.webp": {
+    "src": "/media/images/needle.webp",
+    "width": 700,
+    "height": 561
+  },
+  "/images/ronit.webp": {
+    "src": "/media/images/ronit.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/images/whatsapp.webp": {
+    "src": "/media/images/whatsapp.webp",
+    "width": 125,
+    "height": 128
+  },
+  "/products/flower_clips.png": {
+    "src": "/media/products/flower_clips.webp",
+    "width": 1400,
+    "height": 1050
+  },
+  "/products/hair_clips.png": {
+    "src": "/media/products/hair_clips.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/mix_clips.png": {
+    "src": "/media/products/mix_clips.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-1.1.png": {
+    "src": "/media/products/pro-1.1.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-1.2.png": {
+    "src": "/media/products/pro-1.2.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-1.3.jpeg": {
+    "src": "/media/products/pro-1.3.webp",
+    "width": 1400,
+    "height": 1054
+  },
+  "/products/pro-10.1.png": {
+    "src": "/media/products/pro-10.1.webp",
+    "width": 1055,
+    "height": 1400
+  },
+  "/products/pro-10.2.png": {
+    "src": "/media/products/pro-10.2.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-10.3.jpeg": {
+    "src": "/media/products/pro-10.3.webp",
+    "width": 1400,
+    "height": 1341
+  },
+  "/products/pro-11.1.png": {
+    "src": "/media/products/pro-11.1.webp",
+    "width": 1038,
+    "height": 1400
+  },
+  "/products/pro-11.2.png": {
+    "src": "/media/products/pro-11.2.webp",
+    "width": 1310,
+    "height": 1200
+  },
+  "/products/pro-11.3.png": {
+    "src": "/media/products/pro-11.3.webp",
+    "width": 1254,
+    "height": 1254
+  },
+  "/products/pro-12.1.png": {
+    "src": "/media/products/pro-12.1.webp",
+    "width": 1199,
+    "height": 1312
+  },
+  "/products/pro-12.2.png": {
+    "src": "/media/products/pro-12.2.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-13.1.png": {
+    "src": "/media/products/pro-13.1.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-13.2.png": {
+    "src": "/media/products/pro-13.2.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-13.3.webp": {
+    "src": "/media/products/pro-13.3.webp",
+    "width": 1013,
+    "height": 1400
+  },
+  "/products/pro-13.4.webp": {
+    "src": "/media/products/pro-13.4.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-14.1.png": {
+    "src": "/media/products/pro-14.1.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-14.2.png": {
+    "src": "/media/products/pro-14.2.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-15.1.png": {
+    "src": "/media/products/pro-15.1.webp",
+    "width": 933,
+    "height": 1400
+  },
+  "/products/pro-15.2.png": {
+    "src": "/media/products/pro-15.2.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-16.1.png": {
+    "src": "/media/products/pro-16.1.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-16.2.png": {
+    "src": "/media/products/pro-16.2.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-17.1.png": {
+    "src": "/media/products/pro-17.1.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-17.2.png": {
+    "src": "/media/products/pro-17.2.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-2.1.png": {
+    "src": "/media/products/pro-2.1.webp",
+    "width": 933,
+    "height": 1400
+  },
+  "/products/pro-2.2.png": {
+    "src": "/media/products/pro-2.2.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-2.3.jpeg": {
+    "src": "/media/products/pro-2.3.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-3.1.png": {
+    "src": "/media/products/pro-3.1.webp",
+    "width": 933,
+    "height": 1400
+  },
+  "/products/pro-3.2.png": {
+    "src": "/media/products/pro-3.2.webp",
+    "width": 933,
+    "height": 1400
+  },
+  "/products/pro-3.3.png": {
+    "src": "/media/products/pro-3.3.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-3.4.webp": {
+    "src": "/media/products/pro-3.4.webp",
+    "width": 714,
+    "height": 933
+  },
+  "/products/pro-4.1.png": {
+    "src": "/media/products/pro-4.1.webp",
+    "width": 933,
+    "height": 1400
+  },
+  "/products/pro-4.2.png": {
+    "src": "/media/products/pro-4.2.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-4.3.webp": {
+    "src": "/media/products/pro-4.3.webp",
+    "width": 621,
+    "height": 898
+  },
+  "/products/pro-5.1.png": {
+    "src": "/media/products/pro-5.1.webp",
+    "width": 1199,
+    "height": 1312
+  },
+  "/products/pro-5.2.png": {
+    "src": "/media/products/pro-5.2.webp",
+    "width": 1199,
+    "height": 1312
+  },
+  "/products/pro-5.4.png": {
+    "src": "/media/products/pro-5.4.webp",
+    "width": 1017,
+    "height": 1400
+  },
+  "/products/pro-5.5.jpeg": {
+    "src": "/media/products/pro-5.5.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-6.2.png": {
+    "src": "/media/products/pro-6.2.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-6.3.jpeg": {
+    "src": "/media/products/pro-6.3.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-7.1.webp": {
+    "src": "/media/products/pro-7.1.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-7.2.jpeg": {
+    "src": "/media/products/pro-7.2.webp",
+    "width": 1053,
+    "height": 1400
+  },
+  "/products/pro-8.1.png": {
+    "src": "/media/products/pro-8.1.webp",
+    "width": 1054,
+    "height": 1400
+  },
+  "/products/pro-8.2.png": {
+    "src": "/media/products/pro-8.2.webp",
+    "width": 1050,
+    "height": 1400
+  },
+  "/products/pro-8.3.jpg": {
+    "src": "/media/products/pro-8.3.webp",
+    "width": 1400,
+    "height": 483
+  },
+  "/products/pro-9.1.png": {
+    "src": "/media/products/pro-9.1.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-9.2.png": {
+    "src": "/media/products/pro-9.2.webp",
+    "width": 1120,
+    "height": 1400
+  },
+  "/products/pro-9.3.png": {
+    "src": "/media/products/pro-9.3.webp",
+    "width": 1312,
+    "height": 1199
+  },
+  "/products/pro-9.4.webp": {
+    "src": "/media/products/pro-9.4.webp",
+    "width": 736,
+    "height": 983
+  },
+  "/products/pro-9.5.webp": {
+    "src": "/media/products/pro-9.5.webp",
+    "width": 522,
+    "height": 653
+  },
+  "/products/pro6.1.png": {
+    "src": "/media/products/pro6.1.webp",
+    "width": 1050,
+    "height": 1400
+  }
+}

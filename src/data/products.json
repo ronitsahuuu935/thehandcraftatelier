@@ -1,0 +1,436 @@
+[
+  {
+    "id": 1001,
+    "name": "Wildflower Bouquet Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-1.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-1.1.png"
+      },
+      {
+        "source": "/products/pro-1.2.png"
+      },
+      {
+        "source": "/products/pro-1.3.jpeg"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Wildflower Bouquet Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1002,
+    "name": "Blue Blossom Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-2.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-2.1.png"
+      },
+      {
+        "source": "/products/pro-2.2.png"
+      },
+      {
+        "source": "/products/pro-2.3.jpeg"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Blue Blossom Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1003,
+    "name": "Botanical Linework Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-3.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-3.1.png"
+      },
+      {
+        "source": "/products/pro-3.2.png"
+      },
+      {
+        "source": "/products/pro-3.3.png"
+      },
+      {
+        "source": "/products/pro-3.4.webp"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Botanical Linework Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1004,
+    "name": "Little Cherry Tank",
+    "category": "Tops & Tees",
+    "price": 1999,
+    "imageSource": "/products/pro-4.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-4.1.png"
+      },
+      {
+        "source": "/products/pro-4.2.png"
+      },
+      {
+        "source": "/products/pro-4.3.webp"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Little Cherry Tank, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1005,
+    "name": "Garden Smocked Top",
+    "category": "Tops & Tees",
+    "price": 1999,
+    "imageSource": "/products/pro-5.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-5.1.png"
+      },
+      {
+        "source": "/products/pro-5.2.png"
+      },
+      {
+        "source": "/products/pro-5.4.png"
+      },
+      {
+        "source": "/products/pro-5.5.jpeg"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Garden Smocked Top, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1006,
+    "name": "Everyday Fruit Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro6.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro6.1.png"
+      },
+      {
+        "source": "/products/pro-6.2.png"
+      },
+      {
+        "source": "/products/pro-6.3.jpeg"
+      },
+      {
+        "source": "/products/pro-6.4.mp4",
+        "type": "video",
+        "posterSource": "/products/pro6.1.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Everyday Fruit Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1007,
+    "name": "Wildflower Meadow Dress",
+    "category": "Kids",
+    "price": 1499,
+    "imageSource": "/products/pro-7.1.webp",
+    "gallery": [
+      {
+        "source": "/products/pro-7.1.webp"
+      },
+      {
+        "source": "/products/pro-7.2.jpeg"
+      },
+      {
+        "source": "/products/pro-7.3.mp4",
+        "type": "video",
+        "posterSource": "/products/pro-7.1.webp"
+      }
+    ],
+    "sizes": ["2–3 years", "4–5 years", "6–7 years"],
+    "tag": null,
+    "description": "Wildflower Meadow Dress, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1008,
+    "name": "Daisy Garland Tee",
+    "category": "Tops & Tees",
+    "price": 1999,
+    "imageSource": "/products/pro-8.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-8.1.png"
+      },
+      {
+        "source": "/products/pro-8.2.png"
+      },
+      {
+        "source": "/products/pro-8.3.jpg"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Daisy Garland Tee, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1009,
+    "name": "Olive Branch Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-9.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-9.1.png"
+      },
+      {
+        "source": "/products/pro-9.2.png"
+      },
+      {
+        "source": "/products/pro-9.3.png"
+      },
+      {
+        "source": "/products/pro-9.4.webp"
+      },
+      {
+        "source": "/products/pro-9.5.webp"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Olive Branch Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1010,
+    "name": "Little Songbird Co-ord",
+    "category": "Kids",
+    "price": 1499,
+    "imageSource": "/products/pro-10.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-10.1.png"
+      },
+      {
+        "source": "/products/pro-10.2.png"
+      },
+      {
+        "source": "/products/pro-10.3.jpeg"
+      }
+    ],
+    "sizes": ["2–3 years", "4–5 years", "6–7 years"],
+    "tag": null,
+    "description": "Little Songbird Co-ord, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1011,
+    "name": "Trailing Vines Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-11.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-11.1.png"
+      },
+      {
+        "source": "/products/pro-11.2.png"
+      },
+      {
+        "source": "/products/pro-11.3.png"
+      },
+      {
+        "source": "/products/pro-11.4.mp4",
+        "type": "video",
+        "posterSource": "/products/pro-11.1.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Trailing Vines Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1012,
+    "name": "Blush Botanical Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-12.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-12.1.png"
+      },
+      {
+        "source": "/products/pro-12.2.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Blush Botanical Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1013,
+    "name": "Sunflower Stem Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-13.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-13.1.png"
+      },
+      {
+        "source": "/products/pro-13.2.png"
+      },
+      {
+        "source": "/products/pro-13.3.webp"
+      },
+      {
+        "source": "/products/pro-13.4.webp"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Sunflower Stem Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1014,
+    "name": "Monogram Wreath Tee",
+    "category": "Personalized",
+    "price": 1999,
+    "imageSource": "/products/pro-14.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-14.1.png"
+      },
+      {
+        "source": "/products/pro-14.2.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": "Personalized",
+    "description": "Monogram Wreath Tee, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1015,
+    "name": "Wildflower Sprig Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-15.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-15.1.png"
+      },
+      {
+        "source": "/products/pro-15.2.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Wildflower Sprig Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1016,
+    "name": "Little Bird Pocket Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-16.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-16.1.png"
+      },
+      {
+        "source": "/products/pro-16.2.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Little Bird Pocket Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1017,
+    "name": "Everyday Grey Shirt",
+    "category": "Shirts",
+    "price": 1999,
+    "imageSource": "/products/pro-17.1.png",
+    "gallery": [
+      {
+        "source": "/products/pro-17.1.png"
+      },
+      {
+        "source": "/products/pro-17.2.png"
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": null,
+    "description": "Everyday Grey Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1018,
+    "name": "Crochet Flower Hair Clips",
+    "category": "Accessories",
+    "price": 299,
+    "imageSource": "/products/flower_clips.png",
+    "gallery": [
+      {
+        "source": "/products/flower_clips.png"
+      }
+    ],
+    "sizes": ["One size"],
+    "tag": null,
+    "description": "A little handmade detail for your hair. Choose a playful finishing touch for everyday outfits and thoughtful gifts.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1019,
+    "name": "Playful Embroidered Hair Clips",
+    "category": "Accessories",
+    "price": 299,
+    "imageSource": "/products/hair_clips.png",
+    "gallery": [
+      {
+        "source": "/products/hair_clips.png"
+      }
+    ],
+    "sizes": ["One size"],
+    "tag": null,
+    "description": "A little handmade detail for your hair. Choose a playful finishing touch for everyday outfits and thoughtful gifts.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1020,
+    "name": "Garden Mix Hair Clips",
+    "category": "Accessories",
+    "price": 299,
+    "imageSource": "/products/mix_clips.png",
+    "gallery": [
+      {
+        "source": "/products/mix_clips.png"
+      }
+    ],
+    "sizes": ["One size"],
+    "tag": null,
+    "description": "A little handmade detail for your hair. Choose a playful finishing touch for everyday outfits and thoughtful gifts.",
+    "stock_quantity": 0
+  }
+]
