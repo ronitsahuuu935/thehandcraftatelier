@@ -66,7 +66,7 @@
   min-height: 650px;
   background:
     linear-gradient(90deg, #f8f1e6 30%, #f8f1e6db 50%, #f8f1e640),
-    url("/images/hero-bg.webp") center/cover;
+    url("/media/images/hero-bg.webp") center/cover;
 }
 .story-intro {
   padding: 55px 0 65px 15%;
@@ -221,7 +221,7 @@
   padding: 42px 8%;
   background:
     linear-gradient(90deg, #f8f0e7af, #fbf5e9f5 25%, #fbf5e9f5 75%, #f8f0e7af),
-    url("/images/hero-bg.webp") center/cover;
+    url("/media/images/hero-bg.webp") center/cover;
 }
 .story-closing blockquote {
   font-size: 28px;
@@ -293,7 +293,7 @@
     grid-template-columns: 1fr;
     background:
       linear-gradient(#f8f1e6f2, #f8f1e6b0),
-      url("/images/hero-bg.webp") center/cover;
+      url("/media/images/hero-bg.webp") center/cover;
   }
   .story-intro {
     padding: 38px 7% 0;
@@ -410,7 +410,7 @@
 }
 .story-process-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 25px;
   max-width: 1200px;
   margin: auto;
@@ -419,17 +419,14 @@
 .story-process-grid figure {
   margin: 0;
 }
-.story-process-grid img,
-.story-process-grid video {
+.story-process-grid img {
   width: 100%;
   aspect-ratio: 3/4;
   object-fit: cover;
   background: #ddd2c1;
   border-radius: 6px;
 }
-.story-process-grid video {
-  object-fit: contain;
-}
+
 .story-process-grid figcaption {
   text-align: center;
   font-size: 22px;
@@ -511,10 +508,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 18px;
   }
-  .story-process-grid video {
-    grid-column: 1/-1;
-    max-height: 470px;
-  }
+
   .story-process-grid figcaption {
     font-size: 19px;
   }

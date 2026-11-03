@@ -85,7 +85,7 @@ export function Footer({ goShop, navigate }) {
             href="#shop"
             onClick={(e) => {
               e.preventDefault();
-              goShop("Personalized");
+              goShop();
             }}
           >
             Personalized

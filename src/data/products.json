@@ -4,16 +4,16 @@
     "name": "Wildflower Bouquet Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-1.1.png",
+    "imageSource": "/media/products/pro-1.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-1.1.png"
+        "source": "/media/products/pro-1.1.webp"
       },
       {
-        "source": "/products/pro-1.2.png"
+        "source": "/media/products/pro-1.2.webp"
       },
       {
-        "source": "/products/pro-1.3.jpeg"
+        "source": "/media/products/pro-1.3.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -26,16 +26,16 @@
     "name": "Blue Blossom Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-2.1.png",
+    "imageSource": "/media/products/pro-2.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-2.1.png"
+        "source": "/media/products/pro-2.1.webp"
       },
       {
-        "source": "/products/pro-2.2.png"
+        "source": "/media/products/pro-2.2.webp"
       },
       {
-        "source": "/products/pro-2.3.jpeg"
+        "source": "/media/products/pro-2.3.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -48,19 +48,19 @@
     "name": "Botanical Linework Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-3.1.png",
+    "imageSource": "/media/products/pro-3.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-3.1.png"
+        "source": "/media/products/pro-3.1.webp"
       },
       {
-        "source": "/products/pro-3.2.png"
+        "source": "/media/products/pro-3.2.webp"
       },
       {
-        "source": "/products/pro-3.3.png"
+        "source": "/media/products/pro-3.3.webp"
       },
       {
-        "source": "/products/pro-3.4.webp"
+        "source": "/media/products/pro-3.4.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -73,16 +73,16 @@
     "name": "Little Cherry Tank",
     "category": "Tops & Tees",
     "price": 1999,
-    "imageSource": "/products/pro-4.1.png",
+    "imageSource": "/media/products/pro-4.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-4.1.png"
+        "source": "/media/products/pro-4.1.webp"
       },
       {
-        "source": "/products/pro-4.2.png"
+        "source": "/media/products/pro-4.2.webp"
       },
       {
-        "source": "/products/pro-4.3.webp"
+        "source": "/media/products/pro-4.3.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -95,19 +95,19 @@
     "name": "Garden Smocked Top",
     "category": "Tops & Tees",
     "price": 1999,
-    "imageSource": "/products/pro-5.1.png",
+    "imageSource": "/media/products/pro-5.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-5.1.png"
+        "source": "/media/products/pro-5.1.webp"
       },
       {
-        "source": "/products/pro-5.2.png"
+        "source": "/media/products/pro-5.2.webp"
       },
       {
-        "source": "/products/pro-5.4.png"
+        "source": "/media/products/pro-5.4.webp"
       },
       {
-        "source": "/products/pro-5.5.jpeg"
+        "source": "/media/products/pro-5.5.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -120,21 +120,21 @@
     "name": "Everyday Fruit Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro6.1.png",
+    "imageSource": "/media/products/pro6.1.webp",
     "gallery": [
       {
-        "source": "/products/pro6.1.png"
+        "source": "/media/products/pro6.1.webp"
       },
       {
-        "source": "/products/pro-6.2.png"
+        "source": "/media/products/pro-6.2.webp"
       },
       {
-        "source": "/products/pro-6.3.jpeg"
+        "source": "/media/products/pro-6.3.webp"
       },
       {
-        "source": "/products/pro-6.4.mp4",
+        "source": "/media/products/pro-6.4.mp4",
         "type": "video",
-        "posterSource": "/products/pro6.1.png"
+        "posterSource": "/media/products/pro6.1.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -147,18 +147,18 @@
     "name": "Wildflower Meadow Dress",
     "category": "Kids",
     "price": 1499,
-    "imageSource": "/products/pro-7.1.webp",
+    "imageSource": "/media/products/pro-7.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-7.1.webp"
+        "source": "/media/products/pro-7.1.webp"
       },
       {
-        "source": "/products/pro-7.2.jpeg"
+        "source": "/media/products/pro-7.2.webp"
       },
       {
-        "source": "/products/pro-7.3.mp4",
+        "source": "/media/products/pro-7.3.mp4",
         "type": "video",
-        "posterSource": "/products/pro-7.1.webp"
+        "posterSource": "/media/products/pro-7.1.webp"
       }
     ],
     "sizes": ["2–3 years", "4–5 years", "6–7 years"],
@@ -171,16 +171,16 @@
     "name": "Daisy Garland Tee",
     "category": "Tops & Tees",
     "price": 1999,
-    "imageSource": "/products/pro-8.1.png",
+    "imageSource": "/media/products/pro-8.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-8.1.png"
+        "source": "/media/products/pro-8.1.webp"
       },
       {
-        "source": "/products/pro-8.2.png"
+        "source": "/media/products/pro-8.2.webp"
       },
       {
-        "source": "/products/pro-8.3.jpg"
+        "source": "/media/products/pro-8.3.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -193,22 +193,22 @@
     "name": "Olive Branch Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-9.1.png",
+    "imageSource": "/media/products/pro-9.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-9.1.png"
+        "source": "/media/products/pro-9.1.webp"
       },
       {
-        "source": "/products/pro-9.2.png"
+        "source": "/media/products/pro-9.2.webp"
       },
       {
-        "source": "/products/pro-9.3.png"
+        "source": "/media/products/pro-9.3.webp"
       },
       {
-        "source": "/products/pro-9.4.webp"
+        "source": "/media/products/pro-9.4.webp"
       },
       {
-        "source": "/products/pro-9.5.webp"
+        "source": "/media/products/pro-9.5.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -221,16 +221,16 @@
     "name": "Little Songbird Co-ord",
     "category": "Kids",
     "price": 1499,
-    "imageSource": "/products/pro-10.1.png",
+    "imageSource": "/media/products/pro-10.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-10.1.png"
+        "source": "/media/products/pro-10.1.webp"
       },
       {
-        "source": "/products/pro-10.2.png"
+        "source": "/media/products/pro-10.2.webp"
       },
       {
-        "source": "/products/pro-10.3.jpeg"
+        "source": "/media/products/pro-10.3.webp"
       }
     ],
     "sizes": ["2–3 years", "4–5 years", "6–7 years"],
@@ -243,21 +243,21 @@
     "name": "Trailing Vines Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-11.1.png",
+    "imageSource": "/media/products/pro-11.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-11.1.png"
+        "source": "/media/products/pro-11.1.webp"
       },
       {
-        "source": "/products/pro-11.2.png"
+        "source": "/media/products/pro-11.2.webp"
       },
       {
-        "source": "/products/pro-11.3.png"
+        "source": "/media/products/pro-11.3.webp"
       },
       {
-        "source": "/products/pro-11.4.mp4",
+        "source": "/media/products/pro-11.4.mp4",
         "type": "video",
-        "posterSource": "/products/pro-11.1.png"
+        "posterSource": "/media/products/pro-11.1.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -270,13 +270,13 @@
     "name": "Blush Botanical Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-12.1.png",
+    "imageSource": "/media/products/pro-12.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-12.1.png"
+        "source": "/media/products/pro-12.1.webp"
       },
       {
-        "source": "/products/pro-12.2.png"
+        "source": "/media/products/pro-12.2.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -289,19 +289,19 @@
     "name": "Sunflower Stem Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-13.1.png",
+    "imageSource": "/media/products/pro-13.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-13.1.png"
+        "source": "/media/products/pro-13.1.webp"
       },
       {
-        "source": "/products/pro-13.2.png"
+        "source": "/media/products/pro-13.2.webp"
       },
       {
-        "source": "/products/pro-13.3.webp"
+        "source": "/media/products/pro-13.3.webp"
       },
       {
-        "source": "/products/pro-13.4.webp"
+        "source": "/media/products/pro-13.4.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -314,13 +314,13 @@
     "name": "Monogram Wreath Tee",
     "category": "Personalized",
     "price": 1999,
-    "imageSource": "/products/pro-14.1.png",
+    "imageSource": "/media/products/pro-14.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-14.1.png"
+        "source": "/media/products/pro-14.1.webp"
       },
       {
-        "source": "/products/pro-14.2.png"
+        "source": "/media/products/pro-14.2.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -333,13 +333,13 @@
     "name": "Wildflower Sprig Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-15.1.png",
+    "imageSource": "/media/products/pro-15.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-15.1.png"
+        "source": "/media/products/pro-15.1.webp"
       },
       {
-        "source": "/products/pro-15.2.png"
+        "source": "/media/products/pro-15.2.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -352,13 +352,13 @@
     "name": "Little Bird Pocket Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-16.1.png",
+    "imageSource": "/media/products/pro-16.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-16.1.png"
+        "source": "/media/products/pro-16.1.webp"
       },
       {
-        "source": "/products/pro-16.2.png"
+        "source": "/media/products/pro-16.2.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -371,13 +371,13 @@
     "name": "Everyday Grey Shirt",
     "category": "Shirts",
     "price": 1999,
-    "imageSource": "/products/pro-17.1.png",
+    "imageSource": "/media/products/pro-17.1.webp",
     "gallery": [
       {
-        "source": "/products/pro-17.1.png"
+        "source": "/media/products/pro-17.1.webp"
       },
       {
-        "source": "/products/pro-17.2.png"
+        "source": "/media/products/pro-17.2.webp"
       }
     ],
     "sizes": ["XS", "S", "M", "L", "XL"],
@@ -390,10 +390,10 @@
     "name": "Crochet Flower Hair Clips",
     "category": "Accessories",
     "price": 299,
-    "imageSource": "/products/flower_clips.png",
+    "imageSource": "/media/products/flower_clips.webp",
     "gallery": [
       {
-        "source": "/products/flower_clips.png"
+        "source": "/media/products/flower_clips.webp"
       }
     ],
     "sizes": ["One size"],
@@ -406,10 +406,10 @@
     "name": "Playful Embroidered Hair Clips",
     "category": "Accessories",
     "price": 299,
-    "imageSource": "/products/hair_clips.png",
+    "imageSource": "/media/products/hair_clips.webp",
     "gallery": [
       {
-        "source": "/products/hair_clips.png"
+        "source": "/media/products/hair_clips.webp"
       }
     ],
     "sizes": ["One size"],
@@ -422,10 +422,10 @@
     "name": "Garden Mix Hair Clips",
     "category": "Accessories",
     "price": 299,
-    "imageSource": "/products/mix_clips.png",
+    "imageSource": "/media/products/mix_clips.webp",
     "gallery": [
       {
-        "source": "/products/mix_clips.png"
+        "source": "/media/products/mix_clips.webp"
       }
     ],
     "sizes": ["One size"],

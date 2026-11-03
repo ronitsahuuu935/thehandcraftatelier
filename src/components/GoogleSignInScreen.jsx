@@ -9,7 +9,7 @@ export function GoogleSignInScreen({ onGoogleSignIn }) {
     <section className="google-signin-page">
       <img
         className="google-flower google-flower-one"
-        src={IMG + "Floral_Embroidery_Hoop.webp"}
+        src={IMG + "design-32.webp"}
         alt=""
         aria-hidden="true"
       />

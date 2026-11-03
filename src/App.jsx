@@ -7,6 +7,7 @@ import OurStory from "./OurStory";
 import ContactUs from "./ContactUs";
 
 import { PRODUCT_IMG, SOCIAL, AVAILABLE_SIZES, products } from "./data/storefront.js";
+import { imageUrl, resolveGalleryMedia } from "./data/media.js";
 
 import { ADMIN_HASH, PENDING_CHECKOUT_KEY } from "./data/app.js";
 import { Header } from "./components/Header.jsx";
@@ -214,12 +215,14 @@ export function App() {
         );
       } else if (rows?.length) {
         catalog = rows.map((row) => {
-          const image = row.image_url || "/images/logo.webp";
+          const image = imageUrl(row.image_url) || "/media/images/logo.webp";
           return {
             ...row,
             image,
             gallery:
-              Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [{ src: image }],
+              Array.isArray(row.gallery) && row.gallery.length
+                ? row.gallery.map(resolveGalleryMedia)
+                : [{ src: image }],
             sizes: Array.isArray(row.sizes) && row.sizes.length ? row.sizes : AVAILABLE_SIZES,
             stock_quantity: row.stock_quantity ?? null,
           };

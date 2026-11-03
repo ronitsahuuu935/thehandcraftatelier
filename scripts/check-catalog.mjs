@@ -10,7 +10,7 @@ try {
   const { products } = await server.ssrLoadModule("/src/data/catalog.js");
   const { designs } = await server.ssrLoadModule("/src/data/designs.js");
   const source = JSON.parse(fs.readFileSync("src/data/products.json", "utf8"));
-  const actual = fs.readdirSync("public/products").map((file) => "/products/" + file);
+  const actual = fs.readdirSync("public/media/products").map((file) => "/media/products/" + file);
   const included = source.flatMap((product) => product.gallery.map((item) => item.source));
   assert.deepEqual(
     new Set(included),
@@ -53,15 +53,31 @@ try {
       .filter((src) => src.startsWith("/")),
   );
   for (const match of markup.matchAll(/url\((\/[^)]+)\)/g)) assets.add(match[1]);
-  for (const src of assets)
+  for (const src of assets) {
+    assert.ok(src.startsWith("/media/"), `Asset still depends on an original folder: ${src}`);
     assert.ok(fs.existsSync(path.join("public", src)), `Missing rendered asset ${src}`);
-  const media = JSON.parse(fs.readFileSync("src/data/media.json", "utf8"));
-  for (const file of fs.readdirSync("public/images")) {
-    const original = "/images/" + file;
-    assert.ok(
-      assets.has(original) || assets.has(media[original]?.src),
-      `Image not used in page markup: ${file}`,
-    );
+  }
+  // Check CSS backgrounds, favicon, preload, and admin asset paths too.
+  for (const filename of [
+    "src/story.css",
+    "src/contact.css",
+    "src/styles.css",
+    "src/admin.css",
+    "src/AdminPanel.jsx",
+    "index.html",
+  ]) {
+    const text = fs.readFileSync(filename, "utf8");
+    assert.ok(!/["'`](?:\/images\/|\/products\/)/.test(text), `Legacy asset path in ${filename}`);
+    for (const match of text.matchAll(/["'](\/media\/[^"']+)["']/g)) {
+      assert.ok(
+        fs.existsSync(path.join("public", match[1])),
+        `Missing asset in ${filename}: ${match[1]}`,
+      );
+    }
+  }
+  for (const file of fs.readdirSync("public/media/images")) {
+    const original = "/media/images/" + file;
+    assert.ok(assets.has(original), `Image not used in page markup: ${file}`);
   }
   for (const product of products)
     for (const item of product.gallery)

@@ -39,5 +39,5 @@ const names = [
 export const designs = names.map((name, index) => ({
   id: index + 1,
   name,
-  src: imageUrl(`/images/design-${index + 1}.${index === 32 ? "jpg" : "webp"}`),
+  src: imageUrl(`/media/images/design-${index + 1}.webp`),
 }));

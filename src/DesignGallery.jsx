@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { designs } from "./data/designs.js";
 
 export default function DesignGallery({ goShop, onStory, full = false }) {
-  const featured = [32, 33, 26, 27, 28, 29, 30, 31].map((id) =>
+  const featured = [24, 33, 26, 27, 28, 29, 30, 31].map((id) =>
     designs.find((design) => design.id === id),
   );
   return (

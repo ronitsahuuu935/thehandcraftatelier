@@ -33,7 +33,7 @@ export default function OurStory({ goShop }) {
         </div>
         <div className="story-hero-art">
           <img
-            src="/images/logo.webp"
+            src="/media/images/logo.webp"
             alt="Hand-embroidered woodland bunny surrounded by flowers, mushrooms and a red butterfly"
             fetchPriority="high"
           />
@@ -65,7 +65,7 @@ export default function OurStory({ goShop }) {
       <section className="story-journey">
         <figure className="story-photo">
           <img
-            src={imageUrl("/images/d1-wreath.webp")}
+            src={imageUrl("/media/images/d1-wreath.webp")}
             alt="A floral embroidery hoop with red blooms and green leaves, resting on soft fabric beside flowers and threads"
             loading="lazy"
           />
@@ -97,7 +97,7 @@ export default function OurStory({ goShop }) {
       <section className="story-maker">
         <div className="story-maker-portrait">
           <img
-            src={imageUrl("/images/ronit.webp")}
+            src={imageUrl("/media/images/ronit.webp")}
             alt="Ronit, the person behind The Hand Craft Atelier"
             loading="lazy"
           />
@@ -122,23 +122,13 @@ export default function OurStory({ goShop }) {
       <section className="story-process">
         <div className="story-process-heading">
           <span className="eyebrow">A MOMENT IN THE MAKING</span>
-          <h2>Watch the little details come to life.</h2>
+          <h2>Beauty in the little details.</h2>
           <p>A closer look at the embroidery that gives each piece its character.</p>
         </div>
         <div className="story-process-grid">
-          <video
-            controls
-            playsInline
-            preload="none"
-            poster={imageUrl("/images/d6-960.webp")}
-            aria-label="Blue embroidery reel"
-          >
-            <source src="/images/blue_embro_reel.mp4" type="video/mp4" />
-            Your browser does not support video playback.
-          </video>
           <figure>
             <img
-              src={imageUrl("/images/d6-960.webp")}
+              src={imageUrl("/media/images/d6-960.webp")}
               alt="Tiny embroidered birds and flowers on blue fabric"
               loading="lazy"
             />
@@ -146,7 +136,7 @@ export default function OurStory({ goShop }) {
           </figure>
           <figure>
             <img
-              src={imageUrl("/images/d9-960.webp")}
+              src={imageUrl("/media/images/d9-960.webp")}
               alt="Hand embroidery of a hand holding a floral bouquet on peach fabric"
               loading="lazy"
             />
@@ -158,7 +148,7 @@ export default function OurStory({ goShop }) {
       <section className="story-wear">
         <figure>
           <img
-            src={imageUrl("/images/model.webp")}
+            src={imageUrl("/media/images/model.webp")}
             alt="Handcrafted clothing styled for everyday wear"
             loading="lazy"
           />
@@ -176,8 +166,8 @@ export default function OurStory({ goShop }) {
           </p>
           <img
             className="story-wear-detail"
-            src={imageUrl("/images/Floral_Embroidery_Hoop.webp")}
-            alt="A colourful floral embroidery hoop"
+            src={imageUrl("/media/images/design-32.webp")}
+            alt="Hand-embroidered tree with colourful flowers"
             loading="lazy"
           />
           <button className="story-collection-button" onClick={() => goShop()}>

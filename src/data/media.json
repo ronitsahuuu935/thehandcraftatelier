@@ -184,11 +184,6 @@
     "width": 1400,
     "height": 1054
   },
-  "/images/Floral_Embroidery_Hoop.webp": {
-    "src": "/media/images/Floral_Embroidery_Hoop.webp",
-    "width": 1400,
-    "height": 933
-  },
   "/images/G_logo.webp": {
     "src": "/media/images/G_logo.webp",
     "width": 1254,
@@ -498,5 +493,14 @@
     "src": "/media/products/pro6.1.webp",
     "width": 1050,
     "height": 1400
+  },
+  "/products/pro-11.4.mp4": {
+    "src": "/media/products/pro-11.4.mp4"
+  },
+  "/products/pro-6.4.mp4": {
+    "src": "/media/products/pro-6.4.mp4"
+  },
+  "/products/pro-7.3.mp4": {
+    "src": "/media/products/pro-7.3.mp4"
   }
 }

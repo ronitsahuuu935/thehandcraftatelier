@@ -15,7 +15,7 @@
   align-items: center;
   background:
     linear-gradient(90deg, #f9ecdcef 0%, #f9ecdce6 34%, #f9ecdc55 55%, transparent 70%),
-    url("/images/hero-bg.webp") 70% 48% / cover;
+    url("/media/images/hero-bg.webp") 70% 48% / cover;
   overflow: hidden;
 }
 .contact-hero-copy {

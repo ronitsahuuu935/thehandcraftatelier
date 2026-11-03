@@ -129,20 +129,20 @@ export default function ContactUs({ contact }) {
             {[
               {
                 title: "Email Us",
-                image: "/images/mail.webp",
+                image: "/media/images/mail.webp",
                 detail: contact.email,
                 href: `mailto:${contact.email}`,
               },
               {
                 title: "WhatsApp",
-                image: "/images/whatsapp.webp",
+                image: "/media/images/whatsapp.webp",
                 detail: contact.phoneLabel,
                 href: contact.whatsapp,
                 external: true,
               },
               {
                 title: "Call Us",
-                image: "/images/call.webp",
+                image: "/media/images/call.webp",
                 detail: contact.phoneLabel,
                 href: `tel:${contact.phone}`,
               },
@@ -173,7 +173,7 @@ export default function ContactUs({ contact }) {
             <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
               <img
                 className="contact-instagram-logo"
-                src="/images/instagram.webp"
+                src="/media/images/instagram.webp"
                 alt=""
                 width="40"
                 height="40"

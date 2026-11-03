@@ -97,7 +97,7 @@ export function Header({
         </button>
         <button
           onClick={() => {
-            goShop("Personalized");
+            goShop();
             setMenuOpen(false);
           }}
         >

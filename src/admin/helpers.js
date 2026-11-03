@@ -1,4 +1,5 @@
 import { money as formatMoney } from "../lib/format.js";
+import { imageUrl, resolveGalleryMedia } from "../data/media.js";
 
 import {
   BarChart3,
@@ -67,11 +68,11 @@ const money = (value) => formatMoney(Number(value || 0));
 
 const catalogFromRow = (row) => ({
   ...row,
-  image: row.image_url || "/images/logo.webp",
+  image: imageUrl(row.image_url) || "/media/images/logo.webp",
   gallery:
     Array.isArray(row.gallery) && row.gallery.length
-      ? row.gallery
-      : [{ src: row.image_url || "/images/logo.webp" }],
+      ? row.gallery.map(resolveGalleryMedia)
+      : [{ src: imageUrl(row.image_url) || "/media/images/logo.webp" }],
   sizes: Array.isArray(row.sizes) && row.sizes.length ? row.sizes : AVAILABLE_SIZES,
   stock_quantity: row.stock_quantity ?? null,
 });

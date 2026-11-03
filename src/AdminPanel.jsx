@@ -1,4 +1,4 @@
-import { isVideo } from "./data/media.js";
+import { isVideo, imageUrl as resolveImageUrl } from "./data/media.js";
 import {
   nav,
   copy,
@@ -11,10 +11,11 @@ import {
   money,
   catalogFromRow,
 } from "./admin/helpers.js";
-import { AVAILABLE_SIZES } from "./data/storefront.js";
+import { AVAILABLE_SIZES, SOCIAL } from "./data/storefront.js";
+import { isPaidOrder } from "./lib/orders.js";
 import { Status, Metric, DemoNote, Empty, Chart } from "./admin/components.jsx";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -49,6 +50,8 @@ import "./admin.css";
 import { productStorageBucket, supabase } from "./lib/supabase";
 
 function AdminPanel({ products = [], onProductsChange, onExit }) {
+  const [downloadingLabelId, setDownloadingLabelId] = useState(null);
+  const labelDownloadInProgress = useRef(false);
   const [sessionUser, setSessionUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const [loginName, setLoginName] = useState("");
@@ -237,7 +240,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [productSort, setProductSort] = useState("name-asc");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderStatusBusy, setOrderStatusBusy] = useState(false);
-  const [adminAvatar, setAdminAvatar] = useState("/images/ronit.webp");
+  const [adminAvatar, setAdminAvatar] = useState("/media/images/ronit.webp");
   const [adminAvatarOpen, setAdminAvatarOpen] = useState(false);
   const [adminAvatarFile, setAdminAvatarFile] = useState(null);
   const [adminAvatarPreview, setAdminAvatarPreview] = useState("");
@@ -246,7 +249,9 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   useEffect(() => {
     const metadata = sessionUser?.user_metadata || {};
     setAdminAvatar(
-      metadata.admin_avatar_removed ? "" : metadata.admin_avatar_url || "/images/ronit.webp",
+      metadata.admin_avatar_removed
+        ? ""
+        : resolveImageUrl(metadata.admin_avatar_url) || "/media/images/ronit.webp",
     );
   }, [sessionUser]);
   useEffect(() => {
@@ -458,15 +463,23 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       setNotice("Stock saved to Supabase.");
     }
   };
+  const selectedOrderDelivered = [
+    selectedOrder?.status,
+    orders.find((order) => order.id === selectedOrder?.id)?.status,
+  ].some(
+    (status) =>
+      String(status || "")
+        .trim()
+        .toLowerCase() === "delivered",
+  );
   const updateOrderStatus = async (status) => {
-    if (!supabase || !selectedOrder) return;
-    if (String(selectedOrder.status || "").toLowerCase() === "delivered" && status !== "delivered")
-      return;
+    if (!supabase || !selectedOrder || orderStatusBusy || selectedOrderDelivered) return;
     setOrderStatusBusy(true);
     const { data, error } = await supabase
       .from("orders")
       .update({ status })
       .eq("id", selectedOrder.id)
+      .eq("status", selectedOrder.status)
       .select("id,status")
       .maybeSingle();
     setOrderStatusBusy(false);
@@ -1027,6 +1040,49 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       </button>
     </div>
   );
+  const downloadOrderLabel = async (order) => {
+    if (labelDownloadInProgress.current || !isPaidOrder(order)) return;
+    labelDownloadInProgress.current = true;
+    setDownloadingLabelId(order.id);
+    try {
+      if (!supabase) throw new Error("Sign in to download an order label.");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error("Your session has expired. Please sign in again.");
+      // Read the saved shipping details and payment status again under the admin session.
+      const { data: latestOrder, error } = await supabase
+        .from("orders")
+        .select(
+          "id,recipient_name,recipient_phone,shipping_address_line1,shipping_address_line2,shipping_city,shipping_state,shipping_postal_code,shipping_country,total,payment_status",
+        )
+        .eq("id", order.id)
+        .maybeSingle();
+      if (error) throw new Error("Could not load this order's delivery details. Please try again.");
+      if (!latestOrder) throw new Error("This order is unavailable or you no longer have access.");
+      if (!isPaidOrder(latestOrder)) {
+        setOrders((current) =>
+          current.map((item) =>
+            item.id === order.id ? { ...item, payment_status: latestOrder.payment_status } : item,
+          ),
+        );
+        throw new Error("Labels are available only for paid orders.");
+      }
+      const { downloadShippingLabel } = await import("./admin/shipping-label.js");
+      await downloadShippingLabel(latestOrder, {
+        name: "The Hand Craft Atelier",
+        address: "Malviya Nagar, Creware Coworks, near Saras Parlour",
+        postalCode: "302017",
+        phone: SOCIAL.phoneLabel,
+      });
+      setNotice("Shipping label download started.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Could not download the shipping label.");
+    } finally {
+      labelDownloadInProgress.current = false;
+      setDownloadingLabelId(null);
+    }
+  };
   const orderRows = (
     <>
       <div className="admin-table-wrap">
@@ -1073,6 +1129,18 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                     <button className="admin-row-button" onClick={() => setSelectedOrder(o)}>
                       View
                     </button>
+                    {isPaidOrder(o) && (
+                      <button
+                        className="admin-row-button admin-label-button"
+                        type="button"
+                        onClick={() => downloadOrderLabel(o)}
+                        disabled={downloadingLabelId !== null}
+                        aria-label={`Download PDF label for order ${String(o.id).slice(0, 8)}`}
+                      >
+                        <Download size={13} aria-hidden="true" />
+                        {downloadingLabelId === o.id ? "Preparing…" : "Label"}
+                      </button>
+                    )}
                     {!["rejected", "shipped", "delivered", "fulfilled"].includes(
                       String(o.status || "").toLowerCase(),
                     ) && (
@@ -1094,13 +1162,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       )}
     </>
   );
-  const paidSales = orders.filter((order) =>
-    ["paid", "success", "successful", "captured"].includes(
-      String(order.payment_status || "")
-        .trim()
-        .toLowerCase(),
-    ),
-  );
+  const paidSales = orders.filter(isPaidOrder);
   const unreadSales = paidSales.filter(
     (order) => new Date(order.created_at || 0).getTime() > lastNotificationSeen,
   );
@@ -1121,7 +1183,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     <div className="admin-app">
       <aside className={"admin-sidebar" + (menu ? " is-open" : "")}>
         <div className="admin-brand">
-          <img src="/images/logo.webp" alt="" />
+          <img src="/media/images/logo.webp" alt="" />
           <span>
             The Handcraft
             <br />
@@ -2525,7 +2587,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                       (selectedOrder.status === "shipped" ? " is-dispatched" : "")
                     }
                     type="button"
-                    disabled={orderStatusBusy || selectedOrder.status === "delivered"}
+                    disabled={orderStatusBusy || selectedOrderDelivered}
                     onClick={() =>
                       updateOrderStatus(selectedOrder.status === "shipped" ? "pending" : "shipped")
                     }
@@ -2536,7 +2598,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   <button
                     className="admin-primary-button"
                     type="button"
-                    disabled={orderStatusBusy || selectedOrder.status === "delivered"}
+                    disabled={orderStatusBusy || selectedOrderDelivered}
                     onClick={() => updateOrderStatus("delivered")}
                   >
                     <Check size={15} /> Mark delivered

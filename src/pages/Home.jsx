@@ -17,7 +17,11 @@ export function Home({
   isWishlisted,
   onToggleWishlist,
 }) {
-  const visible = productCatalog.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+  const visible = productCatalog.filter(
+    (product) =>
+      product.category !== "Accessories" &&
+      product.name.toLowerCase().includes(search.toLowerCase()),
+  );
   return (
     <main>
       <section className="hero">
@@ -51,7 +55,7 @@ export function Home({
           ["Shirts", images.catShirts],
           ["Tops & Tees", images.catTops],
           ["Kids", images.catKids],
-          ["Accessories", images.catAccessories],
+          ["Personalized", images.catPersonalized],
         ].map(([name, img]) => (
           <button className="category-card" key={name} onClick={() => goShop(name)}>
             <img src={img} alt="" />
@@ -126,7 +130,11 @@ export function Home({
           </p>
         </div>
         <div className="testimonial-art">
-          <img src={images.floralEmbroideryHoop} alt="Floral embroidery hoop" loading="lazy" />
+          <img
+            src={images.promiseEmbroideryHoop}
+            alt="Hand-embroidered tree with colourful flowers"
+            loading="lazy"
+          />
         </div>
       </section>
       <section className="journal-strip" id="journal">
@@ -144,8 +152,8 @@ export function Home({
             Made to be <em>kept close.</em>
           </h2>
           <p>Thoughtful gifts, little rituals, and the beauty of making things slowly.</p>
-          <button className="story-cta" onClick={() => navigate("story")}>
-            Our story <ArrowRight size={15} />
+          <button className="story-cta" onClick={() => goShop()}>
+            Shop now <ArrowRight size={15} />
           </button>
         </div>
         <div className="journal-decoration" aria-hidden="true" />

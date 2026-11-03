@@ -2369,6 +2369,13 @@
   align-items: center;
   gap: 6px;
 }
+.admin-label-button {
+  white-space: nowrap;
+}
+.admin-label-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 .admin-reject-button {
   padding: 6px 9px;
   border: 1px solid #e8c1b7;
@@ -2460,6 +2467,16 @@
 }
 .admin-dispatch-button.is-dispatched:hover {
   background: #dcecd8;
+}
+.admin-order-detail-actions button:disabled,
+.admin-order-detail-actions button:disabled:hover {
+  background: #eeede7;
+  color: #96998e;
+  border-color: #dedfd6;
+  box-shadow: none;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 .admin-gallery-manager {
   margin: 14px 0;

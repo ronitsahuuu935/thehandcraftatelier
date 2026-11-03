@@ -1,7 +1,7 @@
 import { imageUrl } from "./media.js";
 export { products } from "./catalog.js";
-export const IMG = "/images/";
-export const PRODUCT_IMG = "/products/";
+export const IMG = "/media/images/";
+export const PRODUCT_IMG = "/media/products/";
 export const SOCIAL = {
   instagram:
     "https://www.instagram.com/thehandcraftatelier?utm_source=ig_web_button_share_sheet&vrfl=ZDNlZDc0MzIxNw==",
@@ -14,12 +14,11 @@ export const images = {
   logo: IMG + "logo.webp",
   heroBg: IMG + "hero-bg.webp",
   needle: IMG + "needle.webp",
-  catShirts: imageUrl("/products/pro-2.1.png"),
-  catTops: imageUrl("/products/pro-5.1.png"),
-  catKids: imageUrl("/products/pro-7.1.webp"),
-  catPersonalized: imageUrl("/products/pro-14.1.png"),
-  catAccessories: imageUrl("/products/mix_clips.png"),
-  floralEmbroideryHoop: IMG + "Floral_Embroidery_Hoop.webp",
+  catShirts: imageUrl("/media/products/pro-2.1.webp"),
+  catTops: imageUrl("/media/products/pro-5.1.webp"),
+  catKids: imageUrl("/media/products/pro-7.1.webp"),
+  catPersonalized: imageUrl("/media/products/pro-14.1.webp"),
+  promiseEmbroideryHoop: IMG + "design-32.webp",
   journal2: IMG + "d6-960.webp",
   gift: IMG + "d9-960.webp",
   instagram: IMG + "instagram.webp",
