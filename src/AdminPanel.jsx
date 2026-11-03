@@ -49,10 +49,22 @@ import {
 import "./admin.css";
 import { productStorageBucket, supabase } from "./lib/supabase";
 
+async function prepareShippingLabels() {
+  const module = await import("./admin/shipping-label.js");
+  await module.preloadLabelAssets();
+  return module;
+}
+
 function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [downloadingLabelId, setDownloadingLabelId] = useState(null);
   const labelDownloadInProgress = useRef(false);
   const [sessionUser, setSessionUser] = useState(null);
+  useEffect(() => {
+    if (sessionUser) {
+      // Warm the PDF code and reusable assets before the first Label click.
+      prepareShippingLabels().catch(() => {});
+    }
+  }, [sessionUser]);
   const [authReady, setAuthReady] = useState(false);
   const [loginName, setLoginName] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -1051,13 +1063,16 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       } = await supabase.auth.getSession();
       if (!session) throw new Error("Your session has expired. Please sign in again.");
       // Read the saved shipping details and payment status again under the admin session.
-      const { data: latestOrder, error } = await supabase
-        .from("orders")
-        .select(
-          "id,recipient_name,recipient_phone,shipping_address_line1,shipping_address_line2,shipping_city,shipping_state,shipping_postal_code,shipping_country,total,payment_status",
-        )
-        .eq("id", order.id)
-        .maybeSingle();
+      const [{ data: latestOrder, error }, { downloadShippingLabel }] = await Promise.all([
+        supabase
+          .from("orders")
+          .select(
+            "id,recipient_name,recipient_phone,shipping_address_line1,shipping_address_line2,shipping_city,shipping_state,shipping_postal_code,shipping_country,total,payment_status",
+          )
+          .eq("id", order.id)
+          .maybeSingle(),
+        prepareShippingLabels(),
+      ]);
       if (error) throw new Error("Could not load this order's delivery details. Please try again.");
       if (!latestOrder) throw new Error("This order is unavailable or you no longer have access.");
       if (!isPaidOrder(latestOrder)) {
@@ -1068,7 +1083,6 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
         );
         throw new Error("Labels are available only for paid orders.");
       }
-      const { downloadShippingLabel } = await import("./admin/shipping-label.js");
       await downloadShippingLabel(latestOrder, {
         name: "The Hand Craft Atelier",
         address: "Malviya Nagar, Creware Coworks, near Saras Parlour",

@@ -4,6 +4,26 @@ import fontkit from "@pdf-lib/fontkit";
 import { isPaidOrder } from "../lib/orders.js";
 
 export const LABEL_FONT_URL = "/media/fonts/NotoSansDevanagari.ttf";
+export const LABEL_LOGO_URL = "/media/labels/logo.png";
+
+let assetsPromise;
+export function preloadLabelAssets() {
+  if (!assetsPromise) {
+    assetsPromise = Promise.all(
+      [LABEL_FONT_URL, LABEL_LOGO_URL].map(async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Label assets could not load. Please try again.");
+        return response.arrayBuffer();
+      }),
+    )
+      .then(([fontBytes, logoBytes]) => ({ fontBytes, logoBytes }))
+      .catch((error) => {
+        assetsPromise = undefined;
+        throw error;
+      });
+  }
+  return assetsPromise;
+}
 
 const clean = (value) =>
   String(value ?? "")
@@ -35,7 +55,7 @@ function wrapText(text, font, size, maxWidth) {
   return lines;
 }
 
-export async function createShippingLabel(order, { fontBytes, sender }) {
+export async function createShippingLabel(order, { fontBytes, logoBytes, sender }) {
   if (!isPaidOrder(order)) throw new Error("Labels are available only for paid orders.");
   if (
     !clean(order.recipient_name) ||
@@ -50,6 +70,7 @@ export async function createShippingLabel(order, { fontBytes, sender }) {
   const pdf = await PDFDocument.create();
   pdf.registerFontkit(fontkit);
   const font = await pdf.embedFont(fontBytes, { subset: true });
+  const logo = logoBytes ? await pdf.embedPng(logoBytes) : null;
   const orderId = clean(order.id);
   pdf.setTitle(`Shipping label — ${orderId}`);
   pdf.setAuthor(sender.name);
@@ -67,7 +88,12 @@ export async function createShippingLabel(order, { fontBytes, sender }) {
     blocks.push({ divider: true, height: 12 });
   }
 
-  text(sender.name, 12, 9);
+  if (logo) {
+    const lines = wrapText(sender.name, font, 12, width - margin * 2 - 44);
+    blocks.push({ lines, size: 12, logo: true, height: Math.max(38, lines.length * 15 + 9) });
+  } else {
+    text(sender.name, 12, 9);
+  }
   text("SHIP TO", 9);
   text(order.recipient_name, 17);
   text(order.recipient_phone ? `Phone: ${clean(order.recipient_phone)}` : "", 12);
@@ -115,6 +141,14 @@ export async function createShippingLabel(order, { fontBytes, sender }) {
         color: rgb(0, 0, 0),
       });
     } else {
+      if (block.logo) {
+        const dimensions = logo.scaleToFit(32, 32);
+        page.drawImage(logo, {
+          x: width - margin - dimensions.width,
+          y: cursor - dimensions.height,
+          ...dimensions,
+        });
+      }
       block.lines.forEach((line, index) =>
         page.drawText(line, {
           x: margin,
@@ -131,10 +165,8 @@ export async function createShippingLabel(order, { fontBytes, sender }) {
 }
 
 export async function downloadShippingLabel(order, sender) {
-  const response = await fetch(LABEL_FONT_URL);
-  if (!response.ok) throw new Error("The label font could not load. Please try again.");
   const bytes = await createShippingLabel(order, {
-    fontBytes: await response.arrayBuffer(),
+    ...(await preloadLabelAssets()),
     sender,
   });
   const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));

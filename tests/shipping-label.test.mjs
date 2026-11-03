@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, PDFName } from "pdf-lib";
 import { createShippingLabel } from "../src/admin/shipping-label.js";
 import { isPaidOrder } from "../src/lib/orders.js";
 
@@ -14,6 +14,7 @@ const sender = {
   postalCode: "302017",
   phone: "+91 78776 42926",
 };
+const logoBytes = await fs.readFile(new URL("../public/media/labels/logo.png", import.meta.url));
 const order = {
   id: "12345678-1234-1234-1234-123456789012",
   payment_status: "paid",
@@ -44,12 +45,13 @@ test("only confirmed payment states qualify for labels", () => {
     assert.equal(isPaidOrder({ payment_status }), false);
 });
 test("a paid order produces a single printable 4 by 6 inch PDF", async () => {
-  const bytes = await createShippingLabel(order, { fontBytes, sender });
+  const bytes = await createShippingLabel(order, { fontBytes, logoBytes, sender });
   const pdf = await PDFDocument.load(bytes);
   assert.equal(pdf.getPageCount(), 1);
   assert.equal(pdf.getTitle(), `Shipping label — ${order.id}`);
   assert.equal(pdf.getPage(0).getWidth(), 288);
   assert.equal(pdf.getPage(0).getHeight(), 432);
+  assert.ok(pdf.getPage(0).node.Resources().get(PDFName.of("XObject")), "Logo is embedded");
 });
 test("unpaid orders are rejected even if generation is invoked directly", async () => {
   await assert.rejects(
@@ -97,7 +99,11 @@ test("one click creates a PDF download without opening a print dialog", async ()
     },
   };
   try {
-    globalThis.fetch = async () => ({ ok: true, arrayBuffer: async () => fontBytes });
+    let fetches = 0;
+    globalThis.fetch = async (url) => {
+      fetches++;
+      return { ok: true, arrayBuffer: async () => (url.endsWith(".png") ? logoBytes : fontBytes) };
+    };
     globalThis.document = { createElement: () => link, body: { appendChild() {} } };
     URL.createObjectURL = (blob) => {
       assert.equal(blob.type, "application/pdf");
@@ -111,7 +117,9 @@ test("one click creates a PDF download without opening a print dialog", async ()
       return 0;
     };
     await downloadShippingLabel(order, sender);
-    assert.equal(clicks, 1);
+    await downloadShippingLabel(order, sender);
+    assert.equal(clicks, 2);
+    assert.equal(fetches, 2, "Font and logo are reused across downloads");
     assert.equal(link.download, `shipping-label-${order.id}.pdf`);
     assert.equal(link.href, "blob:test-label");
     assert.equal(removed, true);
