@@ -1291,6 +1291,12 @@ img {
   }
 }
 @media (max-width: 620px) {
+  .product-image > img {
+    object-fit: contain;
+  }
+  .product-image:hover > img {
+    transform: none;
+  }
   .announcement {
     font-size: 9px;
   }
