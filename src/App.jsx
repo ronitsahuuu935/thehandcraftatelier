@@ -8,6 +8,7 @@ import ContactUs from "./ContactUs";
 
 import { PRODUCT_IMG, SOCIAL, AVAILABLE_SIZES, products } from "./data/storefront.js";
 import { imageUrl, resolveGalleryMedia } from "./data/media.js";
+import { cartAvailabilityError } from "./lib/inventory.js";
 
 import { ADMIN_HASH, PENDING_CHECKOUT_KEY } from "./data/app.js";
 import { Header } from "./components/Header.jsx";
@@ -24,7 +25,7 @@ import { CustomerAccount } from "./pages/CustomerAccount.jsx";
 import { Checkout } from "./pages/Checkout.jsx";
 
 export function App() {
-  const [productCatalog, setProductCatalog] = useState(products);
+  const [productCatalog, setProductCatalog] = useState(supabase ? [] : products);
   const [adminMode, setAdminMode] = useState(() => window.location.hash === ADMIN_HASH);
   useEffect(() => {
     const syncAdminRoute = () => setAdminMode(window.location.hash === ADMIN_HASH);
@@ -201,7 +202,7 @@ export function App() {
 
     let active = true;
     const loadProductImages = async () => {
-      let catalog = products;
+      let catalog = [];
       const { data: rows, error: catalogError } = await supabase
         .from("products")
         .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
@@ -209,11 +210,9 @@ export function App() {
         .order("id");
 
       if (catalogError) {
-        console.warn(
-          "Unable to load the products table; using the built-in catalog until the admin schema is applied.",
-          catalogError,
-        );
-      } else if (rows?.length) {
+        console.warn("Unable to refresh the product catalog.", catalogError);
+        return;
+      } else {
         catalog = rows.map((row) => {
           const image = imageUrl(row.image_url) || "/media/images/logo.webp";
           return {
@@ -265,15 +264,25 @@ export function App() {
 
       if (active) {
         setProductCatalog(withStorageImages);
+        setCart((current) =>
+          current.filter((item) => withStorageImages.some((product) => product.id === item.id)),
+        );
         setSelectedProduct(
-          (current) => withStorageImages.find((product) => product.id === current.id) || current,
+          (current) => withStorageImages.find((product) => product.id === current?.id) || null,
         );
       }
     };
 
     loadProductImages();
+    const refreshCatalog = () => {
+      void loadProductImages();
+    };
+    window.addEventListener("focus", refreshCatalog);
+    const refreshTimer = window.setInterval(refreshCatalog, 30000);
     return () => {
       active = false;
+      window.removeEventListener("focus", refreshCatalog);
+      window.clearInterval(refreshTimer);
     };
   }, []);
   const navigate = (next, product) => {
@@ -289,6 +298,8 @@ export function App() {
     navigate("shop");
   };
   const startCheckout = (items, fromBag = false) => {
+    const error = cartAvailabilityError(items, productCatalog);
+    if (error) return window.alert(error);
     const checkoutItems = items.map((item) => {
       const catalogItem = productCatalog.find((product) => product.id === item.id);
       return { ...(catalogItem || {}), ...item, quantity: item.quantity || 1 };
@@ -309,6 +320,8 @@ export function App() {
     } else navigate("home");
   };
   const addToCart = (product) => {
+    const error = cartAvailabilityError([...cart, product], productCatalog);
+    if (error) return window.alert(error);
     setCart((old) => {
       const match = old.findIndex(
         (item) =>
@@ -343,7 +356,16 @@ export function App() {
     setCart((old) =>
       old.map((item, itemIndex) =>
         itemIndex === index
-          ? { ...item, quantity: Math.max(1, (item.quantity || 1) + delta) }
+          ? {
+              ...item,
+              quantity: Math.min(
+                Math.max(1, (item.quantity || 1) + delta),
+                Math.max(
+                  1,
+                  productCatalog.find((p) => p.id === item.id)?.stock_quantity ?? Infinity,
+                ),
+              ),
+            }
           : item,
       ),
     );
@@ -359,7 +381,10 @@ export function App() {
         onProductsChange={(updated) => {
           setProductCatalog(updated);
           setSelectedProduct(
-            (current) => updated.find((product) => product.id === current.id) || current,
+            (current) => updated.find((product) => product.id === current?.id) || null,
+          );
+          setCart((current) =>
+            current.filter((item) => updated.some((product) => product.id === item.id)),
           );
         }}
         onExit={() => {
@@ -459,7 +484,15 @@ export function App() {
               onToggleWishlist={toggleWishlist}
             />
           )}
-          {page === "product" && (
+          {page === "product" && !selectedProduct && (
+            <main className="section-wrap empty-state">
+              <p>This product is no longer available.</p>
+              <button className="btn primary" onClick={() => goShop()}>
+                Browse products
+              </button>
+            </main>
+          )}
+          {page === "product" && selectedProduct && (
             <ProductDetail
               key={selectedProduct.id}
               product={selectedProduct}

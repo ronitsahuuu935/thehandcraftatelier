@@ -3,6 +3,7 @@ import React from "react";
 import { Heart, Plus } from "lucide-react";
 
 import { money } from "../lib/format.js";
+import { canPurchase } from "../lib/inventory.js";
 
 export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWishlist }) {
   return (
@@ -41,8 +42,12 @@ export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWish
         </button>
         <strong>{money(product.price)}</strong>
         <p className="product-craft-note">Handcrafted with care</p>
-        <button className="quick-add" onClick={() => onAdd(product)}>
-          Add to bag <Plus size={13} />
+        <button
+          className="quick-add"
+          disabled={!canPurchase(product)}
+          onClick={() => onAdd(product)}
+        >
+          {canPurchase(product) ? "Add to bag" : "Out of stock"} <Plus size={13} />
         </button>
       </div>
     </article>

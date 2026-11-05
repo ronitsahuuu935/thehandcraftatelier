@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { cartAvailabilityError } from "../../../src/lib/inventory.js";
 import {
   cashfreeHeaders,
   getAdminClient,
@@ -61,7 +62,7 @@ export default async function createCashfreeOrder(request, response) {
   const admin = getAdminClient(config);
   const { data: products, error: productsError } = await admin
     .from("products")
-    .select("id,name,price,category,sizes,gallery")
+    .select("id,name,price,category,sizes,gallery,stock_quantity")
     .eq("is_active", true)
     .in("id", productIds);
   if (productsError) {
@@ -70,6 +71,8 @@ export default async function createCashfreeOrder(request, response) {
       .status(500)
       .json({ error: "We could not verify product prices. Please try again." });
   }
+  const inventoryError = cartAvailabilityError(items, products || []);
+  if (inventoryError) return response.status(409).json({ error: inventoryError });
   const byId = new Map((products || []).map((product) => [String(product.id), product]));
   const orderItems = [];
   for (const item of items) {

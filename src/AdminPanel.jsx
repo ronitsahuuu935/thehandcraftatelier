@@ -149,6 +149,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [addingProduct, setAddingProduct] = useState(false);
   const [savingProduct, setSavingProduct] = useState(false);
+  const [deletingProduct, setDeletingProduct] = useState(false);
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [customerFormOpen, setCustomerFormOpen] = useState(false);
@@ -469,9 +470,11 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       .eq("id", id);
     if (error) setNotice("Stock was not saved: " + error.message);
     else {
-      setCatalogProducts((current) =>
-        current.map((p) => (p.id === id ? { ...p, stock_quantity: value } : p)),
+      const updated = catalogProducts.map((p) =>
+        p.id === id ? { ...p, stock_quantity: value } : p,
       );
+      setCatalogProducts(updated);
+      onProductsChange?.(updated);
       setNotice("Stock saved to Supabase.");
     }
   };
@@ -580,9 +583,39 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       active = false;
     };
   }, [sessionUser]);
+  const deleteProduct = async () => {
+    if (!supabase || !editingProduct || savingProduct || deletingProduct) return;
+    if (
+      !window.confirm(
+        `Delete "${editingProduct.name}" from the website? This will remove it from the shop. Existing orders will be kept.`,
+      )
+    )
+      return;
+    setDeletingProduct(true);
+    setCatalogError("");
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .update({ is_active: false })
+        .eq("id", editingProduct.id)
+        .select("id")
+        .single();
+      if (error || !data) throw new Error(error?.message || "Product could not be deleted.");
+      const updated = catalogProducts.filter((product) => product.id !== data.id);
+      setCatalogProducts(updated);
+      setCategories([...new Set(updated.map((product) => product.category).filter(Boolean))]);
+      onProductsChange?.(updated);
+      setEditingProduct(null);
+      setNotice("Product removed from the website.");
+    } catch (error) {
+      setCatalogError(error.message || "Could not delete the product. Please try again.");
+    } finally {
+      setDeletingProduct(false);
+    }
+  };
   const saveProduct = async (event) => {
     event.preventDefault();
-    if (!supabase || !editingProduct) return;
+    if (!supabase || !editingProduct || deletingProduct) return;
     setSavingProduct(true);
     setCatalogError("");
     const form = new FormData(event.currentTarget);
@@ -2298,7 +2331,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
               className="admin-modal-backdrop"
               role="presentation"
               onMouseDown={(e) => {
-                if (e.target === e.currentTarget) {
+                if (e.target === e.currentTarget && !deletingProduct) {
                   setEditingProduct(null);
                   setAddingProduct(false);
                 }
@@ -2319,6 +2352,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                     setAddingProduct(false);
                   }}
                   aria-label="Close"
+                  disabled={deletingProduct}
                 >
                   ×
                 </button>
@@ -2511,9 +2545,20 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   </p>
                 )}
                 <div className="admin-editor-actions">
+                  {editingProduct && (
+                    <button
+                      type="button"
+                      className="admin-danger-button"
+                      disabled={savingProduct || deletingProduct}
+                      onClick={deleteProduct}
+                    >
+                      {deletingProduct ? "Deleting…" : "Delete product"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="admin-outline-button"
+                    disabled={deletingProduct}
                     onClick={() => {
                       setEditingProduct(null);
                       setAddingProduct(false);
@@ -2521,7 +2566,10 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   >
                     Cancel
                   </button>
-                  <button className="admin-primary-button" disabled={savingProduct}>
+                  <button
+                    className="admin-primary-button"
+                    disabled={savingProduct || deletingProduct}
+                  >
                     {savingProduct ? "Saving…" : editingProduct ? "Save changes" : "Add product"}
                   </button>
                 </div>

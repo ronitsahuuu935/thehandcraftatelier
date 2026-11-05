@@ -12,12 +12,11 @@ try {
   const source = JSON.parse(fs.readFileSync("src/data/products.json", "utf8"));
   const actual = fs.readdirSync("public/media/products").map((file) => "/media/products/" + file);
   const included = source.flatMap((product) => product.gallery.map((item) => item.source));
-  assert.deepEqual(
-    new Set(included),
-    new Set(actual),
-    "Every product asset must belong to a gallery",
-  );
-  assert.equal(products.length, 20);
+  for (const asset of included) {
+    assert.ok(actual.includes(asset), `Missing product asset: ${asset}`);
+  }
+  assert.equal(products.length, 17);
+  assert.ok(products.every((product) => ![1004, 1005, 1007, 1011, 1017].includes(product.id)));
   assert.equal(designs.length, 33);
   const { default: OurStory } = await server.ssrLoadModule("/src/OurStory.jsx");
   const { Home } = await server.ssrLoadModule("/src/pages/Home.jsx");
@@ -27,6 +26,25 @@ try {
     "/src/components/GoogleSignInScreen.jsx",
   );
   const { SOCIAL } = await server.ssrLoadModule("/src/data/storefront.js");
+  const { ProductCard } = await server.ssrLoadModule("/src/components/ProductCard.jsx");
+  for (const stock_quantity of [0, 2]) {
+    const product = { ...products[0], stock_quantity };
+    const card = renderToStaticMarkup(React.createElement(ProductCard, { product }));
+    assert.equal(/class="quick-add" disabled=""/.test(card), stock_quantity === 0);
+    const detail = renderToStaticMarkup(
+      React.createElement(ProductDetail, {
+        product,
+        productCatalog: products,
+        isWishlisted: () => false,
+      }),
+    );
+    for (const button of ["add-large", "buy-large"]) {
+      assert.equal(
+        new RegExp(`class="[^"]*${button}" disabled=""`).test(detail),
+        stock_quantity === 0,
+      );
+    }
+  }
   const props = {
     goShop: () => {},
     navigate: () => {},

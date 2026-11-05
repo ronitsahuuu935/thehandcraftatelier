@@ -6,6 +6,7 @@ import { isVideo } from "../data/media.js";
 import { AVAILABLE_SIZES } from "../data/storefront.js";
 
 import { money } from "../lib/format.js";
+import { canPurchase } from "../lib/inventory.js";
 
 import { ProductGrid } from "../components/ProductGrid.jsx";
 
@@ -67,7 +68,7 @@ export function ProductDetail({
                   <img
                     src={isVideo(src) ? src.poster || product.image : src.src}
                     alt=""
-                    style={{ objectFit: src.contain ? "contain" : "cover" }}
+                    style={{ "--gallery-image-fit": src.contain ? "contain" : "cover" }}
                   />
                   {isVideo(src) && (
                     <Play className="product-video-badge" size={18} aria-hidden="true" />
@@ -91,7 +92,7 @@ export function ProductDetail({
               <img
                 src={gallery[active]?.src || product.image}
                 alt={product.name}
-                style={{ objectFit: gallery[active]?.contain ? "contain" : "cover" }}
+                style={{ "--gallery-image-fit": gallery[active]?.contain ? "contain" : "cover" }}
               />
             )}
           </div>
@@ -161,20 +162,22 @@ export function ProductDetail({
               <Minus size={14} />
             </button>
             <span>{qty}</span>
-            <button onClick={() => setQty(qty + 1)}>
+            <button disabled={!canPurchase(product, qty + 1)} onClick={() => setQty(qty + 1)}>
               <Plus size={14} />
             </button>
           </div>
           <button
             className="btn primary add-large"
+            disabled={!canPurchase(product, qty)}
             onClick={() =>
               onAdd({ ...product, quantity: qty, size, color: color || null, personalization })
             }
           >
-            Add to bag — {money(product.price * qty)}
+            {canPurchase(product) ? `Add to bag — ${money(product.price * qty)}` : "Out of stock"}
           </button>
           <button
             className="btn secondary buy-large"
+            disabled={!canPurchase(product, qty)}
             onClick={() =>
               onBuyNow({ ...product, quantity: qty, size, color: color || null, personalization })
             }

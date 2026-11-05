@@ -56,15 +56,22 @@ export function Home({
           ["Tops & Tees", images.catTops],
           ["Kids", images.catKids],
           ["Personalized", images.catPersonalized],
-        ].map(([name, img]) => (
-          <button className="category-card" key={name} onClick={() => goShop(name)}>
-            <img src={img} alt="" />
-            <span>
-              {name}
-              <small>Shop now ↗</small>
-            </span>
-          </button>
-        ))}
+        ].map(([name, img]) => {
+          const candidates = productCatalog.filter((product) => product.category === name);
+          if (!candidates.length) return null;
+          const image =
+            candidates.find((product) => product.image.split("?")[0].endsWith(img.split("/").pop()))
+              ?.image || candidates[0].image;
+          return (
+            <button className="category-card" key={name} onClick={() => goShop(name)}>
+              <img src={image} alt="" />
+              <span>
+                {name}
+                <small>Shop now ↗</small>
+              </span>
+            </button>
+          );
+        })}
       </section>
       <section className="section-wrap">
         <div className="section-heading">

@@ -69,53 +69,6 @@
     "stock_quantity": 0
   },
   {
-    "id": 1004,
-    "name": "Little Cherry Tank",
-    "category": "Tops & Tees",
-    "price": 1999,
-    "imageSource": "/media/products/pro-4.1.webp",
-    "gallery": [
-      {
-        "source": "/media/products/pro-4.1.webp"
-      },
-      {
-        "source": "/media/products/pro-4.2.webp"
-      },
-      {
-        "source": "/media/products/pro-4.3.webp"
-      }
-    ],
-    "sizes": ["XS", "S", "M", "L", "XL"],
-    "tag": null,
-    "description": "Little Cherry Tank, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
-    "stock_quantity": 0
-  },
-  {
-    "id": 1005,
-    "name": "Garden Smocked Top",
-    "category": "Tops & Tees",
-    "price": 1999,
-    "imageSource": "/media/products/pro-5.1.webp",
-    "gallery": [
-      {
-        "source": "/media/products/pro-5.1.webp"
-      },
-      {
-        "source": "/media/products/pro-5.2.webp"
-      },
-      {
-        "source": "/media/products/pro-5.4.webp"
-      },
-      {
-        "source": "/media/products/pro-5.5.webp"
-      }
-    ],
-    "sizes": ["XS", "S", "M", "L", "XL"],
-    "tag": null,
-    "description": "Garden Smocked Top, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
-    "stock_quantity": 0
-  },
-  {
     "id": 1006,
     "name": "Everyday Fruit Shirt",
     "category": "Shirts",
@@ -140,30 +93,6 @@
     "sizes": ["XS", "S", "M", "L", "XL"],
     "tag": null,
     "description": "Everyday Fruit Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
-    "stock_quantity": 0
-  },
-  {
-    "id": 1007,
-    "name": "Wildflower Meadow Dress",
-    "category": "Kids",
-    "price": 1499,
-    "imageSource": "/media/products/pro-7.1.webp",
-    "gallery": [
-      {
-        "source": "/media/products/pro-7.1.webp"
-      },
-      {
-        "source": "/media/products/pro-7.2.webp"
-      },
-      {
-        "source": "/media/products/pro-7.3.mp4",
-        "type": "video",
-        "posterSource": "/media/products/pro-7.1.webp"
-      }
-    ],
-    "sizes": ["2–3 years", "4–5 years", "6–7 years"],
-    "tag": null,
-    "description": "Wildflower Meadow Dress, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
     "stock_quantity": 0
   },
   {
@@ -233,36 +162,13 @@
         "source": "/media/products/pro-10.3.webp"
       }
     ],
-    "sizes": ["2–3 years", "4–5 years", "6–7 years"],
+    "sizes": [
+      "2\u00e2\u20ac\u201c3 years",
+      "4\u00e2\u20ac\u201c5 years",
+      "6\u00e2\u20ac\u201c7 years"
+    ],
     "tag": null,
     "description": "Little Songbird Co-ord, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
-    "stock_quantity": 0
-  },
-  {
-    "id": 1011,
-    "name": "Trailing Vines Shirt",
-    "category": "Shirts",
-    "price": 1999,
-    "imageSource": "/media/products/pro-11.1.webp",
-    "gallery": [
-      {
-        "source": "/media/products/pro-11.1.webp"
-      },
-      {
-        "source": "/media/products/pro-11.2.webp"
-      },
-      {
-        "source": "/media/products/pro-11.3.webp"
-      },
-      {
-        "source": "/media/products/pro-11.4.mp4",
-        "type": "video",
-        "posterSource": "/media/products/pro-11.1.webp"
-      }
-    ],
-    "sizes": ["XS", "S", "M", "L", "XL"],
-    "tag": null,
-    "description": "Trailing Vines Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
     "stock_quantity": 0
   },
   {
@@ -367,25 +273,6 @@
     "stock_quantity": 0
   },
   {
-    "id": 1017,
-    "name": "Everyday Grey Shirt",
-    "category": "Shirts",
-    "price": 1999,
-    "imageSource": "/media/products/pro-17.1.webp",
-    "gallery": [
-      {
-        "source": "/media/products/pro-17.1.webp"
-      },
-      {
-        "source": "/media/products/pro-17.2.webp"
-      }
-    ],
-    "sizes": ["XS", "S", "M", "L", "XL"],
-    "tag": null,
-    "description": "Everyday Grey Shirt, finished with thoughtful hand-embroidered details. Made to bring a little colour and character to everyday dressing.",
-    "stock_quantity": 0
-  },
-  {
     "id": 1018,
     "name": "Crochet Flower Hair Clips",
     "category": "Accessories",
@@ -431,6 +318,52 @@
     "sizes": ["One size"],
     "tag": null,
     "description": "A little handmade detail for your hair. Choose a playful finishing touch for everyday outfits and thoughtful gifts.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1021,
+    "name": "Tree of Blooms Co-ord",
+    "category": "Tops & Tees",
+    "price": 1999,
+    "imageSource": "/media/products/tree-of-blooms-coord-1.webp",
+    "gallery": [
+      {
+        "source": "/media/products/tree-of-blooms-coord-1.webp",
+        "contain": true
+      },
+      {
+        "source": "/media/products/tree-of-blooms-coord-2.webp",
+        "contain": true
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": "New",
+    "description": "Tree of Blooms Co-ord, featuring hand-embroidered details and a matching top and trousers.",
+    "stock_quantity": 0
+  },
+  {
+    "id": 1022,
+    "name": "Pink Daisy Co-ord",
+    "category": "Tops & Tees",
+    "price": 1999,
+    "imageSource": "/media/products/pink-daisy-coord-1.webp",
+    "gallery": [
+      {
+        "source": "/media/products/pink-daisy-coord-1.webp",
+        "contain": true
+      },
+      {
+        "source": "/media/products/pink-daisy-coord-2.webp",
+        "contain": true
+      },
+      {
+        "source": "/media/products/pink-daisy-coord-3.webp",
+        "contain": true
+      }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "tag": "New",
+    "description": "Pink Daisy Co-ord, featuring hand-embroidered details and a matching top and trousers.",
     "stock_quantity": 0
   }
 ]
