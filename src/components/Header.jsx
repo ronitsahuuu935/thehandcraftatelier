@@ -55,14 +55,18 @@ export function Header({
           </button>
           <button
             className="icon-btn wishlist-header-button"
-            aria-label="Open wishlist"
+            aria-label={`Open wishlist, ${wishlistCount} items`}
             title="Wishlist"
             onClick={onWishlist}
           >
             <Heart />
             <span>{wishlistCount}</span>
           </button>
-          <button className="icon-btn bag" aria-label="Open shopping bag" onClick={onBag}>
+          <button
+            className="icon-btn bag"
+            aria-label={`Open shopping bag, ${cartCount} items`}
+            onClick={onBag}
+          >
             <ShoppingBag />
             <span>{cartCount}</span>
           </button>

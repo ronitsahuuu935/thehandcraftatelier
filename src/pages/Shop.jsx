@@ -17,6 +17,7 @@ export function Shop({
   productCatalog,
   isWishlisted,
   onToggleWishlist,
+  loading = false,
 }) {
   const [sort, setSort] = useState("Featured");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -110,7 +111,11 @@ export function Shop({
             </label>
           </div>
         </aside>
-        <section className="shop-results">
+        <section
+          className="shop-results"
+          style={loading ? { minHeight: "100vh" } : undefined}
+          aria-busy={loading}
+        >
           <div className="shop-toolbar">
             <button className="filter-trigger" onClick={() => setFilterOpen(true)}>
               <SlidersHorizontal size={16} /> Filter & sort

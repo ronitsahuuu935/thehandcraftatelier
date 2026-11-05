@@ -4,6 +4,7 @@ import { Leaf, ArrowRight } from "lucide-react";
 
 import DesignGallery from "../DesignGallery";
 import { images } from "../data/storefront.js";
+import { responsiveImageProps } from "../lib/responsive-images.js";
 
 import { ProductGrid } from "../components/ProductGrid.jsx";
 
@@ -16,6 +17,7 @@ export function Home({
   productCatalog,
   isWishlisted,
   onToggleWishlist,
+  loading = false,
 }) {
   const visible = productCatalog.filter(
     (product) =>
@@ -29,6 +31,7 @@ export function Home({
           <img
             className="hero-logo"
             src={images.logo}
+            {...responsiveImageProps(images.logo, "180px")}
             alt="The Hand Craft Atelier embroidered logo"
           />
           <span className="eyebrow">Stitched to Stand Out</span>
@@ -58,13 +61,23 @@ export function Home({
           ["Personalized", images.catPersonalized],
         ].map(([name, img]) => {
           const candidates = productCatalog.filter((product) => product.category === name);
-          if (!candidates.length) return null;
+          if (!candidates.length && !loading) return null;
           const image =
             candidates.find((product) => product.image.split("?")[0].endsWith(img.split("/").pop()))
-              ?.image || candidates[0].image;
+              ?.image || candidates[0]?.image;
           return (
             <button className="category-card" key={name} onClick={() => goShop(name)}>
-              <img src={image} alt="" />
+              {image ? (
+                <img
+                  src={image}
+                  {...responsiveImageProps(image)}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div style={{ height: "var(--category-image-height)" }} aria-hidden="true" />
+              )}
               <span>
                 {name}
                 <small>Shop now ↗</small>
@@ -139,6 +152,10 @@ export function Home({
         <div className="testimonial-art">
           <img
             src={images.promiseEmbroideryHoop}
+            {...responsiveImageProps(
+              images.promiseEmbroideryHoop,
+              "(max-width: 620px) 270px, 40vw",
+            )}
             alt="Hand-embroidered tree with colourful flowers"
             loading="lazy"
           />
@@ -147,6 +164,7 @@ export function Home({
       <section className="journal-strip" id="journal">
         <img
           src={images.journal2}
+          {...responsiveImageProps(images.journal2, "(max-width: 620px) 90vw, 40vw")}
           alt="Hand-embroidered hoop with tiny birds and flowers on turquoise fabric"
           style={{ objectPosition: "center 52%" }}
           loading="lazy"

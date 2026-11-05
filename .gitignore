@@ -2,3 +2,5 @@
 .env.local
 node_modules
 dist
+lighthouse-*.report.*
+lighthouse-preview.png

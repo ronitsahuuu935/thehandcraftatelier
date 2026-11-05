@@ -14,6 +14,7 @@ import { googleMapsApiKey, supabase } from "../lib/supabase";
 
 import { INDIAN_STATES_AND_UTS } from "../data/locations.js";
 import { money } from "../lib/format.js";
+import { loadCashfree } from "../lib/load-cashfree.js";
 
 import { GoogleSignInScreen } from "../components/GoogleSignInScreen.jsx";
 
@@ -27,6 +28,9 @@ export function Checkout({
   onGoogleSignIn,
 }) {
   const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    loadCashfree().catch(() => {});
+  }, []);
   const [submitError, setSubmitError] = useState("");
   const [activeStep, setActiveStep] = useState(1);
   const [reviewDetails, setReviewDetails] = useState(null);
@@ -190,6 +194,7 @@ export function Checkout({
     setSubmitError("");
     const details = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
+      await loadCashfree();
       const payment = await onPlaceOrder(
         details,
         appliedCoupon ? { ...appliedCoupon, discountAmount } : null,

@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { Heart, ArrowRight, Plus, Minus, Play } from "lucide-react";
 import { isVideo } from "../data/media.js";
 
-import { AVAILABLE_SIZES } from "../data/storefront.js";
+import { AVAILABLE_SIZES, images } from "../data/storefront.js";
+import { whatsappProductUrl } from "../lib/product-sharing.js";
 
 import { money } from "../lib/format.js";
 import { canPurchase } from "../lib/inventory.js";
+import { responsiveImageProps } from "../lib/responsive-images.js";
 
 import { ProductGrid } from "../components/ProductGrid.jsx";
 
@@ -67,8 +69,11 @@ export function ProductDetail({
                 >
                   <img
                     src={isVideo(src) ? src.poster || product.image : src.src}
+                    {...responsiveImageProps(
+                      isVideo(src) ? src.poster || product.image : src.src,
+                      "65px",
+                    )}
                     alt=""
-                    style={{ "--gallery-image-fit": src.contain ? "contain" : "cover" }}
                   />
                   {isVideo(src) && (
                     <Play className="product-video-badge" size={18} aria-hidden="true" />
@@ -91,8 +96,12 @@ export function ProductDetail({
             ) : (
               <img
                 src={gallery[active]?.src || product.image}
+                {...responsiveImageProps(
+                  gallery[active]?.src || product.image,
+                  "(max-width: 900px) 90vw, 50vw",
+                )}
+                fetchPriority="high"
                 alt={product.name}
-                style={{ "--gallery-image-fit": gallery[active]?.contain ? "contain" : "cover" }}
               />
             )}
           </div>
@@ -158,11 +167,15 @@ export function ProductDetail({
           </label>
           <div className="option-label">Quantity</div>
           <div className="quantity">
-            <button onClick={() => setQty(Math.max(1, qty - 1))}>
+            <button aria-label="Decrease quantity" onClick={() => setQty(Math.max(1, qty - 1))}>
               <Minus size={14} />
             </button>
             <span>{qty}</span>
-            <button disabled={!canPurchase(product, qty + 1)} onClick={() => setQty(qty + 1)}>
+            <button
+              aria-label="Increase quantity"
+              disabled={!canPurchase(product, qty + 1)}
+              onClick={() => setQty(qty + 1)}
+            >
               <Plus size={14} />
             </button>
           </div>
@@ -189,6 +202,20 @@ export function ProductDetail({
             <span>♧ Dispatch in 5–7 days</span>
             <span>✧ Free shipping above ₹2,000</span>
           </div>
+          <a
+            className="product-whatsapp-share"
+            href={whatsappProductUrl(
+              product,
+              typeof window === "undefined"
+                ? "https://thehandcraftatelier.live"
+                : window.location.origin,
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={images.whatsapp} alt="" />
+            Share on WhatsApp
+          </a>
           <div className="detail-tabs">
             {["Details", "Shipping", "Care"].map((t) => (
               <button

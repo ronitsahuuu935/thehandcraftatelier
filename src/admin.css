@@ -2348,6 +2348,9 @@
   gap: 8px;
   margin-top: 20px;
 }
+.admin-product-editor .admin-editor-actions > .admin-danger-button {
+  margin-right: auto;
+}
 @media (max-width: 520px) {
   .admin-product-editor {
     padding: 24px 18px;

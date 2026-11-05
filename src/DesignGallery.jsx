@@ -1,6 +1,8 @@
 import React from "react";
+import "./story.css";
 import { ArrowRight } from "lucide-react";
 import { designs } from "./data/designs.js";
+import { responsiveImageProps } from "./lib/responsive-images.js";
 
 export default function DesignGallery({ goShop, onStory, full = false }) {
   const featured = [24, 33, 26, 27, 28, 29, 30, 31].map((id) =>
@@ -24,6 +26,7 @@ export default function DesignGallery({ goShop, onStory, full = false }) {
           <figure key={design.id}>
             <img
               src={design.src}
+              {...responsiveImageProps(design.src)}
               alt={`Hand embroidery: ${design.name}`}
               loading="lazy"
               decoding="async"

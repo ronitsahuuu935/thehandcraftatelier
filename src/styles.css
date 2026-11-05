@@ -1,3 +1,25 @@
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/media/fonts/dm-sans.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/media/fonts/cormorant-garamond.woff2") format("woff2");
+}
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/media/fonts/dm-sans-extended.woff2") format("woff2");
+  unicode-range: U+0100-02FF, U+1E00-1EFF, U+20B9;
+}
 :root {
   font-family: "DM Sans", sans-serif;
   color: #353535;
@@ -6,10 +28,10 @@
   text-rendering: optimizeLegibility;
   --ivory: #f8f3ed;
   --pink: #f7c7cc;
-  --clay: #b87868;
+  --clay: #955342;
   --sage: #8a9b87;
   --ink: #353535;
-  --muted: #756c66;
+  --muted: #665c56;
   --line: #e7dcd2;
   --white: #fffcf8;
 }
@@ -278,12 +300,8 @@ img {
 .category-card img {
   width: 100%;
   height: var(--category-image-height);
-  object-fit: cover;
-  object-position: center 55%;
-  transition: transform 0.4s;
-}
-.category-card:hover img {
-  transform: scale(1.04);
+  object-fit: contain;
+  object-position: center;
 }
 .category-card span {
   font-family: "Cormorant Garamond", serif;
@@ -356,10 +374,55 @@ img {
   overflow: hidden;
   cursor: pointer;
 }
-.product-image > img {
+.product-photo-open {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.product-photo-open > img {
+  touch-action: pan-y;
+  user-select: none;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  /* Keep the full photo inside the curved corners of the arch. */
+  padding: 30px 30px 8px;
+}
+.product-photo-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 44px;
+  border: 0;
+  border-radius: 6px;
+  background: #fffcf8e8;
+  color: var(--ink);
+  cursor: pointer;
+}
+.product-photo-arrow.previous {
+  left: 3px;
+}
+.product-photo-arrow.next {
+  right: 3px;
+}
+.product-photo-count {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #fffcf8e8;
+  color: var(--ink);
+  font-size: 10px;
+  pointer-events: none;
 }
 .product-image .wishlist {
   top: auto;
@@ -1083,7 +1146,7 @@ img {
 .thumbs img {
   width: 100%;
   height: 100%;
-  object-fit: var(--gallery-image-fit, cover);
+  object-fit: contain;
 }
 .detail-main-image {
   position: relative;
@@ -1094,10 +1157,32 @@ img {
 .detail-main-image > img {
   width: 100%;
   height: 100%;
-  object-fit: var(--gallery-image-fit, cover);
+  object-fit: contain;
 }
 .detail-info {
   padding: 10px 0;
+}
+.product-whatsapp-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  margin: 10px 0 18px;
+  padding: 9px 15px;
+  border: 1px solid #aac6af;
+  border-radius: 6px;
+  background: #edf5ed;
+  color: #235c35;
+  font-size: 13px;
+  text-decoration: none;
+}
+.product-whatsapp-share img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.product-whatsapp-share:hover {
+  background: #deeddf;
 }
 .detail-info h1 {
   font-family: "Cormorant Garamond", serif;
@@ -1875,7 +1960,7 @@ img {
   margin-top: 14px;
   border-radius: 30px;
   padding: 12px 22px;
-  background: #bf6048;
+  background: #a94e38;
   color: white;
   font-size: 12px;
 }

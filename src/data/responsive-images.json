@@ -1,0 +1,637 @@
+{
+  "/media/images/call.webp": {
+    "srcSet": "/media/responsive/call-f93653f1d77c-400.webp 400w, /media/responsive/call-f93653f1d77c-800.webp 800w, /media/images/call.webp 1400w",
+    "width": 1400,
+    "height": 933
+  },
+  "/media/images/d1-wreath.webp": {
+    "srcSet": "/media/responsive/d1-wreath-b85f052195ff-400.webp 400w, /media/images/d1-wreath.webp 638w",
+    "width": 638,
+    "height": 480
+  },
+  "/media/images/d6-960.webp": {
+    "srcSet": "/media/responsive/d6-960-b46c19992ffc-400.webp 400w, /media/responsive/d6-960-b46c19992ffc-800.webp 800w, /media/images/d6-960.webp 964w",
+    "width": 964,
+    "height": 1280
+  },
+  "/media/images/d9-960.webp": {
+    "srcSet": "/media/responsive/d9-960-a1ba80155ec9-400.webp 400w, /media/responsive/d9-960-a1ba80155ec9-800.webp 800w, /media/images/d9-960.webp 964w",
+    "width": 964,
+    "height": 1280
+  },
+  "/media/images/design-1.webp": {
+    "srcSet": "/media/responsive/design-1-918e1dd2437d-400.webp 400w, /media/responsive/design-1-918e1dd2437d-800.webp 800w, /media/images/design-1.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-10.webp": {
+    "srcSet": "/media/responsive/design-10-f40c2fb485d3-400.webp 400w, /media/responsive/design-10-f40c2fb485d3-800.webp 800w, /media/images/design-10.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-11.webp": {
+    "srcSet": "/media/responsive/design-11-1001ce7df912-400.webp 400w, /media/responsive/design-11-1001ce7df912-800.webp 800w, /media/images/design-11.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-12.webp": {
+    "srcSet": "/media/responsive/design-12-e78c23e5cf09-400.webp 400w, /media/responsive/design-12-e78c23e5cf09-800.webp 800w, /media/images/design-12.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-13.webp": {
+    "srcSet": "/media/responsive/design-13-4a61440fc179-400.webp 400w, /media/responsive/design-13-4a61440fc179-800.webp 800w, /media/images/design-13.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-14.webp": {
+    "srcSet": "/media/responsive/design-14-dc7f67cddc65-400.webp 400w, /media/responsive/design-14-dc7f67cddc65-800.webp 800w, /media/images/design-14.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-15.webp": {
+    "srcSet": "/media/responsive/design-15-55df311c6a4b-400.webp 400w, /media/responsive/design-15-55df311c6a4b-800.webp 800w, /media/images/design-15.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-16.webp": {
+    "srcSet": "/media/responsive/design-16-a7684e9baee8-400.webp 400w, /media/responsive/design-16-a7684e9baee8-800.webp 800w, /media/images/design-16.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-17.webp": {
+    "srcSet": "/media/responsive/design-17-a59ca0d54ce7-400.webp 400w, /media/responsive/design-17-a59ca0d54ce7-800.webp 800w, /media/images/design-17.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-18.webp": {
+    "srcSet": "/media/responsive/design-18-9c877cbfb2cb-400.webp 400w, /media/responsive/design-18-9c877cbfb2cb-800.webp 800w, /media/images/design-18.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-19.webp": {
+    "srcSet": "/media/responsive/design-19-2476d3d68f86-400.webp 400w, /media/responsive/design-19-2476d3d68f86-800.webp 800w, /media/images/design-19.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-2.webp": {
+    "srcSet": "/media/responsive/design-2-8f26f66060db-400.webp 400w, /media/images/design-2.webp 787w",
+    "width": 787,
+    "height": 1400
+  },
+  "/media/images/design-20.webp": {
+    "srcSet": "/media/responsive/design-20-14b8c77c8776-400.webp 400w, /media/responsive/design-20-14b8c77c8776-800.webp 800w, /media/images/design-20.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-21.webp": {
+    "srcSet": "/media/responsive/design-21-6c98e7e9e04d-400.webp 400w, /media/responsive/design-21-6c98e7e9e04d-800.webp 800w, /media/images/design-21.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-22.webp": {
+    "srcSet": "/media/responsive/design-22-9b3d3e020a8f-400.webp 400w, /media/responsive/design-22-9b3d3e020a8f-800.webp 800w, /media/images/design-22.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-23.webp": {
+    "srcSet": "/media/responsive/design-23-d43ca252fa61-400.webp 400w, /media/responsive/design-23-d43ca252fa61-800.webp 800w, /media/images/design-23.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-24.webp": {
+    "srcSet": "/media/responsive/design-24-8564031a0d07-400.webp 400w, /media/responsive/design-24-8564031a0d07-800.webp 800w, /media/images/design-24.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-25.webp": {
+    "srcSet": "/media/responsive/design-25-54574ff3e010-400.webp 400w, /media/responsive/design-25-54574ff3e010-800.webp 800w, /media/images/design-25.webp 1063w",
+    "width": 1063,
+    "height": 1400
+  },
+  "/media/images/design-26.webp": {
+    "srcSet": "/media/responsive/design-26-19673c815b82-400.webp 400w, /media/responsive/design-26-19673c815b82-800.webp 800w, /media/images/design-26.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-27.webp": {
+    "srcSet": "/media/responsive/design-27-8e744f55b8f4-400.webp 400w, /media/responsive/design-27-8e744f55b8f4-800.webp 800w, /media/images/design-27.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-28.webp": {
+    "srcSet": "/media/responsive/design-28-0c488e0cc6ed-400.webp 400w, /media/responsive/design-28-0c488e0cc6ed-800.webp 800w, /media/images/design-28.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-29.webp": {
+    "srcSet": "/media/responsive/design-29-bd23938b9c59-400.webp 400w, /media/responsive/design-29-bd23938b9c59-800.webp 800w, /media/images/design-29.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-3.webp": {
+    "srcSet": "/media/responsive/design-3-6684b35d7f1d-400.webp 400w, /media/responsive/design-3-6684b35d7f1d-800.webp 800w, /media/images/design-3.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-30.webp": {
+    "srcSet": "/media/responsive/design-30-929496dc16ad-400.webp 400w, /media/responsive/design-30-929496dc16ad-800.webp 800w, /media/images/design-30.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-31.webp": {
+    "srcSet": "/media/responsive/design-31-2b7e3c559b68-400.webp 400w, /media/responsive/design-31-2b7e3c559b68-800.webp 800w, /media/images/design-31.webp 1080w",
+    "width": 1080,
+    "height": 1049
+  },
+  "/media/images/design-32.webp": {
+    "srcSet": "/media/responsive/design-32-a0e815023be4-400.webp 400w, /media/images/design-32.webp 500w",
+    "width": 500,
+    "height": 500
+  },
+  "/media/images/design-33.webp": {
+    "srcSet": "/media/responsive/design-33-a5ede0df126a-400.webp 400w, /media/images/design-33.webp 736w",
+    "width": 736,
+    "height": 1308
+  },
+  "/media/images/design-4.webp": {
+    "srcSet": "/media/responsive/design-4-cb3ba68ce76f-400.webp 400w, /media/responsive/design-4-cb3ba68ce76f-800.webp 800w, /media/images/design-4.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-5.webp": {
+    "srcSet": "/media/responsive/design-5-39ebb6dbc4a7-400.webp 400w, /media/responsive/design-5-39ebb6dbc4a7-800.webp 800w, /media/images/design-5.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-6.webp": {
+    "srcSet": "/media/responsive/design-6-def291b05bcf-400.webp 400w, /media/responsive/design-6-def291b05bcf-800.webp 800w, /media/images/design-6.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-7.webp": {
+    "srcSet": "/media/responsive/design-7-03e58ebb8569-400.webp 400w, /media/responsive/design-7-03e58ebb8569-800.webp 800w, /media/images/design-7.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-8.webp": {
+    "srcSet": "/media/responsive/design-8-cbe8f1a4f128-400.webp 400w, /media/responsive/design-8-cbe8f1a4f128-800.webp 800w, /media/images/design-8.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/images/design-9.webp": {
+    "srcSet": "/media/responsive/design-9-689fbb9f9279-400.webp 400w, /media/responsive/design-9-689fbb9f9279-800.webp 800w, /media/images/design-9.webp 1400w",
+    "width": 1400,
+    "height": 1054
+  },
+  "/media/images/G_logo.webp": {
+    "srcSet": "/media/responsive/G_logo-99b9894d5825-400.webp 400w, /media/responsive/G_logo-99b9894d5825-800.webp 800w, /media/images/G_logo.webp 1254w",
+    "width": 1254,
+    "height": 1254
+  },
+  "/media/images/hero-bg.webp": {
+    "srcSet": "/media/responsive/hero-bg-075e63b25158-400.webp 400w, /media/responsive/hero-bg-075e63b25158-800.webp 800w, /media/images/hero-bg.webp 1400w",
+    "width": 1400,
+    "height": 933
+  },
+  "/media/images/logo.webp": {
+    "srcSet": "/media/responsive/logo-f7f0be2042f0-400.webp 400w, /media/responsive/logo-f7f0be2042f0-800.webp 800w, /media/images/logo.webp 1254w",
+    "width": 1254,
+    "height": 1254
+  },
+  "/media/images/mail.webp": {
+    "srcSet": "/media/responsive/mail-bf426c8e7165-400.webp 400w, /media/responsive/mail-bf426c8e7165-800.webp 800w, /media/images/mail.webp 1400w",
+    "width": 1400,
+    "height": 933
+  },
+  "/media/images/model.webp": {
+    "srcSet": "/media/responsive/model-9383058fc667-400.webp 400w, /media/responsive/model-9383058fc667-800.webp 800w, /media/images/model.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/images/needle.webp": {
+    "srcSet": "/media/responsive/needle-4ac16ccc3589-400.webp 400w, /media/images/needle.webp 700w",
+    "width": 700,
+    "height": 561
+  },
+  "/media/images/ronit.webp": {
+    "srcSet": "/media/responsive/ronit-cfb2da9928e6-400.webp 400w, /media/responsive/ronit-cfb2da9928e6-800.webp 800w, /media/images/ronit.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/flower_clips.webp": {
+    "srcSet": "/media/responsive/flower_clips-4436643f1440-400.webp 400w, /media/responsive/flower_clips-4436643f1440-800.webp 800w, /media/products/flower_clips.webp 1400w",
+    "width": 1400,
+    "height": 1050
+  },
+  "/media/products/hair_clips.webp": {
+    "srcSet": "/media/responsive/hair_clips-86c7133f8f11-400.webp 400w, /media/responsive/hair_clips-86c7133f8f11-800.webp 800w, /media/products/hair_clips.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/mix_clips.webp": {
+    "srcSet": "/media/responsive/mix_clips-7c5d34119c59-400.webp 400w, /media/responsive/mix_clips-7c5d34119c59-800.webp 800w, /media/products/mix_clips.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/pink-daisy-coord-1.webp": {
+    "srcSet": "/media/responsive/pink-daisy-coord-1-4962ddd58fd4-400.webp 400w, /media/responsive/pink-daisy-coord-1-4962ddd58fd4-800.webp 800w, /media/products/pink-daisy-coord-1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/products/pink-daisy-coord-2.webp": {
+    "srcSet": "/media/responsive/pink-daisy-coord-2-170a67a6d3ef-400.webp 400w, /media/responsive/pink-daisy-coord-2-170a67a6d3ef-800.webp 800w, /media/products/pink-daisy-coord-2.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/products/pink-daisy-coord-3.webp": {
+    "srcSet": "/media/responsive/pink-daisy-coord-3-17808031a3df-400.webp 400w, /media/products/pink-daisy-coord-3.webp 736w",
+    "width": 736,
+    "height": 844
+  },
+  "/media/products/pro-1.1.webp": {
+    "srcSet": "/media/responsive/pro-1.1-1b5e9e57a2b3-400.webp 400w, /media/responsive/pro-1.1-1b5e9e57a2b3-800.webp 800w, /media/products/pro-1.1.webp 1086w",
+    "width": 1086,
+    "height": 1448
+  },
+  "/media/products/pro-1.2.webp": {
+    "srcSet": "/media/responsive/pro-1.2-419dd0b41b22-400.webp 400w, /media/responsive/pro-1.2-419dd0b41b22-800.webp 800w, /media/products/pro-1.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/pro-1.3.webp": {
+    "srcSet": "/media/responsive/pro-1.3-462f28cc684a-400.webp 400w, /media/responsive/pro-1.3-462f28cc684a-800.webp 800w, /media/products/pro-1.3.webp 1400w",
+    "width": 1400,
+    "height": 1054
+  },
+  "/media/products/pro-10.1.webp": {
+    "srcSet": "/media/responsive/pro-10.1-a5158496f326-400.webp 400w, /media/responsive/pro-10.1-a5158496f326-800.webp 800w, /media/products/pro-10.1.webp 1055w",
+    "width": 1055,
+    "height": 1400
+  },
+  "/media/products/pro-10.2.webp": {
+    "srcSet": "/media/responsive/pro-10.2-41d68f4fbce8-400.webp 400w, /media/responsive/pro-10.2-41d68f4fbce8-800.webp 800w, /media/products/pro-10.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-10.3.webp": {
+    "srcSet": "/media/responsive/pro-10.3-d7f9e8db2d2d-400.webp 400w, /media/responsive/pro-10.3-d7f9e8db2d2d-800.webp 800w, /media/products/pro-10.3.webp 1400w",
+    "width": 1400,
+    "height": 1341
+  },
+  "/media/products/pro-12.1.webp": {
+    "srcSet": "/media/responsive/pro-12.1-e350f474f344-400.webp 400w, /media/responsive/pro-12.1-e350f474f344-800.webp 800w, /media/products/pro-12.1.webp 1199w",
+    "width": 1199,
+    "height": 1312
+  },
+  "/media/products/pro-12.2.webp": {
+    "srcSet": "/media/responsive/pro-12.2-1b0feb9df24e-400.webp 400w, /media/responsive/pro-12.2-1b0feb9df24e-800.webp 800w, /media/products/pro-12.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/pro-13.1.webp": {
+    "srcSet": "/media/responsive/pro-13.1-21a2a109e3da-400.webp 400w, /media/responsive/pro-13.1-21a2a109e3da-800.webp 800w, /media/products/pro-13.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-13.2.webp": {
+    "srcSet": "/media/responsive/pro-13.2-1716e86d8ef5-400.webp 400w, /media/responsive/pro-13.2-1716e86d8ef5-800.webp 800w, /media/products/pro-13.2.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-13.3.webp": {
+    "srcSet": "/media/responsive/pro-13.3-8da0bf00deac-400.webp 400w, /media/responsive/pro-13.3-8da0bf00deac-800.webp 800w, /media/products/pro-13.3.webp 1013w",
+    "width": 1013,
+    "height": 1400
+  },
+  "/media/products/pro-13.4.webp": {
+    "srcSet": "/media/responsive/pro-13.4-d7dd02197373-400.webp 400w, /media/responsive/pro-13.4-d7dd02197373-800.webp 800w, /media/products/pro-13.4.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-14.1.webp": {
+    "srcSet": "/media/responsive/pro-14.1-b923f63bbc7c-400.webp 400w, /media/responsive/pro-14.1-b923f63bbc7c-800.webp 800w, /media/products/pro-14.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-14.2.webp": {
+    "srcSet": "/media/responsive/pro-14.2-2dc0d9b752bd-400.webp 400w, /media/responsive/pro-14.2-2dc0d9b752bd-800.webp 800w, /media/products/pro-14.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/pro-15.1.webp": {
+    "srcSet": "/media/responsive/pro-15.1-9b497e2909fc-400.webp 400w, /media/responsive/pro-15.1-9b497e2909fc-800.webp 800w, /media/products/pro-15.1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/products/pro-15.2.webp": {
+    "srcSet": "/media/responsive/pro-15.2-216db1ca5c47-400.webp 400w, /media/responsive/pro-15.2-216db1ca5c47-800.webp 800w, /media/products/pro-15.2.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-16.1.webp": {
+    "srcSet": "/media/responsive/pro-16.1-08e4e5c4d5d3-400.webp 400w, /media/responsive/pro-16.1-08e4e5c4d5d3-800.webp 800w, /media/products/pro-16.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-16.2.webp": {
+    "srcSet": "/media/responsive/pro-16.2-df0e287235c7-400.webp 400w, /media/responsive/pro-16.2-df0e287235c7-800.webp 800w, /media/products/pro-16.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-2.1.webp": {
+    "srcSet": "/media/responsive/pro-2.1-d67895738cbb-400.webp 400w, /media/responsive/pro-2.1-d67895738cbb-800.webp 800w, /media/products/pro-2.1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/products/pro-2.2.webp": {
+    "srcSet": "/media/responsive/pro-2.2-3daceb885e19-400.webp 400w, /media/responsive/pro-2.2-3daceb885e19-800.webp 800w, /media/products/pro-2.2.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-2.3.webp": {
+    "srcSet": "/media/responsive/pro-2.3-5a0c79bd0768-400.webp 400w, /media/responsive/pro-2.3-5a0c79bd0768-800.webp 800w, /media/products/pro-2.3.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-3.1.webp": {
+    "srcSet": "/media/responsive/pro-3.1-20c4f447e033-400.webp 400w, /media/responsive/pro-3.1-20c4f447e033-800.webp 800w, /media/products/pro-3.1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/products/pro-3.2.webp": {
+    "srcSet": "/media/responsive/pro-3.2-ad634c57888b-400.webp 400w, /media/responsive/pro-3.2-ad634c57888b-800.webp 800w, /media/products/pro-3.2.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "/media/products/pro-3.3.webp": {
+    "srcSet": "/media/responsive/pro-3.3-26dbfa2df6f2-400.webp 400w, /media/responsive/pro-3.3-26dbfa2df6f2-800.webp 800w, /media/products/pro-3.3.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/pro-3.4.webp": {
+    "srcSet": "/media/responsive/pro-3.4-6150fa90df6d-400.webp 400w, /media/products/pro-3.4.webp 714w",
+    "width": 714,
+    "height": 933
+  },
+  "/media/products/pro-6.2.webp": {
+    "srcSet": "/media/responsive/pro-6.2-66495c1ccc79-400.webp 400w, /media/responsive/pro-6.2-66495c1ccc79-800.webp 800w, /media/products/pro-6.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-6.3.webp": {
+    "srcSet": "/media/responsive/pro-6.3-0c586ff8d0d8-400.webp 400w, /media/responsive/pro-6.3-0c586ff8d0d8-800.webp 800w, /media/products/pro-6.3.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-8.1.webp": {
+    "srcSet": "/media/responsive/pro-8.1-931b31e8f21c-400.webp 400w, /media/responsive/pro-8.1-931b31e8f21c-800.webp 800w, /media/products/pro-8.1.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/pro-8.2.webp": {
+    "srcSet": "/media/responsive/pro-8.2-4d65b8aa935c-400.webp 400w, /media/responsive/pro-8.2-4d65b8aa935c-800.webp 800w, /media/products/pro-8.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/pro-8.3.webp": {
+    "srcSet": "/media/responsive/pro-8.3-ca6966ad94ee-400.webp 400w, /media/responsive/pro-8.3-ca6966ad94ee-800.webp 800w, /media/products/pro-8.3.webp 1400w",
+    "width": 1400,
+    "height": 483
+  },
+  "/media/products/pro-9.1.webp": {
+    "srcSet": "/media/responsive/pro-9.1-733bece3c2fe-400.webp 400w, /media/responsive/pro-9.1-733bece3c2fe-800.webp 800w, /media/products/pro-9.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-9.2.webp": {
+    "srcSet": "/media/responsive/pro-9.2-25cfae6f5c16-400.webp 400w, /media/responsive/pro-9.2-25cfae6f5c16-800.webp 800w, /media/products/pro-9.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "/media/products/pro-9.3.webp": {
+    "srcSet": "/media/responsive/pro-9.3-c6f8b6f4b775-400.webp 400w, /media/responsive/pro-9.3-c6f8b6f4b775-800.webp 800w, /media/products/pro-9.3.webp 1312w",
+    "width": 1312,
+    "height": 1199
+  },
+  "/media/products/pro-9.4.webp": {
+    "srcSet": "/media/responsive/pro-9.4-80b036f4bb7a-400.webp 400w, /media/products/pro-9.4.webp 736w",
+    "width": 736,
+    "height": 983
+  },
+  "/media/products/pro-9.5.webp": {
+    "srcSet": "/media/responsive/pro-9.5-559148071ba5-400.webp 400w, /media/products/pro-9.5.webp 522w",
+    "width": 522,
+    "height": 653
+  },
+  "/media/products/pro6.1.webp": {
+    "srcSet": "/media/responsive/pro6.1-8e5697f16e3b-400.webp 400w, /media/responsive/pro6.1-8e5697f16e3b-800.webp 800w, /media/products/pro6.1.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "/media/products/tree-of-blooms-coord-1.webp": {
+    "srcSet": "/media/responsive/tree-of-blooms-coord-1-c5cc6459a56e-400.webp 400w, /media/responsive/tree-of-blooms-coord-1-c5cc6459a56e-800.webp 800w, /media/products/tree-of-blooms-coord-1.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "/media/products/tree-of-blooms-coord-2.webp": {
+    "srcSet": "/media/responsive/tree-of-blooms-coord-2-6e825df5cd03-400.webp 400w, /media/responsive/tree-of-blooms-coord-2-6e825df5cd03-800.webp 800w, /media/products/tree-of-blooms-coord-2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-1.1-1b5e9e57a2b3.webp": {
+    "srcSet": "/media/responsive/pro-1.1-1b5e9e57a2b3-400.webp 400w, /media/responsive/pro-1.1-1b5e9e57a2b3-800.webp 800w, /media/products/pro-1.1.webp 1086w",
+    "width": 1086,
+    "height": 1448
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/mix_clips.webp": {
+    "srcSet": "/media/responsive/mix_clips-7c5d34119c59-400.webp 400w, /media/responsive/mix_clips-7c5d34119c59-800.webp 800w, /media/products/mix_clips.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-13.1.webp": {
+    "srcSet": "/media/responsive/pro-13.1-21a2a109e3da-400.webp 400w, /media/responsive/pro-13.1-21a2a109e3da-800.webp 800w, /media/products/pro-13.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-8.2.webp": {
+    "srcSet": "/media/responsive/pro-8.2-4d65b8aa935c-400.webp 400w, /media/responsive/pro-8.2-4d65b8aa935c-800.webp 800w, /media/products/pro-8.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-3.1.webp": {
+    "srcSet": "/media/responsive/pro-3.1-20c4f447e033-400.webp 400w, /media/responsive/pro-3.1-20c4f447e033-800.webp 800w, /media/products/pro-3.1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/hair_clips.webp": {
+    "srcSet": "/media/responsive/hair_clips-86c7133f8f11-400.webp 400w, /media/responsive/hair_clips-86c7133f8f11-800.webp 800w, /media/products/hair_clips.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-9.4.webp": {
+    "srcSet": "/media/responsive/pro-9.4-80b036f4bb7a-400.webp 400w, /media/products/pro-9.4.webp 736w",
+    "width": 736,
+    "height": 983
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-9.2.webp": {
+    "srcSet": "/media/responsive/pro-9.2-25cfae6f5c16-400.webp 400w, /media/responsive/pro-9.2-25cfae6f5c16-800.webp 800w, /media/products/pro-9.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-9.5.webp": {
+    "srcSet": "/media/responsive/pro-9.5-559148071ba5-400.webp 400w, /media/products/pro-9.5.webp 522w",
+    "width": 522,
+    "height": 653
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro6.1.webp": {
+    "srcSet": "/media/responsive/pro6.1-8e5697f16e3b-400.webp 400w, /media/responsive/pro6.1-8e5697f16e3b-800.webp 800w, /media/products/pro6.1.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-8.1.webp": {
+    "srcSet": "/media/responsive/pro-8.1-931b31e8f21c-400.webp 400w, /media/responsive/pro-8.1-931b31e8f21c-800.webp 800w, /media/products/pro-8.1.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pink-daisy-coord-1.webp": {
+    "srcSet": "/media/responsive/pink-daisy-coord-1-4962ddd58fd4-400.webp 400w, /media/responsive/pink-daisy-coord-1-4962ddd58fd4-800.webp 800w, /media/products/pink-daisy-coord-1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-14.1.webp": {
+    "srcSet": "/media/responsive/pro-14.1-b923f63bbc7c-400.webp 400w, /media/responsive/pro-14.1-b923f63bbc7c-800.webp 800w, /media/products/pro-14.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-3.3.webp": {
+    "srcSet": "/media/responsive/pro-3.3-26dbfa2df6f2-400.webp 400w, /media/responsive/pro-3.3-26dbfa2df6f2-800.webp 800w, /media/products/pro-3.3.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-2.3.webp": {
+    "srcSet": "/media/responsive/pro-2.3-5a0c79bd0768-400.webp 400w, /media/responsive/pro-2.3-5a0c79bd0768-800.webp 800w, /media/products/pro-2.3.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-13.3.webp": {
+    "srcSet": "/media/responsive/pro-13.3-8da0bf00deac-400.webp 400w, /media/responsive/pro-13.3-8da0bf00deac-800.webp 800w, /media/products/pro-13.3.webp 1013w",
+    "width": 1013,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-16.1.webp": {
+    "srcSet": "/media/responsive/pro-16.1-08e4e5c4d5d3-400.webp 400w, /media/responsive/pro-16.1-08e4e5c4d5d3-800.webp 800w, /media/products/pro-16.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-13.4.webp": {
+    "srcSet": "/media/responsive/pro-13.4-d7dd02197373-400.webp 400w, /media/responsive/pro-13.4-d7dd02197373-800.webp 800w, /media/products/pro-13.4.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-3.2.webp": {
+    "srcSet": "/media/responsive/pro-3.2-ad634c57888b-400.webp 400w, /media/responsive/pro-3.2-ad634c57888b-800.webp 800w, /media/products/pro-3.2.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-15.2.webp": {
+    "srcSet": "/media/responsive/pro-15.2-216db1ca5c47-400.webp 400w, /media/responsive/pro-15.2-216db1ca5c47-800.webp 800w, /media/products/pro-15.2.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-6.2.webp": {
+    "srcSet": "/media/responsive/pro-6.2-66495c1ccc79-400.webp 400w, /media/responsive/pro-6.2-66495c1ccc79-800.webp 800w, /media/products/pro-6.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pink-daisy-coord-3.webp": {
+    "srcSet": "/media/responsive/pink-daisy-coord-3-17808031a3df-400.webp 400w, /media/products/pink-daisy-coord-3.webp 736w",
+    "width": 736,
+    "height": 844
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-16.2.webp": {
+    "srcSet": "/media/responsive/pro-16.2-df0e287235c7-400.webp 400w, /media/responsive/pro-16.2-df0e287235c7-800.webp 800w, /media/products/pro-16.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-2.1.webp": {
+    "srcSet": "/media/responsive/pro-2.1-d67895738cbb-400.webp 400w, /media/responsive/pro-2.1-d67895738cbb-800.webp 800w, /media/products/pro-2.1.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/flower_clips.webp": {
+    "srcSet": "/media/responsive/flower_clips-4436643f1440-400.webp 400w, /media/responsive/flower_clips-4436643f1440-800.webp 800w, /media/products/flower_clips.webp 1400w",
+    "width": 1400,
+    "height": 1050
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-10.1.webp": {
+    "srcSet": "/media/responsive/pro-10.1-a5158496f326-400.webp 400w, /media/responsive/pro-10.1-a5158496f326-800.webp 800w, /media/products/pro-10.1.webp 1055w",
+    "width": 1055,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-2.2.webp": {
+    "srcSet": "/media/responsive/pro-2.2-3daceb885e19-400.webp 400w, /media/responsive/pro-2.2-3daceb885e19-800.webp 800w, /media/products/pro-2.2.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pink-daisy-coord-2.webp": {
+    "srcSet": "/media/responsive/pink-daisy-coord-2-170a67a6d3ef-400.webp 400w, /media/responsive/pink-daisy-coord-2-170a67a6d3ef-800.webp 800w, /media/products/pink-daisy-coord-2.webp 933w",
+    "width": 933,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-8.3.webp": {
+    "srcSet": "/media/responsive/pro-8.3-ca6966ad94ee-400.webp 400w, /media/responsive/pro-8.3-ca6966ad94ee-800.webp 800w, /media/products/pro-8.3.webp 1400w",
+    "width": 1400,
+    "height": 483
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-12.2.webp": {
+    "srcSet": "/media/responsive/pro-12.2-1b0feb9df24e-400.webp 400w, /media/responsive/pro-12.2-1b0feb9df24e-800.webp 800w, /media/products/pro-12.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-13.2.webp": {
+    "srcSet": "/media/responsive/pro-13.2-1716e86d8ef5-400.webp 400w, /media/responsive/pro-13.2-1716e86d8ef5-800.webp 800w, /media/products/pro-13.2.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-10.3.webp": {
+    "srcSet": "/media/responsive/pro-10.3-d7f9e8db2d2d-400.webp 400w, /media/responsive/pro-10.3-d7f9e8db2d2d-800.webp 800w, /media/products/pro-10.3.webp 1400w",
+    "width": 1400,
+    "height": 1341
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/tree-of-blooms-coord-1.webp": {
+    "srcSet": "/media/responsive/tree-of-blooms-coord-1-c5cc6459a56e-400.webp 400w, /media/responsive/tree-of-blooms-coord-1-c5cc6459a56e-800.webp 800w, /media/products/tree-of-blooms-coord-1.webp 1054w",
+    "width": 1054,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-12.1.webp": {
+    "srcSet": "/media/responsive/pro-12.1-e350f474f344-400.webp 400w, /media/responsive/pro-12.1-e350f474f344-800.webp 800w, /media/products/pro-12.1.webp 1199w",
+    "width": 1199,
+    "height": 1312
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-14.2.webp": {
+    "srcSet": "/media/responsive/pro-14.2-2dc0d9b752bd-400.webp 400w, /media/responsive/pro-14.2-2dc0d9b752bd-800.webp 800w, /media/products/pro-14.2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-9.1.webp": {
+    "srcSet": "/media/responsive/pro-9.1-733bece3c2fe-400.webp 400w, /media/responsive/pro-9.1-733bece3c2fe-800.webp 800w, /media/products/pro-9.1.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-9.3.webp": {
+    "srcSet": "/media/responsive/pro-9.3-c6f8b6f4b775-400.webp 400w, /media/responsive/pro-9.3-c6f8b6f4b775-800.webp 800w, /media/products/pro-9.3.webp 1312w",
+    "width": 1312,
+    "height": 1199
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/pro-10.2.webp": {
+    "srcSet": "/media/responsive/pro-10.2-41d68f4fbce8-400.webp 400w, /media/responsive/pro-10.2-41d68f4fbce8-800.webp 800w, /media/products/pro-10.2.webp 1120w",
+    "width": 1120,
+    "height": 1400
+  },
+  "https://gbtfzcdrrxmosqhrqdla.supabase.co/storage/v1/object/public/product-images/catalog/november-2026/tree-of-blooms-coord-2.webp": {
+    "srcSet": "/media/responsive/tree-of-blooms-coord-2-6e825df5cd03-400.webp 400w, /media/responsive/tree-of-blooms-coord-2-6e825df5cd03-800.webp 800w, /media/products/tree-of-blooms-coord-2.webp 1050w",
+    "width": 1050,
+    "height": 1400
+  }
+}
