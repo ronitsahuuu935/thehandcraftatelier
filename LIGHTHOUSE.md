@@ -26,6 +26,6 @@ Production build, catalog checks, formatting, and all 17 Node tests passed. Test
 
 Mobile performance still has room to improve: the homepage's final simulated largest-contentful paint was 6.9 seconds; rendering depends on downloading and running the client application. Eliminating this startup delay further would benefit from server-rendered or prerendered routes. A Lighthouse 100 does not establish complete accessibility or SEO compliance.
 
-Reports are available locally as `lighthouse-final-mobile.report.html`, `lighthouse-final-desktop.report.html`, `lighthouse-final-shop.report.html`, and `lighthouse-final-product.report.html`. Matching JSON reports contain full audit details. Reports are ignored by Git. Changes must be deployed before they affect the live website.
+The generated HTML/JSON reports and preview screenshot were removed during cleanup on 7 November 2026. The historical results above are retained for comparison; rerun Lighthouse for current measurements. Generated reports are ignored by Git.
 
 To regenerate image variants after local asset changes, run `python scripts/prepare-responsive-images.py` (requires Pillow). New remote uploads fall back to their original URL unless a matching optimized alias has been verified.

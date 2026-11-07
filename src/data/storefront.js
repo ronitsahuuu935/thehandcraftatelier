@@ -1,7 +1,6 @@
 import { imageUrl } from "./media.js";
 export { products } from "./catalog.js";
 export const IMG = "/media/images/";
-export const PRODUCT_IMG = "/media/products/";
 export const SOCIAL = {
   instagram:
     "https://www.instagram.com/thehandcraftatelier?utm_source=ig_web_button_share_sheet&vrfl=ZDNlZDc0MzIxNw==",

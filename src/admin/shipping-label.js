@@ -3,8 +3,8 @@ import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { isPaidOrder } from "../lib/orders.js";
 
-export const LABEL_FONT_URL = "/media/fonts/NotoSansDevanagari.ttf";
-export const LABEL_LOGO_URL = "/media/labels/logo.png";
+const LABEL_FONT_URL = "/media/fonts/NotoSansDevanagari.ttf";
+const LABEL_LOGO_URL = "/media/labels/logo.png";
 
 let assetsPromise;
 export function preloadLabelAssets() {

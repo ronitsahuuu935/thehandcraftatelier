@@ -83,7 +83,6 @@ export {
   CREATE_CATEGORY_VALUE,
   seedCustom,
   DISCOUNTS_STORAGE_KEY,
-  todayDate,
   isDiscountExpired,
   discountFromRow,
   discountToRow,

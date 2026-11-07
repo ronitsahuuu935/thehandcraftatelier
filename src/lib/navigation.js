@@ -1,6 +1,6 @@
 import { productIdFromHash } from "./product-sharing.js";
 
-export function routeHash(route) {
+function routeHash(route) {
   if (route.bagOpen) return "#bag";
   if (route.page === "home") return "";
   if (route.page === "story") return "#our-story";

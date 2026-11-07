@@ -4,3 +4,4 @@ node_modules
 dist
 lighthouse-*.report.*
 lighthouse-preview.png
+.local-backups/
