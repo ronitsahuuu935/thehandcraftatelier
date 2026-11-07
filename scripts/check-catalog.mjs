@@ -15,6 +15,21 @@ try {
   for (const asset of included) {
     assert.ok(actual.includes(asset), `Missing product asset: ${asset}`);
   }
+  // These originals are represented by their optimized WebP copies in the galleries.
+  const originals = {
+    "pro-4.1.png": "tree-of-blooms-coord-1.webp",
+    "pro-4.2.png": "tree-of-blooms-coord-2.webp",
+    "pro-5.1.png": "pink-daisy-coord-1.webp",
+    "pro-5.2.png": "pink-daisy-coord-2.webp",
+    "pro-5.3.jpeg": "pink-daisy-coord-3.webp",
+  };
+  for (const asset of actual) {
+    const optimized = originals[path.basename(asset)];
+    assert.ok(
+      included.includes(optimized ? `/media/products/${optimized}` : asset),
+      `Product media is not assigned to a gallery: ${asset}`,
+    );
+  }
   assert.equal(products.length, 17);
   assert.ok(products.every((product) => ![1004, 1005, 1007, 1011, 1017].includes(product.id)));
   assert.equal(designs.length, 33);
