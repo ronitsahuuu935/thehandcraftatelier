@@ -87,7 +87,7 @@ export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWish
                 changePhoto(-1);
               }}
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={15} />
             </button>
             <button
               type="button"
@@ -98,11 +98,8 @@ export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWish
                 changePhoto(1);
               }}
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={15} />
             </button>
-            <span className="product-photo-count" aria-live="polite" aria-atomic="true">
-              {index + 1} / {photos.length}
-            </span>
           </>
         )}
         {product.tag && <span className="product-tag">{product.tag}</span>}

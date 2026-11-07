@@ -41,7 +41,16 @@ export function Home({
           </h1>
           <p>Timeless embroidery. Thoughtful details. Pieces made just for you.</p>
           <button className="btn primary" onClick={() => goShop()}>
-            Explore the collection <ArrowRight size={16} />
+            <span className="hero-button-embroidery" aria-hidden="true">
+              <img
+                src={images.promiseEmbroideryHoop}
+                {...responsiveImageProps(images.promiseEmbroideryHoop, "38px")}
+                alt=""
+                width="38"
+                height="38"
+              />
+            </span>
+            Explore the collection <ArrowRight size={20} aria-hidden="true" />
           </button>
         </div>
 
