@@ -1,3 +1,4 @@
+import { HomeCouponPopup } from "./components/StoreCoupons.jsx";
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import { ShoppingBag, ArrowRight, Check, ShieldCheck } from "lucide-react";
@@ -476,6 +477,7 @@ export function App() {
           </main>
         ) : (
           <>
+            {page === "home" && <HomeCouponPopup />}
             {page === "home" && (
               <Home
                 navigate={navigate}

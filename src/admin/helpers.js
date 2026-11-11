@@ -2,7 +2,6 @@ import { money as formatMoney } from "../lib/format.js";
 import { imageUrl, resolveGalleryMedia } from "../data/media.js";
 
 import {
-  BarChart3,
   Grid2X2,
   LayoutDashboard,
   Package,
@@ -22,7 +21,6 @@ const nav = [
   ["categories", "Categories", Grid2X2],
   ["custom-orders", "Custom Orders", Scissors],
   ["discounts", "Discounts", Tag],
-  ["reports", "Reports", BarChart3],
   ["settings", "Settings", Settings],
 ];
 const copy = {
@@ -33,7 +31,6 @@ const copy = {
   categories: "Organize your products for a thoughtful shopping experience.",
   "custom-orders": "Manage and track custom embroidery requests.",
   discounts: "Create and manage discounts, promo codes, and offers.",
-  reports: "Get insights into store performance and customer behavior.",
   settings: "Manage your store settings, preferences, and configurations.",
 };
 const CREATE_CATEGORY_VALUE = "__create_new_category__";

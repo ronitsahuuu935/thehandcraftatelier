@@ -20,7 +20,6 @@ import {
   Metric,
   DemoNote,
   Empty,
-  Chart,
   SalesChart,
   DiscountCategories,
 } from "./admin/components.jsx";
@@ -30,7 +29,6 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  BarChart3,
   Bell,
   Boxes,
   Check,
@@ -2073,65 +2071,6 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                     </button>
                   )}
                 </form>
-              </div>
-            </>
-          )}
-          {page === "reports" && (
-            <>
-              {heading("Download Report", () =>
-                setNotice("There is no recorded sales data to export yet."),
-              )}
-              {metrics(
-                <>
-                  <Metric icon={CircleDollarSign} label="Total Sales" value="—" />
-                  <Metric icon={ShoppingCart} label="Total Orders" value={orders.length} />
-                  <Metric icon={Users} label="New Customers" value={seedCustomers.length} />
-                  <Metric icon={BarChart3} label="Avg. Order Value" value="—" />
-                </>,
-              )}
-              <div className="admin-reports-grid">
-                <section className="admin-panel-card report-chart-panel">
-                  <h2>Sales Overview</h2>
-                  <p>Sales data will appear after orders are recorded.</p>
-                  <Chart />
-                </section>
-                <section className="admin-panel-card report-chart-panel">
-                  <h2>Sales by Product Category</h2>
-                  <p>Revenue breakdown will appear after sales are recorded.</p>
-                  <Chart />
-                </section>
-                <section className="admin-panel-card report-top-panel">
-                  <h2>Catalog Products</h2>
-                  {catalogProducts.length ? (
-                    catalogProducts.slice(0, 5).map((p) => (
-                      <div className="report-product" key={p.id}>
-                        <img src={p.image} alt="" />
-                        <span>
-                          {p.name}
-                          <small>
-                            {p.category} · {money(p.price)}
-                          </small>
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <Empty title="No products yet">Catalog data will appear here.</Empty>
-                  )}
-                </section>
-                <section className="admin-panel-card report-orders-panel">
-                  <h2>Recent Orders</h2>
-                  {orderRows}
-                </section>
-                <section className="admin-panel-card report-region-panel">
-                  <h2>Sales by Region</h2>
-                  <Empty title="No regional data">
-                    Regional sales will appear after orders are recorded.
-                  </Empty>
-                </section>
-                <section className="admin-panel-card report-growth-panel">
-                  <h2>Monthly Growth</h2>
-                  <Chart />
-                </section>
               </div>
             </>
           )}

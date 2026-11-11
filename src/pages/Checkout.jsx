@@ -1,3 +1,4 @@
+import { CheckoutCoupons } from "../components/StoreCoupons.jsx";
 import { categoryDiscount } from "../lib/discounts.js";
 import React, { useEffect, useState } from "react";
 
@@ -53,8 +54,9 @@ export function Checkout({
   );
   const discountAmount = categoryDiscount(appliedCoupon, checkoutItems);
   const payableTotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
-  const applyCoupon = async () => {
-    const code = couponCode.trim().toUpperCase();
+  const applyCoupon = async (requestedCode = couponCode) => {
+    const code = requestedCode.trim().toUpperCase();
+    setCouponCode(code);
     const { data: discount, error } = supabase
       ? await supabase
           .from("discounts")
@@ -558,6 +560,11 @@ export function Checkout({
                 ))}
               </div>
               <div className="checkout-coupon">
+                <CheckoutCoupons
+                  items={checkoutItems}
+                  onApply={applyCoupon}
+                  appliedCode={appliedCoupon?.code}
+                />
                 <label htmlFor="checkout-coupon-code">Have a coupon code?</label>
                 <div className="checkout-coupon-row">
                   <input
@@ -575,7 +582,7 @@ export function Checkout({
                       Remove
                     </button>
                   ) : (
-                    <button type="button" onClick={applyCoupon}>
+                    <button type="button" onClick={() => applyCoupon()}>
                       Apply
                     </button>
                   )}

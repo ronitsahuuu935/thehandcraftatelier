@@ -4753,3 +4753,83 @@ img {
     object-fit: contain;
   }
 }
+
+.home-coupon-popup {
+  position: fixed;
+  z-index: 65;
+  right: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: 55dvh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0 1rem 1rem;
+  background: #fffcf6;
+  color: #303829;
+  border: 1px solid #dcd8ce;
+  border-radius: 14px;
+  box-shadow: 0 8px 34px #36362d30;
+}
+.home-coupon-popup header {
+  position: sticky;
+  top: 0;
+  background: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0;
+}
+.home-coupon-popup h2,
+.checkout-coupon h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.home-coupon-popup header button {
+  border: 0;
+  background: transparent;
+  font-size: 1.6rem;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+}
+.store-coupon-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.store-coupon-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.65rem 0;
+  border-top: 1px solid #dedbd1;
+}
+.store-coupon-list li div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.store-coupon-list strong,
+.store-coupon-list small {
+  display: block;
+}
+.store-coupon-list small {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+}
+.store-coupon-list button {
+  border: 1px solid #b4b9ad;
+  border-radius: 6px;
+  background: #fbfaf5;
+  color: #344632;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+}
+.store-coupon-list button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+.checkout-coupon section {
+  margin-bottom: 0.8rem;
+}
