@@ -1,3 +1,4 @@
+import { categoryDiscount } from "../../../src/lib/discounts.js";
 import crypto from "node:crypto";
 import { cartAvailabilityError } from "../../../src/lib/inventory.js";
 import {
@@ -123,7 +124,7 @@ export default async function createCashfreeOrder(request, response) {
     const couponCode = clean(details.coupon_code).toUpperCase();
     const { data: savedCoupon, error: couponError } = await admin
       .from("discounts")
-      .select("code,type,value,valid_from,valid_until")
+      .select("code,type,value,applicable_to,valid_from,valid_until")
       .eq("code", couponCode)
       .maybeSingle();
     if (couponError) {
@@ -147,10 +148,11 @@ export default async function createCashfreeOrder(request, response) {
         .status(400)
         .json({ error: "The coupon details are invalid. Please apply the coupon again." });
     }
-    discount =
-      savedCoupon.type === "Percentage"
-        ? (subtotal * Math.min(couponValue, 100)) / 100
-        : Math.min(couponValue, subtotal);
+    discount = categoryDiscount(savedCoupon, orderItems);
+    if (!discount)
+      return response
+        .status(400)
+        .json({ error: "This coupon does not apply to the items in your cart." });
   }
   const total = Math.round((subtotal - discount) * 100) / 100;
   if (!Number.isFinite(total) || total < 200)

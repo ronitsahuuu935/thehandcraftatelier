@@ -34,13 +34,10 @@ export function ProductDetail({
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState("Details");
   const [personalization, setPersonalization] = useState("");
-  const gallery = product.gallery;
-  const [active, setActive] = useState(
-    Math.max(
-      0,
-      product.gallery.findIndex((image) => color && String(image.color || "").trim() === color),
-    ),
+  const gallery = (product.gallery || []).filter(
+    (image) => !color || String(image.color || "").trim() === color,
   );
+  const [active, setActive] = useState(0);
   return (
     <main className="detail-page">
       <div className="breadcrumbs">
@@ -62,10 +59,7 @@ export function ProductDetail({
                         : `View image ${i + 1}`
                   }
                   aria-pressed={i === active}
-                  onClick={() => {
-                    setActive(i);
-                    if (src.color) setColor(src.color);
-                  }}
+                  onClick={() => setActive(i)}
                 >
                   <img
                     src={isVideo(src) ? src.poster || product.image : src.src}
@@ -145,10 +139,7 @@ export function ProductDetail({
                     className={color === name ? "selected" : ""}
                     onClick={() => {
                       setColor(name);
-                      const imageIndex = gallery.findIndex(
-                        (image) => String(image.color || "").trim() === name,
-                      );
-                      if (imageIndex >= 0) setActive(imageIndex);
+                      setActive(0);
                     }}
                   >
                     {name}

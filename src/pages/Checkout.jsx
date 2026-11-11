@@ -1,3 +1,4 @@
+import { categoryDiscount } from "../lib/discounts.js";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -50,21 +51,14 @@ export function Checkout({
     (total, product) => total + Number(product.price || 0) * (product.quantity || 1),
     0,
   );
-  const discountAmount = appliedCoupon
-    ? Math.min(
-        orderTotal,
-        appliedCoupon.type === "Percentage"
-          ? (orderTotal * appliedCoupon.value) / 100
-          : appliedCoupon.value,
-      )
-    : 0;
+  const discountAmount = categoryDiscount(appliedCoupon, checkoutItems);
   const payableTotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
   const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
     const { data: discount, error } = supabase
       ? await supabase
           .from("discounts")
-          .select("code,name,type,value,valid_from,valid_until")
+          .select("code,name,type,value,applicable_to,valid_from,valid_until")
           .eq("code", code)
           .maybeSingle()
       : { data: null, error: new Error("Supabase is not configured.") };
@@ -102,7 +96,13 @@ export function Checkout({
       setCouponMessage("That coupon has an invalid discount value.");
       return;
     }
-    setAppliedCoupon({ ...discount, code, type, value });
+    const coupon = { ...discount, code, type, value };
+    if (!categoryDiscount(coupon, checkoutItems)) {
+      setAppliedCoupon(null);
+      setCouponMessage("This coupon does not apply to the items in your cart.");
+      return;
+    }
+    setAppliedCoupon(coupon);
     setCouponMessage(`${discount.code} applied successfully.`);
   };
   const removeCoupon = () => {

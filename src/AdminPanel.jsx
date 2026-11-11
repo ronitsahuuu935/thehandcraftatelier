@@ -1,4 +1,6 @@
-import { isVideo, imageUrl as resolveImageUrl } from "./data/media.js";
+import { discountCategories } from "./lib/discounts.js";
+import { ProductColors, groupGallery } from "./admin/ProductColors.jsx";
+import { imageUrl as resolveImageUrl } from "./data/media.js";
 import {
   nav,
   copy,
@@ -13,7 +15,15 @@ import {
 } from "./admin/helpers.js";
 import { AVAILABLE_SIZES, SOCIAL } from "./data/storefront.js";
 import { isPaidOrder } from "./lib/orders.js";
-import { Status, Metric, DemoNote, Empty, Chart } from "./admin/components.jsx";
+import {
+  Status,
+  Metric,
+  DemoNote,
+  Empty,
+  Chart,
+  SalesChart,
+  DiscountCategories,
+} from "./admin/components.jsx";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -127,6 +137,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [page, setPage] = useState("dashboard");
   const [query, setQuery] = useState("");
   const [menu, setMenu] = useState(false);
+  const [salesState, setSalesState] = useState("loading");
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [discounts, setDiscounts] = useState(() => {
@@ -147,6 +158,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [catalogProducts, setCatalogProducts] = useState(products);
   const [catalogError, setCatalogError] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
+  const [colorGroups, setColorGroups] = useState([]);
   const [addingProduct, setAddingProduct] = useState(false);
   const [savingProduct, setSavingProduct] = useState(false);
   const [deletingProduct, setDeletingProduct] = useState(false);
@@ -615,213 +627,137 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   };
   const saveProduct = async (event) => {
     event.preventDefault();
-    if (!supabase || !editingProduct || deletingProduct) return;
-    setSavingProduct(true);
-    setCatalogError("");
-    const form = new FormData(event.currentTarget);
-    const chosenCategory = String(form.get("category") || "");
-    const category =
-      chosenCategory === CREATE_CATEGORY_VALUE ? newCategoryName.trim() : chosenCategory.trim();
-    if (!category) {
-      setCatalogError("Enter a name for the new category.");
-      setSavingProduct(false);
-      return;
-    }
-    const newImages = Array.from(form.getAll("galleryImages")).filter(
-      (file) => file instanceof File && file.size,
-    );
-    if (newImages.some((file) => !file.type.startsWith("image/") || file.size > 8 * 1024 * 1024)) {
-      setCatalogError("Choose images smaller than 8 MB.");
-      setSavingProduct(false);
-      return;
-    }
-    const gallery = Array.isArray(editingProduct.gallery)
-      ? editingProduct.gallery
-          .filter((image) => image?.src)
-          .map((image) => ({
-            ...image,
-            color:
-              String(
-                form.get(`image_color_${editingProduct.gallery.indexOf(image)}`) || "",
-              ).trim() || null,
-          }))
-      : [];
-    const uploadedPaths = [];
-    for (const file of newImages) {
-      const extension =
-        file.name
-          .split(".")
-          .pop()
-          ?.toLowerCase()
-          .replace(/[^a-z0-9]/g, "") || "jpg";
-      const imagePath = `catalog/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
-      const { error: uploadError } = await supabase.storage
-        .from(productStorageBucket)
-        .upload(imagePath, file, { contentType: file.type, upsert: false });
-      if (uploadError) {
-        if (uploadedPaths.length)
-          await supabase.storage.from(productStorageBucket).remove(uploadedPaths);
-        setCatalogError("Could not upload product images. Details: " + uploadError.message);
-        setSavingProduct(false);
-        return;
-      }
-      uploadedPaths.push(imagePath);
-      gallery.push({
-        src: supabase.storage.from(productStorageBucket).getPublicUrl(imagePath).data.publicUrl,
-        color: String(form.get("galleryImageColor") || "").trim() || null,
-      });
-    }
-    const sizes = AVAILABLE_SIZES.filter((size) => form.getAll("sizes").includes(size));
-    if (!sizes.length) {
-      setCatalogError("Select at least one available size.");
-      setSavingProduct(false);
-      return;
-    }
-    const values = {
-      name: String(form.get("name")).trim(),
-      price: Number(form.get("price")),
-      category,
-      image_url: gallery[0]?.src || null,
-      gallery,
-      sizes,
-      tag: String(form.get("tag")).trim() || null,
-      description: String(form.get("description")).trim() || null,
-    };
-    const { error } = await supabase.from("products").update(values).eq("id", editingProduct.id);
-    setSavingProduct(false);
-    if (error) {
-      setCatalogError(
-        "Could not save product. Check the products table migration and admin access. Details: " +
-          error.message,
-      );
-      return;
-    }
-    const { data: savedRow, error: reloadError } = await supabase
-      .from("products")
-      .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
-      .eq("id", editingProduct.id)
-      .maybeSingle();
-    if (reloadError || !savedRow) {
-      setCatalogError(
-        "Product update was not accepted. Confirm this Supabase user is listed in public.admin_users.",
-      );
-      return;
-    }
-    const saved = catalogFromRow(savedRow);
-    const updated = catalogProducts.map((item) => (item.id === saved.id ? saved : item));
-    setCatalogProducts(updated);
-    setCategories([...new Set(updated.map((row) => row.category).filter(Boolean))]);
-    onProductsChange?.(updated);
-    setEditingProduct(null);
-    setNotice("Product updated in Supabase.");
-  };
-  const saveNewProduct = async (event) => {
-    event.preventDefault();
+    if (savingProduct || deletingProduct) return;
     if (!supabase) return setCatalogError("Supabase is not configured.");
+    const form = new FormData(event.currentTarget);
+    const choice = String(form.get("category") || "");
+    const category = (choice === CREATE_CATEGORY_VALUE ? newCategoryName : choice).trim();
+    const sizes = AVAILABLE_SIZES.filter((size) => form.getAll("sizes").includes(size));
+    if (!category) return setCatalogError("Choose or enter a category.");
+    if (!sizes.length) return setCatalogError("Select at least one available size.");
+    const names = new Set();
+    const entries = [];
+    for (const group of colorGroups) {
+      const color = group.name.trim();
+      if (group.id !== "general") {
+        if (!color) return setCatalogError("Enter a name for each color.");
+        if (names.has(color.toLowerCase()))
+          return setCatalogError("Give each color a different name.");
+        if (!group.items.length)
+          return setCatalogError("Add at least one image for " + color + ".");
+        names.add(color.toLowerCase());
+      }
+      for (const item of group.items) entries.push({ ...item, color: color || null });
+    }
+    if (!editingProduct && !entries.length)
+      return setCatalogError("Add at least one product image.");
+    if (
+      entries.some(
+        ({ file }) =>
+          file && (!file.size || !file.type.startsWith("image/") || file.size > 8 * 1024 * 1024),
+      )
+    )
+      return setCatalogError("Choose image files up to 8 MB each.");
+    // Keep the original cover and media order when a photo changes groups.
+    entries.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity));
+    const bucket = supabase.storage.from(productStorageBucket);
+    const uploaded = [];
     setSavingProduct(true);
     setCatalogError("");
-    const form = new FormData(event.currentTarget);
-    const chosenCategory = String(form.get("category") || "");
-    const category =
-      chosenCategory === CREATE_CATEGORY_VALUE ? newCategoryName.trim() : chosenCategory.trim();
-    const file = form.get("image");
-    if (!category) {
-      setCatalogError("Choose a category or enter a new category name.");
+    try {
+      const gallery = [];
+      for (const { media, file, color } of entries) {
+        if (!file) {
+          gallery.push({ ...media, color });
+          continue;
+        }
+        const extension =
+          file.name
+            .split(".")
+            .pop()
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "") || "jpg";
+        const path = "catalog/" + crypto.randomUUID() + "." + extension;
+        const { error } = await bucket.upload(path, file, {
+          contentType: file.type,
+          upsert: false,
+        });
+        if (error) throw error;
+        uploaded.push(path);
+        gallery.push({ src: bucket.getPublicUrl(path).data.publicUrl, color });
+      }
+      const values = {
+        name: String(form.get("name")).trim(),
+        price: Number(form.get("price")),
+        category,
+        image_url: gallery[0]?.src || null,
+        gallery,
+        sizes,
+        tag: String(form.get("tag") || "").trim() || null,
+        description: String(form.get("description") || "").trim() || null,
+      };
+      const productsTable = supabase.from("products");
+      const query = editingProduct
+        ? productsTable.update(values).eq("id", editingProduct.id)
+        : productsTable.insert({
+            ...values,
+            id: Math.max(0, ...catalogProducts.map((p) => Number(p.id) || 0)) + 1,
+            stock_quantity: form.get("stock") === "" ? null : Number(form.get("stock")),
+          });
+      const { data, error } = await query
+        .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
+        .single();
+      if (error) throw error;
+      uploaded.length = 0;
+      const saved = catalogFromRow(data);
+      const updated = editingProduct
+        ? catalogProducts.map((p) => (p.id === saved.id ? saved : p))
+        : [...catalogProducts, saved];
+      setCatalogProducts(updated);
+      setCategories([...new Set(updated.map((row) => row.category).filter(Boolean))]);
+      onProductsChange?.(updated);
+      setEditingProduct(null);
+      setAddingProduct(false);
+      setColorGroups([]);
+      setNotice(editingProduct ? "Product updated." : "Product added.");
+    } catch (error) {
+      setCatalogError("Could not save product. " + error.message);
+      if (uploaded.length) await bucket.remove(uploaded);
+    } finally {
       setSavingProduct(false);
-      return;
     }
-    const sizes = AVAILABLE_SIZES.filter((size) => form.getAll("sizes").includes(size));
-    if (!sizes.length) {
-      setCatalogError("Select at least one available size.");
-      setSavingProduct(false);
-      return;
-    }
-    if (!(file instanceof File) || !file.size) {
-      setCatalogError("Choose a product image to upload.");
-      setSavingProduct(false);
-      return;
-    }
-    if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) {
-      setCatalogError("Choose an image smaller than 8 MB.");
-      setSavingProduct(false);
-      return;
-    }
-    const extension =
-      file.name
-        .split(".")
-        .pop()
-        ?.toLowerCase()
-        .replace(/[^a-z0-9]/g, "") || "jpg";
-    const imagePath = `catalog/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
-    const { error: uploadError } = await supabase.storage
-      .from(productStorageBucket)
-      .upload(imagePath, file, { contentType: file.type, upsert: false });
-    if (uploadError) {
-      setCatalogError(
-        "Could not upload the product image. Check the admin Storage policy and bucket. Details: " +
-          uploadError.message,
-      );
-      setSavingProduct(false);
-      return;
-    }
-    const imageUrl = supabase.storage.from(productStorageBucket).getPublicUrl(imagePath)
-      .data.publicUrl;
-    const nextId = Math.max(0, ...catalogProducts.map((product) => Number(product.id) || 0)) + 1;
-    const values = {
-      id: nextId,
-      name: String(form.get("name") || "").trim(),
-      price: Number(form.get("price")),
-      category,
-      image_url: imageUrl,
-      gallery: [{ src: imageUrl, color: String(form.get("image_color") || "").trim() || null }],
-      sizes,
-      tag: String(form.get("tag") || "").trim() || null,
-      description: String(form.get("description") || "").trim() || null,
-      stock_quantity: form.get("stock") === "" ? null : Number(form.get("stock")),
-    };
-    const { data, error } = await supabase
-      .from("products")
-      .insert(values)
-      .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
-      .single();
-    setSavingProduct(false);
-    if (error) {
-      await supabase.storage.from(productStorageBucket).remove([imagePath]);
-      setCatalogError(
-        "Could not add the product. Check the products migration and admin access. Details: " +
-          error.message,
-      );
-      return;
-    }
-    const updated = [...catalogProducts, catalogFromRow(data)];
-    setCatalogProducts(updated);
-    setCategories([...new Set(updated.map((row) => row.category).filter(Boolean))]);
-    onProductsChange?.(updated);
-    setAddingProduct(false);
-    setCreatingCategory(false);
-    setNewCategoryName("");
-    setNotice("Product added to your Supabase catalog.");
   };
   useEffect(() => {
     if (!supabase || !sessionUser) return;
     let active = true;
+    let loading = false;
+    setSalesState("loading");
     const loadOrders = async () => {
-      const { data, error } = await supabase
-        .from("orders")
-        .select(
-          "id,recipient_name,recipient_email,recipient_phone,shipping_address_line1,shipping_city,shipping_postal_code,items,total,payment_method,payment_status,cashfree_order_id,cashfree_refund_id,refund_status,rejection_reason,status,created_at",
-        )
-        .neq("status", "Rejected")
-        .order("created_at", { ascending: false })
-        .limit(30);
-      if (!active) return;
-      if (error) {
-        setCatalogError(
-          "Could not load sales notifications. Apply the latest Supabase migration, then refresh. Details: " +
-            error.message,
-        );
-        return;
+      if (loading) return;
+      loading = true;
+      const data = [];
+      const pageSize = 500;
+      for (let offset = 0; ; offset += pageSize) {
+        const { data: batch, error } = await supabase
+          .from("orders")
+          .select(
+            "id,recipient_name,recipient_email,recipient_phone,shipping_address_line1,shipping_city,shipping_postal_code,items,total,payment_method,payment_status,cashfree_order_id,cashfree_refund_id,refund_status,rejection_reason,status,created_at",
+          )
+          .neq("status", "Rejected")
+          .order("created_at", { ascending: false })
+          .order("id", { ascending: false })
+          .range(offset, offset + pageSize - 1);
+        if (!active) return;
+        if (error) {
+          loading = false;
+          setSalesState("error");
+          return;
+        }
+        data.push(...batch);
+        if (batch.length < pageSize) break;
       }
+      loading = false;
+      setSalesState("ready");
       setOrders(
         (data || [])
           .filter(
@@ -1415,7 +1351,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
           </div>
         )}
         <main className="admin-content">
-          <DemoNote />
+          {page !== "dashboard" && <DemoNote />}
           {page === "dashboard" && (
             <>
               <div className="admin-page-heading">
@@ -1427,7 +1363,15 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
               {metrics(
                 <>
                   <Metric icon={ShoppingCart} label="Total Orders" value={orders.length} />
-                  <Metric icon={CircleDollarSign} label="Total Sales" value="—" />
+                  <Metric
+                    icon={CircleDollarSign}
+                    label="Total Sales"
+                    value={
+                      salesState === "ready"
+                        ? money(paidSales.reduce((sum, order) => sum + order.total, 0))
+                        : "—"
+                    }
+                  />
                   <Metric icon={Package} label="Catalog Products" value={catalogProducts.length} />
                   <Metric icon={Users} label="Total Customers" value={customers.length} />
                 </>,
@@ -1437,10 +1381,10 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   <div className="admin-card-heading">
                     <div>
                       <h2>Sales Overview</h2>
-                      <p>Sales data will appear after orders are recorded.</p>
+                      <p>Monthly paid sales since the first order (INR).</p>
                     </div>
                   </div>
-                  <Chart />
+                  <SalesChart orders={paidSales} state={salesState} />
                 </section>
                 <section className="admin-panel-card admin-best-panel">
                   <div className="admin-card-heading">
@@ -1550,6 +1494,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                 setCatalogError("");
                 setCreatingCategory(false);
                 setNewCategoryName("");
+                setColorGroups(groupGallery());
                 setAddingProduct(true);
               })}
               {metrics(
@@ -1669,6 +1614,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                                 setCatalogError("");
                                 setCreatingCategory(false);
                                 setNewCategoryName("");
+                                setColorGroups(groupGallery(p.gallery));
                                 setEditingProduct(p);
                               }}
                             >
@@ -1981,7 +1927,9 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                               <td>{d.code}</td>
                               <td>{d.type}</td>
                               <td>{d.displayValue || d.value}</td>
-                              <td>{d.applicableTo || "Not configured"}</td>
+                              <td>
+                                {discountCategories(d.applicableTo).join(", ") || "All Products"}
+                              </td>
                               <td>{d.until}</td>
                               <td>
                                 <Status>{d.status}</Status>
@@ -2021,7 +1969,9 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   className="admin-panel-card admin-side-form"
                   onSubmit={async (e) => {
                     e.preventDefault();
-                    const f = new FormData(e.currentTarget);
+                    const form = e.currentTarget;
+                    const f = new FormData(form);
+                    const selected = f.getAll("applicableTo");
                     const numericValue = Number(f.get("value"));
                     const type = String(f.get("type"));
                     const code = String(f.get("code")).trim().toUpperCase();
@@ -2033,7 +1983,8 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                       displayValue: numericValue + (type === "Percentage" ? "%" : ""),
                       until: String(f.get("until") || "").trim() || "No expiry",
                       status: "Active",
-                      applicableTo: String(f.get("applicableTo")),
+                      from: String(f.get("from") || ""),
+                      applicableTo: selected.length ? JSON.stringify(selected) : "All Products",
                     };
                     if (!(await saveDiscount(d))) return;
                     setDiscounts((current) => [
@@ -2044,7 +1995,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                       ),
                     ]);
                     setEditingDiscount(null);
-                    e.currentTarget.reset();
+                    form.reset();
                     setNotice(editingDiscount ? "Discount updated." : "Discount saved.");
                   }}
                 >
@@ -2087,18 +2038,10 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                       placeholder="Enter value"
                     />
                   </label>
-                  <label>
-                    Applicable To
-                    <select
-                      name="applicableTo"
-                      defaultValue={editingDiscount?.applicableTo || "All Products"}
-                    >
-                      <option>All Products</option>
-                      {categories.map((c) => (
-                        <option key={c}>{c}</option>
-                      ))}
-                    </select>
-                  </label>
+                  <DiscountCategories
+                    categories={categories}
+                    selected={discountCategories(editingDiscount?.applicableTo)}
+                  />
                   <div className="admin-form-grid">
                     {" "}
                     <label>
@@ -2331,7 +2274,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
               className="admin-modal-backdrop"
               role="presentation"
               onMouseDown={(e) => {
-                if (e.target === e.currentTarget && !deletingProduct) {
+                if (e.target === e.currentTarget && !savingProduct && !deletingProduct) {
                   setEditingProduct(null);
                   setAddingProduct(false);
                 }
@@ -2341,7 +2284,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                 className="admin-product-editor"
                 role="dialog"
                 aria-modal="true"
-                onSubmit={editingProduct ? saveProduct : saveNewProduct}
+                onSubmit={saveProduct}
                 aria-labelledby="edit-product-title"
               >
                 <button
@@ -2352,7 +2295,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                     setAddingProduct(false);
                   }}
                   aria-label="Close"
-                  disabled={deletingProduct}
+                  disabled={savingProduct || deletingProduct}
                 >
                   ×
                 </button>
@@ -2443,80 +2386,11 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   </div>
                   <small>Customers can choose from the sizes selected here.</small>
                 </fieldset>
-                {(editingProduct || addingProduct) && (
-                  <div className="admin-gallery-manager">
-                    <span>Product images and colors</span>
-                    <p>
-                      Enter a color name for each image. Customers selecting that color will see its
-                      linked photo.
-                    </p>
-                    <div className="admin-gallery-grid">
-                      {(editingProduct?.gallery || []).map((image, index) => (
-                        <div className="admin-gallery-item" key={`${image.src}-${index}`}>
-                          {isVideo(image) ? (
-                            <video
-                              src={image.src}
-                              poster={image.poster}
-                              controls
-                              preload="none"
-                              aria-label={`Product video ${index + 1}`}
-                            />
-                          ) : (
-                            <img src={image.src} alt={`Product image ${index + 1}`} />
-                          )}
-                          <label>
-                            Color
-                            <input
-                              name={`image_color_${index}`}
-                              defaultValue={image.color || ""}
-                              placeholder="e.g. Sage green"
-                            />
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setEditingProduct((current) => ({
-                                ...current,
-                                gallery: (current.gallery || []).filter(
-                                  (_, imageIndex) => imageIndex !== index,
-                                ),
-                              }))
-                            }
-                            aria-label={`Remove product image ${index + 1}`}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    {editingProduct && (
-                      <label className="admin-gallery-upload">
-                        Add images
-                        <input name="galleryImages" type="file" accept="image/*" multiple />
-                        <small>
-                          Color name below will be linked to each new image in this upload.
-                        </small>
-                        <input
-                          name="galleryImageColor"
-                          placeholder="Color for new image(s), optional"
-                        />
-                      </label>
-                    )}
-                    {addingProduct && (
-                      <>
-                        <label className="admin-gallery-upload">
-                          Product image
-                          <input name="image" type="file" accept="image/*" required />
-                          <small>Upload a product photo (up to 8 MB).</small>
-                        </label>
-                        <label>
-                          Image color
-                          <input name="image_color" placeholder="e.g. Natural white" />
-                        </label>
-                      </>
-                    )}
-                  </div>
-                )}
+                <ProductColors
+                  groups={colorGroups}
+                  setGroups={setColorGroups}
+                  disabled={savingProduct || deletingProduct}
+                />
                 <label>
                   Product tag
                   <input
@@ -2558,7 +2432,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   <button
                     type="button"
                     className="admin-outline-button"
-                    disabled={deletingProduct}
+                    disabled={savingProduct || deletingProduct}
                     onClick={() => {
                       setEditingProduct(null);
                       setAddingProduct(false);

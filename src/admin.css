@@ -3175,3 +3175,83 @@
     display: none !important;
   }
 }
+
+.admin-discount-categories {
+  margin: 0;
+  min-width: 0;
+  border: 1px solid #dedbd3;
+  border-radius: 8px;
+  padding: 12px;
+}
+.admin-discount-categories small {
+  display: block;
+  margin-bottom: 8px;
+}
+.admin-side-form .admin-discount-categories label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.admin-side-form .admin-discount-categories input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  accent-color: #44624e;
+}
+.admin-monthly-sales {
+  list-style: none;
+  padding: 0;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.admin-monthly-sales li {
+  display: grid;
+  grid-template-columns: 6em minmax(24px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 15px 0;
+}
+.admin-monthly-sales li div {
+  background: #eeeee9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.admin-monthly-sales i {
+  display: block;
+  height: 12px;
+  background: #44624e;
+  border-radius: inherit;
+}
+.admin-product-colors {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.admin-color-card {
+  margin: 10px 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.admin-color-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-color-heading label {
+  flex: 1;
+  min-width: 0;
+}
+.admin-color-card .admin-gallery-item video {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.admin-color-card .admin-gallery-grid > div {
+  min-width: 0;
+}
+.admin-color-card select {
+  width: 100%;
+}
