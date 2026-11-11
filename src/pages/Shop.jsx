@@ -95,21 +95,6 @@ export function Shop({
               <span>₹2,500</span>
             </div>
           </div>
-          <div className="filter-group">
-            <h4>Availability</h4>
-            <label>
-              <input type="checkbox" /> In stock
-            </label>
-            <label>
-              <input type="checkbox" /> Made to order
-            </label>
-          </div>
-          <div className="filter-group">
-            <h4>Personalization</h4>
-            <label>
-              <input type="checkbox" /> Can be personalized
-            </label>
-          </div>
         </aside>
         <section
           className="shop-results"
