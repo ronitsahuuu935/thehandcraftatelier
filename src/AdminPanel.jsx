@@ -63,6 +63,40 @@ async function prepareShippingLabels() {
   return module;
 }
 
+function isAtelierLogo(source) {
+  return /(?:^|\/)logo\.webp(?:[?#].*)?$/i.test(String(source || ""));
+}
+
+function orderItemProduct(item, catalog) {
+  const byId = catalog.find((product) => String(product.id) === String(item.product_id));
+  if (byId) return byId;
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  const itemName = normalize(item.name);
+  const exact = catalog.find((product) => normalize(product.name) === itemName);
+  if (exact) return exact;
+  const words = itemName
+    .split(/\s+/)
+    .filter(
+      (word) =>
+        word.length > 2 &&
+        !["shirt", "shirts", "tee", "tees", "top", "tops", "piece", "pieces"].includes(word),
+    );
+  if (words.length < 2) return null;
+  const candidates = catalog
+    .map((product) => {
+      const productWords = new Set(normalize(product.name).split(/\s+/));
+      const matched = words.filter((word) => productWords.has(word)).length;
+      return { product, score: matched / words.length, matched };
+    })
+    .filter((candidate) => candidate.matched >= 2)
+    .sort((a, b) => b.score - a.score);
+  return candidates[0]?.score >= 0.5 ? candidates[0].product : null;
+}
+
 function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [downloadingLabelId, setDownloadingLabelId] = useState(null);
   const labelDownloadInProgress = useRef(false);
@@ -2691,14 +2725,21 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                     <li key={`${item.product_id || item.name}-${index}`}>
                       <span className="admin-order-detail-product">
                         <img
-                          src={
-                            item.image ||
-                            catalogProducts.find(
-                              (product) => String(product.id) === String(item.product_id),
-                            )?.image ||
-                            "/media/images/logo.webp"
-                          }
+                          src={(() => {
+                            const product = orderItemProduct(item, catalogProducts);
+                            const savedImage = isAtelierLogo(item.image) ? "" : item.image;
+                            return product?.image || savedImage || "/media/images/logo.webp";
+                          })()}
                           alt=""
+                          onError={(event) => {
+                            const product = orderItemProduct(item, catalogProducts);
+                            if (product?.image && !event.currentTarget.dataset.fallbackAttempted) {
+                              event.currentTarget.dataset.fallbackAttempted = "true";
+                              event.currentTarget.src = product.image;
+                            } else {
+                              event.currentTarget.src = "/media/images/logo.webp";
+                            }
+                          }}
                         />
                         <span>
                           {item.name} × {item.quantity}
