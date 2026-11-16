@@ -1,7 +1,7 @@
 import { HomeCouponPopup } from "./components/StoreCoupons.jsx";
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 
-import { ShoppingBag, ArrowRight, Check, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, ShieldCheck } from "lucide-react";
 import { supabase } from "./lib/supabase";
 const AdminPanel = lazy(() => import("./AdminPanel"));
 const OurStory = lazy(() => import("./OurStory"));
@@ -62,7 +62,6 @@ export function App() {
   });
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(initialRoute.category || "All pieces");
-  const [showCartToast, setShowCartToast] = useState(false);
   const [bagOpen, setBagOpen] = useState(Boolean(initialRoute.bagOpen));
   const [checkoutItem, setCheckoutItem] = useState(initialRoute.checkoutItem || null);
   const [checkoutFromBag, setCheckoutFromBag] = useState(initialRoute.checkoutFromBag || false);
@@ -338,7 +337,7 @@ export function App() {
           : item,
       );
     });
-    setShowCartToast(true);
+    openBag();
   };
   const toggleWishlist = (product) =>
     setWishlistIds((current) =>
@@ -370,11 +369,6 @@ export function App() {
           : item,
       ),
     );
-  useEffect(() => {
-    if (!showCartToast) return;
-    const t = setTimeout(() => setShowCartToast(false), 3000);
-    return () => clearTimeout(t);
-  }, [showCartToast, cart.length]);
   if (adminMode)
     return (
       <Suspense
@@ -619,13 +613,6 @@ export function App() {
                   onCheckout={checkoutCart}
                 />
               </>
-            )}
-            {showCartToast && (
-              <div className="cart-toast" role="status">
-                <ShoppingBag size={16} />
-                <span>Added to your bag</span>
-                <button onClick={() => setShowCartToast(false)}>Dismiss</button>
-              </div>
             )}
           </>
         )}

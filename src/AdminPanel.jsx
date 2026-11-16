@@ -162,7 +162,12 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   const [deletingProduct, setDeletingProduct] = useState(false);
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [categoryDialog, setCategoryDialog] = useState(null);
+  const [categoryDraft, setCategoryDraft] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
   const [customerFormOpen, setCustomerFormOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomRequest, setSelectedCustomRequest] = useState(null);
   const [savingCustomer, setSavingCustomer] = useState(false);
   const [customerFormError, setCustomerFormError] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -563,11 +568,14 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     if (!supabase || !sessionUser) return;
     let active = true;
     const loadCatalog = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
-        .eq("is_active", true)
-        .order("id");
+      const [{ data, error }, { data: categoryRows, error: categoryError }] = await Promise.all([
+        supabase
+          .from("products")
+          .select("id,name,price,category,image_url,gallery,sizes,tag,description,stock_quantity")
+          .eq("is_active", true)
+          .order("id"),
+        supabase.from("categories").select("name").order("name"),
+      ]);
       if (!active) return;
       if (error) {
         setCatalogError(
@@ -578,7 +586,23 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       }
       const rows = (data || []).map(catalogFromRow);
       setCatalogProducts(rows);
-      setCategories([...new Set(rows.map((row) => row.category).filter(Boolean))]);
+      if (categoryError) {
+        setCatalogError(
+          "Could not load categories. Run supabase/migrations/20261116_categories.sql, then refresh. Details: " +
+            categoryError.message,
+        );
+        return;
+      }
+      setCategories(
+        [
+          ...new Set(
+            [
+              ...(categoryRows || []).map((row) => row.name),
+              ...rows.map((row) => row.category),
+            ].filter(Boolean),
+          ),
+        ].sort((a, b) => a.localeCompare(b)),
+      );
       setStockByProduct(
         Object.fromEntries(
           rows
@@ -593,6 +617,66 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       active = false;
     };
   }, [sessionUser]);
+  const saveCategory = async (event) => {
+    event.preventDefault();
+    if (!supabase || savingCategory) return;
+    const name = categoryDraft.trim().replace(/\s+/g, " ");
+    if (!name) return;
+    if (name === categoryDialog?.original) {
+      setCategoryDialog(null);
+      return;
+    }
+    if (
+      categories.some(
+        (category) =>
+          category.toLowerCase() === name.toLowerCase() && category !== categoryDialog?.original,
+      )
+    ) {
+      setCatalogError("A category with that name already exists.");
+      return;
+    }
+    setSavingCategory(true);
+    setCatalogError("");
+    try {
+      if (categoryDialog?.original) {
+        const { error: categoryInsertError } = await supabase
+          .from("categories")
+          .upsert({ name }, { onConflict: "name" });
+        if (categoryInsertError) throw categoryInsertError;
+        const { error: productError } = await supabase
+          .from("products")
+          .update({ category: name })
+          .eq("category", categoryDialog.original);
+        if (productError) throw productError;
+        const { error: categoryError } = await supabase
+          .from("categories")
+          .delete()
+          .eq("name", categoryDialog.original);
+        if (categoryError) throw categoryError;
+      } else {
+        const { error } = await supabase.from("categories").insert({ name });
+        if (error) throw error;
+      }
+      setCategories((current) =>
+        [...new Set([...current.filter((value) => value !== categoryDialog?.original), name])].sort(
+          (a, b) => a.localeCompare(b),
+        ),
+      );
+      if (categoryDialog?.original) {
+        const updated = catalogProducts.map((product) =>
+          product.category === categoryDialog.original ? { ...product, category: name } : product,
+        );
+        setCatalogProducts(updated);
+        onProductsChange?.(updated);
+      }
+      setCategoryDialog(null);
+      setNotice(categoryDialog?.original ? "Category renamed." : "Category created.");
+    } catch (error) {
+      setCatalogError("Could not save category. " + error.message);
+    } finally {
+      setSavingCategory(false);
+    }
+  };
   const deleteProduct = async () => {
     if (!supabase || !editingProduct || savingProduct || deletingProduct) return;
     if (
@@ -1695,7 +1779,12 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                               <Status>{c.status}</Status>
                             </td>
                             <td>
-                              <button className="admin-row-button">View</button>
+                              <button
+                                className="admin-row-button"
+                                onClick={() => setSelectedCustomer(c)}
+                              >
+                                View
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -1712,9 +1801,11 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
           )}
           {page === "categories" && (
             <>
-              {heading("Add Category", () =>
-                setNotice("Category creation will be enabled with catalog management."),
-              )}
+              {heading("Add Category", () => {
+                setCatalogError("");
+                setCategoryDraft("");
+                setCategoryDialog({ original: null });
+              })}
               {metrics(
                 <>
                   <Metric icon={Grid2X2} label="Catalog Categories" value={categories.length} />
@@ -1747,11 +1838,11 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                           <td>
                             <button
                               className="admin-row-button"
-                              onClick={() =>
-                                setNotice(
-                                  "Category editing will be enabled with catalog management.",
-                                )
-                              }
+                              onClick={() => {
+                                setCatalogError("");
+                                setCategoryDraft(c);
+                                setCategoryDialog({ original: c });
+                              }}
                             >
                               <Pencil size={13} /> Edit
                             </button>
@@ -1830,7 +1921,12 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                               </td>
                               <td>{c.step}</td>
                               <td>
-                                <button className="admin-row-button">View</button>
+                                <button
+                                  className="admin-row-button"
+                                  onClick={() => setSelectedCustomRequest(c)}
+                                >
+                                  View
+                                </button>
                               </td>
                             </tr>
                           ))}
@@ -2208,6 +2304,71 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
               </button>
             </div>
           )}
+          {categoryDialog && (
+            <div
+              className="admin-modal-backdrop"
+              onMouseDown={(event) =>
+                event.target === event.currentTarget && !savingCategory && setCategoryDialog(null)
+              }
+            >
+              <form
+                className="admin-product-editor"
+                onSubmit={saveCategory}
+                aria-labelledby="category-editor-title"
+              >
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  aria-label="Close"
+                  disabled={savingCategory}
+                  onClick={() => setCategoryDialog(null)}
+                >
+                  <X size={18} />
+                </button>
+                <span className="eyebrow">CATALOG ORGANIZATION</span>
+                <h2 id="category-editor-title">
+                  {categoryDialog.original ? "Rename category" : "Add category"}
+                </h2>
+                <p>Categories are saved to your store catalog and can be assigned to products.</p>
+                {catalogError && (
+                  <p className="admin-login-error" role="alert">
+                    {catalogError}
+                  </p>
+                )}
+                <label>
+                  Category name
+                  <input
+                    autoFocus
+                    required
+                    maxLength={60}
+                    value={categoryDraft}
+                    onChange={(event) => setCategoryDraft(event.target.value)}
+                    placeholder="e.g. Accessories"
+                  />
+                </label>
+                <div className="admin-editor-actions">
+                  <button
+                    type="button"
+                    className="admin-row-button"
+                    disabled={savingCategory}
+                    onClick={() => setCategoryDialog(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="admin-primary-button"
+                    disabled={savingCategory || !categoryDraft.trim()}
+                  >
+                    {savingCategory
+                      ? "Saving…"
+                      : categoryDialog.original
+                        ? "Save changes"
+                        : "Add category"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
           {(editingProduct || addingProduct) && (
             <div
               className="admin-modal-backdrop"
@@ -2387,6 +2548,108 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+          {selectedCustomer && (
+            <div
+              className="admin-modal-backdrop"
+              role="presentation"
+              onMouseDown={(event) =>
+                event.target === event.currentTarget && setSelectedCustomer(null)
+              }
+            >
+              <section
+                className="admin-order-detail-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="customer-detail-title"
+              >
+                <button
+                  className="admin-modal-close"
+                  type="button"
+                  onClick={() => setSelectedCustomer(null)}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+                <span className="eyebrow">CUSTOMER PROFILE</span>
+                <h2 id="customer-detail-title">{selectedCustomer.name}</h2>
+                <div className="admin-order-detail-grid">
+                  <div>
+                    <h3>Contact</h3>
+                    <p>
+                      {selectedCustomer.email}
+                      <br />
+                      {selectedCustomer.phone || "No phone on file"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3>Shopping history</h3>
+                    <p>
+                      {selectedCustomer.orders} orders
+                      <br />
+                      <b>{money(selectedCustomer.spent)} spent</b>
+                      <br />
+                      Last order: {selectedCustomer.last}
+                    </p>
+                  </div>
+                  <div>
+                    <h3>Location</h3>
+                    <p>{selectedCustomer.city || "Not provided"}</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
+          {selectedCustomRequest && (
+            <div
+              className="admin-modal-backdrop"
+              role="presentation"
+              onMouseDown={(event) =>
+                event.target === event.currentTarget && setSelectedCustomRequest(null)
+              }
+            >
+              <section
+                className="admin-order-detail-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="custom-detail-title"
+              >
+                <button
+                  className="admin-modal-close"
+                  type="button"
+                  onClick={() => setSelectedCustomRequest(null)}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+                <span className="eyebrow">CUSTOM EMBROIDERY REQUEST</span>
+                <h2 id="custom-detail-title">{selectedCustomRequest.title}</h2>
+                <div className="admin-order-detail-grid">
+                  <div>
+                    <h3>Customer</h3>
+                    <p>
+                      {selectedCustomRequest.name}
+                      <br />
+                      {selectedCustomRequest.email || "Contact details unavailable"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3>Request</h3>
+                    <p>{selectedCustomRequest.details}</p>
+                  </div>
+                  <div>
+                    <h3>Estimate and status</h3>
+                    <p>
+                      {money(selectedCustomRequest.amount)}
+                      <br />
+                      {selectedCustomRequest.status}
+                      <br />
+                      {selectedCustomRequest.step}
+                    </p>
+                  </div>
+                </div>
+              </section>
             </div>
           )}
           {selectedOrder && (

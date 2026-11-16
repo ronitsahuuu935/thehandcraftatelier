@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { Heart, ArrowRight, Plus, Minus, Play } from "lucide-react";
+import { Heart, ArrowRight, Plus, Minus, Play, X } from "lucide-react";
 import { isVideo } from "../data/media.js";
 
 import { AVAILABLE_SIZES, images } from "../data/storefront.js";
@@ -38,6 +38,13 @@ export function ProductDetail({
     (image) => !color || String(image.color || "").trim() === color,
   );
   const [active, setActive] = useState(0);
+  const [imageExpanded, setImageExpanded] = useState(false);
+  useEffect(() => {
+    if (!imageExpanded) return;
+    const closeOnEscape = (event) => event.key === "Escape" && setImageExpanded(false);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [imageExpanded]);
   return (
     <main className="detail-page">
       <div className="breadcrumbs">
@@ -88,15 +95,22 @@ export function ProductDetail({
                 aria-label={`${product.name} video`}
               />
             ) : (
-              <img
-                src={gallery[active]?.src || product.image}
-                {...responsiveImageProps(
-                  gallery[active]?.src || product.image,
-                  "(max-width: 900px) 90vw, 50vw",
-                )}
-                fetchPriority="high"
-                alt={product.name}
-              />
+              <button
+                className="detail-image-zoom"
+                type="button"
+                onClick={() => setImageExpanded(true)}
+                aria-label="Enlarge product image"
+              >
+                <img
+                  src={gallery[active]?.src || product.image}
+                  {...responsiveImageProps(
+                    gallery[active]?.src || product.image,
+                    "(max-width: 900px) 90vw, 50vw",
+                  )}
+                  fetchPriority="high"
+                  alt={product.name}
+                />
+              </button>
             )}
           </div>
         </div>
@@ -227,6 +241,29 @@ export function ProductDetail({
           </div>
         </div>
       </div>
+      {imageExpanded && !isVideo(gallery[active]) && (
+        <div
+          className="product-image-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${product.name} image`}
+          onClick={() => setImageExpanded(false)}
+        >
+          <button
+            type="button"
+            className="product-image-lightbox-close"
+            aria-label="Close enlarged image"
+            onClick={() => setImageExpanded(false)}
+          >
+            <X size={24} />
+          </button>
+          <img
+            src={gallery[active]?.src || product.image}
+            alt={product.name}
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
       <section className="section-wrap related">
         <div className="section-heading">
           <div>

@@ -6,6 +6,7 @@ import { isVideo } from "../data/media.js";
 import { money } from "../lib/format.js";
 import { canPurchase } from "../lib/inventory.js";
 import { responsiveImageProps } from "../lib/responsive-images.js";
+import { AVAILABLE_SIZES } from "../data/storefront.js";
 
 export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWishlist }) {
   const photos = [
@@ -17,6 +18,15 @@ export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWish
     ),
   ];
   const [activePhoto, setActivePhoto] = useState(0);
+  const sizes =
+    Array.isArray(product.sizes) && product.sizes.length ? product.sizes : AVAILABLE_SIZES;
+  const colors = [
+    ...new Set(
+      (product.gallery || []).map((item) => String(item.color || "").trim()).filter(Boolean),
+    ),
+  ];
+  const [size, setSize] = useState(sizes[0] || "");
+  const [color, setColor] = useState(colors[0] || "");
   const gesture = useRef(null);
   const swiped = useRef(false);
   const index = activePhoto % Math.max(1, photos.length);
@@ -120,10 +130,42 @@ export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWish
         </button>
         <strong>{money(product.price)}</strong>
         <p className="product-craft-note">Handcrafted with care</p>
+        <div className="product-card-options">
+          <label>
+            Size
+            <select
+              aria-label={`Size for ${product.name}`}
+              value={size}
+              onChange={(event) => setSize(event.target.value)}
+            >
+              {sizes.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+          {colors.length > 0 && (
+            <label>
+              Color
+              <select
+                aria-label={`Color for ${product.name}`}
+                value={color}
+                onChange={(event) => setColor(event.target.value)}
+              >
+                {colors.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
         <button
           className="quick-add"
           disabled={!canPurchase(product)}
-          onClick={() => onAdd(product)}
+          onClick={() => onAdd({ ...product, size, color: color || null })}
         >
           {canPurchase(product) ? "Add to bag" : "Out of stock"} <Plus size={13} />
         </button>
