@@ -583,7 +583,8 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
       }
       const rows = (data || []).map(catalogFromRow);
       setCatalogProducts(rows);
-      if (categoryError) {
+      const categoriesTableUnavailable = ["PGRST205", "42P01"].includes(categoryError?.code);
+      if (categoryError && !categoriesTableUnavailable) {
         setCatalogError(
           "Could not load categories. Run supabase/migrations/20261116_categories.sql, then refresh. Details: " +
             categoryError.message,
