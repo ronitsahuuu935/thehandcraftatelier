@@ -205,7 +205,7 @@ export function ProductDetail({
           <div className="trust-row">
             <span>♡ Handmade with care</span>
             <span>♧ Dispatch in 5–7 days</span>
-            <span>✧ Free shipping above ₹2,000</span>
+            <span>✧ Free shipping on orders ₹1,998+</span>
           </div>
           <a
             className="product-whatsapp-share"
@@ -236,7 +236,7 @@ export function ProductDetail({
             {activeTab === "Details"
               ? "Soft, breathable fabric with hand embroidery in cotton thread. Each piece is finished by hand, so small variations make it yours."
               : activeTab === "Shipping"
-                ? "Carefully packed and dispatched in 5–7 business days. Complimentary shipping on orders above ₹2,000."
+                ? "Carefully packed and dispatched in 5–7 business days. Shipping is ₹50 below ₹1,998 and free on orders of ₹1,998 or more."
                 : "Gentle hand wash in cold water. Do not wring or bleach. Dry in shade and iron on the reverse side."}
           </div>
         </div>

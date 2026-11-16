@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { isVideo } from "../data/media.js";
 
 export function groupGallery(gallery = []) {
-  const groups = [{ id: "general", name: "", items: [] }];
+  const groups = [];
   gallery.forEach((media, index) => {
     if (!media?.src) return;
     const name = String(media.color || "").trim();
-    let group = groups.find((group) => group.name === name);
+    let group = groups.find((group) => group.name === name && !group.unassigned);
+    if (!name) group = groups.find((group) => group.unassigned);
     if (!group) {
-      group = { id: crypto.randomUUID(), name, items: [] };
+      group = { id: crypto.randomUUID(), name, unassigned: !name, items: [] };
       groups.push(group);
     }
     group.items.push({ id: crypto.randomUUID(), media, index });
@@ -38,30 +39,26 @@ export function ProductColors({ groups, setGroups, disabled }) {
       <legend>Product images and colors</legend>
       {groups.map((group) => (
         <section key={group.id} className="admin-color-card">
-          {group.id === "general" ? (
-            <strong>General images</strong>
-          ) : (
-            <div className="admin-color-heading">
-              <label>
-                Color name
-                <input
-                  required
-                  value={group.name}
-                  placeholder="e.g. Sage green"
-                  onChange={(event) =>
-                    change(group.id, (g) => ({ ...g, name: event.target.value }))
-                  }
-                />
-              </label>
-              <button
-                type="button"
-                className="admin-row-button"
-                onClick={() => setGroups((current) => current.filter((g) => g.id !== group.id))}
-              >
-                Remove color
-              </button>
-            </div>
-          )}
+          <div className="admin-color-heading">
+            <label>
+              Color name
+              <input
+                required
+                value={group.name}
+                placeholder="e.g. White or Sage green"
+                onChange={(event) =>
+                  change(group.id, (g) => ({ ...g, name: event.target.value, unassigned: false }))
+                }
+              />
+            </label>
+            <button
+              type="button"
+              className="admin-row-button"
+              onClick={() => setGroups((current) => current.filter((g) => g.id !== group.id))}
+            >
+              Remove color
+            </button>
+          </div>
           {group.items.length > 0 && (
             <div className="admin-gallery-grid">
               {group.items.map((item, index) => (
@@ -71,7 +68,7 @@ export function ProductColors({ groups, setGroups, disabled }) {
                     <button
                       type="button"
                       aria-label={
-                        "Remove image " + (index + 1) + " from " + (group.name || "general images")
+                        "Remove image " + (index + 1) + " from " + (group.name || "unnamed color")
                       }
                       onClick={() =>
                         change(group.id, (g) => ({
@@ -83,30 +80,6 @@ export function ProductColors({ groups, setGroups, disabled }) {
                       ×
                     </button>
                   </div>
-                  {groups.length > 1 && (
-                    <select
-                      aria-label={"Assign image " + (index + 1) + " to color"}
-                      value={group.id}
-                      onChange={(event) => {
-                        const destination = event.target.value;
-                        setGroups((current) =>
-                          current.map((g) =>
-                            g.id === destination
-                              ? { ...g, items: [...g.items, item] }
-                              : g.id === group.id
-                                ? { ...g, items: g.items.filter((i) => i.id !== item.id) }
-                                : g,
-                          ),
-                        );
-                      }}
-                    >
-                      {groups.map((g) => (
-                        <option key={g.id} value={g.id}>
-                          {g.id === "general" ? "General images" : g.name || "Unnamed color"}
-                        </option>
-                      ))}
-                    </select>
-                  )}
                 </div>
               ))}
             </div>
@@ -138,6 +111,7 @@ export function ProductColors({ groups, setGroups, disabled }) {
       >
         + Add color
       </button>
+      {groups.length === 0 && <p>Add a color before uploading product photos.</p>}
     </fieldset>
   );
 }

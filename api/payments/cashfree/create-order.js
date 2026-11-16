@@ -1,4 +1,5 @@
 import { categoryDiscount } from "../../../src/lib/discounts.js";
+import { shippingCostFor } from "../../../src/lib/shipping.js";
 import crypto from "node:crypto";
 import { cartAvailabilityError } from "../../../src/lib/inventory.js";
 import {
@@ -154,8 +155,10 @@ export default async function createCashfreeOrder(request, response) {
         .status(400)
         .json({ error: "This coupon does not apply to the items in your cart." });
   }
-  const total = Math.round((subtotal - discount) * 100) / 100;
-  if (!Number.isFinite(total) || total < 200)
+  const discountedSubtotal = Math.round((subtotal - discount) * 100) / 100;
+  const shippingCost = shippingCostFor(discountedSubtotal);
+  const total = Math.round((discountedSubtotal + shippingCost) * 100) / 100;
+  if (!Number.isFinite(total) || discountedSubtotal < 200)
     return response
       .status(400)
       .json({ error: "The minimum order total for online payment is ₹200." });
@@ -192,7 +195,7 @@ export default async function createCashfreeOrder(request, response) {
       customer_id: customer.id,
       items: orderItems,
       subtotal,
-      shipping_cost: 0,
+      shipping_cost: shippingCost,
       total,
       payment_method: "Cashfree",
       payment_status: "pending",

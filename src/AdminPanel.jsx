@@ -721,14 +721,11 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     const entries = [];
     for (const group of colorGroups) {
       const color = group.name.trim();
-      if (group.id !== "general") {
-        if (!color) return setCatalogError("Enter a name for each color.");
-        if (names.has(color.toLowerCase()))
-          return setCatalogError("Give each color a different name.");
-        if (!group.items.length)
-          return setCatalogError("Add at least one image for " + color + ".");
-        names.add(color.toLowerCase());
-      }
+      if (!color) return setCatalogError("Enter a name for each color.");
+      if (names.has(color.toLowerCase()))
+        return setCatalogError("Give each color a different name.");
+      if (!group.items.length) return setCatalogError("Add at least one image for " + color + ".");
+      names.add(color.toLowerCase());
       for (const item of group.items) entries.push({ ...item, color: color || null });
     }
     if (!editingProduct && !entries.length)

@@ -131,36 +131,32 @@ export function ProductCard({ product, onOpen, onAdd, isWishlisted, onToggleWish
         <strong>{money(product.price)}</strong>
         <p className="product-craft-note">Handcrafted with care</p>
         <div className="product-card-options">
-          <label>
-            Size
-            <select
-              aria-label={`Size for ${product.name}`}
-              value={size}
-              onChange={(event) => setSize(event.target.value)}
+          <span className="product-card-option-label">Size</span>
+          {sizes.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className={`product-card-option-value${size === value ? " selected" : ""}`}
+              aria-label={`Size ${value} for ${product.name}`}
+              aria-pressed={size === value}
+              onClick={() => setSize(value)}
             >
-              {sizes.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-          {colors.length > 0 && (
-            <label>
-              Color
-              <select
-                aria-label={`Color for ${product.name}`}
-                value={color}
-                onChange={(event) => setColor(event.target.value)}
-              >
-                {colors.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+              {value}
+            </button>
+          ))}
+          {colors.length > 0 && <span className="product-card-option-label">Color</span>}
+          {colors.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className={`product-card-option-value${color === value ? " selected" : ""}`}
+              aria-label={`Color ${value} for ${product.name}`}
+              aria-pressed={color === value}
+              onClick={() => setColor(value)}
+            >
+              {value}
+            </button>
+          ))}
         </div>
         <button
           className="quick-add"

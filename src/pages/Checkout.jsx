@@ -16,6 +16,7 @@ import { googleMapsApiKey, supabase } from "../lib/supabase";
 
 import { INDIAN_STATES_AND_UTS } from "../data/locations.js";
 import { money } from "../lib/format.js";
+import { FLAT_SHIPPING_FEE, shippingCostFor } from "../lib/shipping.js";
 import { loadCashfree } from "../lib/load-cashfree.js";
 
 import { GoogleSignInScreen } from "../components/GoogleSignInScreen.jsx";
@@ -53,7 +54,9 @@ export function Checkout({
     0,
   );
   const discountAmount = categoryDiscount(appliedCoupon, checkoutItems);
-  const payableTotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
+  const discountedSubtotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
+  const shippingCost = shippingCostFor(discountedSubtotal);
+  const payableTotal = Math.round((discountedSubtotal + shippingCost) * 100) / 100;
   const applyCoupon = async (requestedCode = couponCode) => {
     const code = requestedCode.trim().toUpperCase();
     setCouponCode(code);
@@ -188,7 +191,7 @@ export function Checkout({
       return;
     }
     if (activeStep !== 3) return;
-    if (payableTotal < 200) {
+    if (discountedSubtotal < 200) {
       setSubmitError("The minimum order total for online payment is ₹200.");
       return;
     }
@@ -410,7 +413,9 @@ export function Checkout({
                         <b>Standard delivery</b>
                         <small>5–7 business days</small>
                       </span>
-                      <strong>Complimentary</strong>
+                      <strong>
+                        {shippingCost === 0 ? "Complimentary" : money(FLAT_SHIPPING_FEE)}
+                      </strong>
                       <Leaf size={16} />
                     </label>
                   </section>
@@ -608,7 +613,7 @@ export function Checkout({
               )}
               <div className="checkout-cost-row">
                 <span>Shipping</span>
-                <strong>Complimentary</strong>
+                <strong>{shippingCost === 0 ? "Complimentary" : money(FLAT_SHIPPING_FEE)}</strong>
               </div>
               <div className="checkout-total">
                 <span>Total</span>
