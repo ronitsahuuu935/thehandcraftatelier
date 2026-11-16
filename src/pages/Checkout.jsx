@@ -2,16 +2,7 @@ import { CheckoutCoupons } from "../components/StoreCoupons.jsx";
 import { categoryDiscount } from "../lib/discounts.js";
 import React, { useEffect, useState } from "react";
 
-import {
-  Leaf,
-  ArrowRight,
-  ArrowLeft,
-  Truck,
-  CreditCard,
-  Check,
-  MapPin,
-  ShieldCheck,
-} from "lucide-react";
+import { Leaf, ArrowRight, ArrowLeft, Truck, Check, MapPin } from "lucide-react";
 import { googleMapsApiKey, supabase } from "../lib/supabase";
 
 import { INDIAN_STATES_AND_UTS } from "../data/locations.js";
@@ -190,7 +181,7 @@ export function Checkout({
       setActiveStep(2);
       return;
     }
-    if (activeStep !== 3) return;
+    if (activeStep !== 2) return;
     if (discountedSubtotal < 200) {
       setSubmitError("The minimum order total for online payment is ₹200.");
       return;
@@ -227,7 +218,7 @@ export function Checkout({
       setSubmitting(false);
     }
   };
-  const steps = ["Shipping", "Payment", "Review", "Confirmation"];
+  const steps = ["Shipping", "Review", "Confirmation"];
   return (
     <main className="checkout-page">
       {authLoading ? (
@@ -421,34 +412,6 @@ export function Checkout({
                     <section className="checkout-step-panel">
                       <div className="checkout-section-heading">
                         <span>
-                          <CreditCard size={20} />
-                        </span>
-                        <div>
-                          <h2>Payment method</h2>
-                          <p>Pay securely through Cashfree</p>
-                        </div>
-                      </div>
-                      <div className="checkout-payment-choice selected">
-                        <span className="checkout-cashfree-mark">C</span>
-                        <span>
-                          <b>Online payment</b>
-                          <small>UPI, cards, net banking and other available methods</small>
-                        </span>
-                        <ShieldCheck size={18} />
-                      </div>
-                      <div className="checkout-secure-note">
-                        <ShieldCheck size={18} />
-                        <span>
-                          Your payment is processed securely by Cashfree. We only mark your order
-                          paid after Cashfree confirms it.
-                        </span>
-                      </div>
-                    </section>
-                  )}
-                  {activeStep === 3 && (
-                    <section className="checkout-step-panel">
-                      <div className="checkout-section-heading">
-                        <span>
                           <Check size={20} />
                         </span>
                         <div>
@@ -477,13 +440,9 @@ export function Checkout({
                         </button>
                       </div>
                       <div className="checkout-review-card">
-                        <b>Delivery & payment</b>
+                        <b>Delivery</b>
                         <span>Standard delivery · 5–7 business days</span>
-                        <span>Online payment via Cashfree</span>
                         <input type="hidden" name="payment_method" value="Cashfree" />
-                        <button type="button" onClick={() => setActiveStep(2)}>
-                          Edit payment
-                        </button>
                       </div>
                     </section>
                   )}
@@ -504,19 +463,10 @@ export function Checkout({
                     )}
                     {activeStep === 1 && (
                       <button className="story-cta checkout-submit" type="submit">
-                        Continue to Payment <ArrowRight size={15} />
+                        Continue to Review <ArrowRight size={15} />
                       </button>
                     )}
                     {activeStep === 2 && (
-                      <button
-                        className="story-cta checkout-submit"
-                        type="button"
-                        onClick={() => setActiveStep(3)}
-                      >
-                        Review Order <ArrowRight size={15} />
-                      </button>
-                    )}
-                    {activeStep === 3 && (
                       <button
                         className="story-cta checkout-submit"
                         type="submit"

@@ -23,10 +23,11 @@ export default async function rejectOrder(request, response) {
     return response.status(400).json({ error: "Invalid request body." });
   }
   const orderId = String(body.orderId || "").trim();
-  const reason = String(body.reason || "")
-    .trim()
-    .slice(0, 500);
-  if (!token || !orderId || !reason)
+  const reason =
+    String(body.reason || "")
+      .trim()
+      .slice(0, 500) || "Rejected by admin";
+  if (!token || !orderId)
     return response
       .status(400)
       .json({ error: "Admin session, order ID, and rejection reason are required." });

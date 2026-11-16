@@ -175,11 +175,8 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     Number(localStorage.getItem("atelier-admin-notifications-seen") || 0),
   );
   const [rejectingOrder, setRejectingOrder] = useState(null);
-  const [rejectionStep, setRejectionStep] = useState(1);
-  const [rejectionReason, setRejectionReason] = useState("");
   const [rejectionBusy, setRejectionBusy] = useState(false);
   const [rejectionError, setRejectionError] = useState("");
-  const [rejectionConfirmed, setRejectionConfirmed] = useState(false);
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -869,10 +866,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
   }, [sessionUser]);
   const openRejectOrder = (order) => {
     setRejectingOrder(order);
-    setRejectionStep(1);
-    setRejectionReason("");
     setRejectionError("");
-    setRejectionConfirmed(false);
   };
   const saveCustomer = async (event) => {
     event.preventDefault();
@@ -931,25 +925,11 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     if (!rejectionBusy) {
       setRejectingOrder(null);
       setRejectionError("");
-      setRejectionConfirmed(false);
     }
   };
   const processOrderRejection = async (event) => {
     event.preventDefault();
-    if (rejectionStep === 1) {
-      if (!rejectionReason.trim()) {
-        setRejectionError("Enter a reason before continuing.");
-        return;
-      }
-      setRejectionStep(2);
-      setRejectionError("");
-      return;
-    }
     if (!supabase || !rejectingOrder) return;
-    if (!rejectionConfirmed) {
-      setRejectionError("Confirm the rejection and refund instructions to continue.");
-      return;
-    }
     setRejectionBusy(true);
     setRejectionError("");
     try {
@@ -963,7 +943,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
           "content-type": "application/json",
           authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ orderId: rejectingOrder.id, reason: rejectionReason.trim() }),
+        body: JSON.stringify({ orderId: rejectingOrder.id }),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Could not reject this order.");
@@ -2849,130 +2829,61 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                 >
                   ×
                 </button>
-                <span className="eyebrow">ORDER MANAGEMENT · STEP {rejectionStep} OF 2</span>
-                <h2 id="reject-order-title">
-                  {rejectionStep === 1 ? "Review order rejection" : "Confirm rejection & refund"}
-                </h2>
+                <span className="eyebrow">ORDER MANAGEMENT · CONFIRM</span>
+                <h2 id="reject-order-title">Confirm order rejection</h2>
                 <p>
                   Order #{String(rejectingOrder.id).slice(0, 8)} · {rejectingOrder.name} ·{" "}
                   {money(rejectingOrder.total)}
                 </p>
-                {rejectionStep === 1 ? (
-                  <>
-                    <div className="admin-reject-payment-summary">
-                      <b>Payment: {rejectingOrder.method}</b>
-                      <span>Payment status: {rejectingOrder.payment_status || "pending"}</span>
-                      <span>
-                        Items:{" "}
-                        {rejectingOrder.items
-                          ?.map((item) => `${item.name} × ${item.quantity}`)
-                          .join(", ") || "No items listed"}
-                      </span>
-                    </div>
-                    <label>
-                      Reason for rejection
-                      <textarea
-                        value={rejectionReason}
-                        onChange={(event) => setRejectionReason(event.target.value)}
-                        required
-                        maxLength={500}
-                        placeholder="For example: item unavailable or address could not be verified"
-                      />
-                    </label>
-                    <p className="admin-reject-guidance">
-                      You will review the refund action before confirming.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="admin-reject-payment-summary">
-                      <b>Refund action</b>
-                      {rejectingPaid && rejectingCod ? (
-                        <span>
-                          This COD order is marked paid. Rejecting it will flag a manual refund;
-                          cash payments cannot be refunded through Cashfree.
-                        </span>
-                      ) : rejectingPaid && rejectingOrder.cashfree_order_id ? (
-                        <span>
-                          A full Cashfree refund of {money(rejectingOrder.total)} will be initiated.
-                          Cashfree may take time to complete it; the order will show the refund
-                          status returned by Cashfree.
-                        </span>
-                      ) : rejectingPaid ? (
-                        <span className="admin-reject-warning">
-                          This order is marked paid but has no Cashfree order ID. Verify the payment
-                          and add its Cashfree order ID before proceeding.
-                        </span>
-                      ) : rejectingUnpaid ? (
-                        <span>
-                          No payment is recorded as captured, so this order will be rejected without
-                          a refund.
-                        </span>
-                      ) : (
-                        <span className="admin-reject-warning">
-                          Payment status is {rejectingPaymentStatus}. Verify it before rejecting; no
-                          refund will be sent.
-                        </span>
-                      )}
-                      <span>
-                        <b>Reason:</b> {rejectionReason}
-                      </span>
-                    </div>
-                    <label className="admin-reject-confirm-check">
-                      <input
-                        type="checkbox"
-                        checked={rejectionConfirmed}
-                        onChange={(event) => setRejectionConfirmed(event.target.checked)}
-                      />{" "}
-                      I confirm this order should be rejected and understand the refund action shown
-                      above.
-                    </label>
-                  </>
-                )}
+                <div className="admin-reject-payment-summary">
+                  <b>Refund action</b>
+                  {rejectingPaid && rejectingCod ? (
+                    <span>
+                      This COD order is marked paid. Rejecting it will flag a manual refund; cash
+                      payments cannot be refunded through Cashfree.
+                    </span>
+                  ) : rejectingPaid && rejectingOrder.cashfree_order_id ? (
+                    <span>
+                      A full Cashfree refund of {money(rejectingOrder.total)} will be initiated.
+                      Cashfree may take time to complete it; the order will show the refund status
+                      returned by Cashfree.
+                    </span>
+                  ) : rejectingPaid ? (
+                    <span className="admin-reject-warning">
+                      This order is marked paid but has no Cashfree order ID. Verify the payment and
+                      add its Cashfree order ID before proceeding.
+                    </span>
+                  ) : rejectingUnpaid ? (
+                    <span>
+                      No payment is recorded as captured, so this order will be rejected without a
+                      refund.
+                    </span>
+                  ) : (
+                    <span className="admin-reject-warning">
+                      Payment status is {rejectingPaymentStatus}. Verify it before rejecting; no
+                      refund will be sent.
+                    </span>
+                  )}
+                </div>
                 {rejectionError && (
                   <p className="admin-login-error" role="alert">
                     {rejectionError}
                   </p>
                 )}
                 <div className="admin-editor-actions">
-                  {rejectionStep === 1 ? (
-                    <button
-                      type="button"
-                      className="admin-outline-button"
-                      onClick={closeRejectOrder}
-                    >
-                      Cancel
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="admin-outline-button"
-                      onClick={() => {
-                        setRejectionStep(1);
-                        setRejectionError("");
-                        setRejectionConfirmed(false);
-                      }}
-                      disabled={rejectionBusy}
-                    >
-                      Back
-                    </button>
-                  )}
-                  {rejectionStep === 1 ? (
-                    <button className="admin-primary-button" disabled={!rejectionReason.trim()}>
-                      Continue to confirmation
-                    </button>
-                  ) : (
-                    <button
-                      className="admin-danger-button"
-                      disabled={rejectionBusy || !rejectionConfirmed || !rejectionCanProceed}
-                    >
-                      {rejectionBusy
-                        ? "Processing…"
-                        : rejectingPaid && !rejectingCod
-                          ? "Confirm rejection & refund"
-                          : "Confirm rejection"}
-                    </button>
-                  )}
+                  <button type="button" className="admin-outline-button" onClick={closeRejectOrder}>
+                    Cancel
+                  </button>
+                  <button
+                    className="admin-danger-button"
+                    disabled={rejectionBusy || !rejectionCanProceed}
+                  >
+                    {rejectionBusy
+                      ? "Processing…"
+                      : rejectingPaid && !rejectingCod
+                        ? "Reject & refund"
+                        : "Reject order"}
+                  </button>
                 </div>
               </form>
             </div>
