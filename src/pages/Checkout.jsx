@@ -404,7 +404,7 @@ export function Checkout({
                         <b>Standard delivery</b>
                         <small>5–7 business days</small>
                       </span>
-                      <strong>{shippingCost === 0 ? "Complimentary" : money(shippingCost)}</strong>
+                      <strong>{money(shippingCost)}</strong>
                       <Leaf size={16} />
                     </label>
                   </section>
@@ -561,7 +561,7 @@ export function Checkout({
               )}
               <div className="checkout-cost-row">
                 <span>Shipping</span>
-                <strong>{shippingCost === 0 ? "Complimentary" : money(shippingCost)}</strong>
+                <strong>{money(shippingCost)}</strong>
               </div>
               <div className="checkout-total">
                 <span>Total</span>
