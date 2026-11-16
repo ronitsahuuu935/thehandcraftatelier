@@ -64,7 +64,7 @@ export default async function createCashfreeOrder(request, response) {
   const admin = getAdminClient(config);
   const { data: products, error: productsError } = await admin
     .from("products")
-    .select("id,name,price,category,sizes,gallery,stock_quantity")
+    .select("id,name,price,category,image_url,sizes,gallery,stock_quantity")
     .eq("is_active", true)
     .in("id", productIds);
   if (productsError) {
@@ -109,6 +109,7 @@ export default async function createCashfreeOrder(request, response) {
     orderItems.push({
       product_id: product.id,
       name: product.name,
+      image: product.image_url || product.gallery?.find((image) => image?.src)?.src || null,
       category: product.category,
       unit_price: Number(product.price),
       quantity,

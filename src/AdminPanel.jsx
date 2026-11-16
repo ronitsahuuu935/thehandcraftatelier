@@ -2689,8 +2689,30 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                 <ul className="admin-order-detail-items">
                   {(selectedOrder.items || []).map((item, index) => (
                     <li key={`${item.product_id || item.name}-${index}`}>
-                      <span>
-                        {item.name} × {item.quantity}
+                      <span className="admin-order-detail-product">
+                        <img
+                          src={
+                            item.image ||
+                            catalogProducts.find(
+                              (product) => String(product.id) === String(item.product_id),
+                            )?.image ||
+                            "/media/images/logo.webp"
+                          }
+                          alt=""
+                        />
+                        <span>
+                          {item.name} × {item.quantity}
+                          {(item.size || item.color) && (
+                            <small>
+                              {[
+                                item.size && `Size: ${item.size}`,
+                                item.color && `Color: ${item.color}`,
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </small>
+                          )}
+                        </span>
                       </span>
                       <b>{money(Number(item.unit_price || 0) * Number(item.quantity || 1))}</b>
                     </li>

@@ -2452,6 +2452,29 @@
   border-bottom: 1px solid var(--admin-line);
   font-size: 12px;
 }
+.admin-order-detail-product {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.admin-order-detail-product > img {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 5px;
+  object-fit: cover;
+  background: #f5f2ea;
+}
+.admin-order-detail-product > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.admin-order-detail-product small {
+  color: var(--admin-muted);
+  font-size: 9px;
+}
 .admin-order-detail-actions {
   display: flex;
   justify-content: flex-end;
