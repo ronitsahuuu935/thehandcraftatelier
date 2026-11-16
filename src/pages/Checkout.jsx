@@ -16,7 +16,7 @@ import { googleMapsApiKey, supabase } from "../lib/supabase";
 
 import { INDIAN_STATES_AND_UTS } from "../data/locations.js";
 import { money } from "../lib/format.js";
-import { FLAT_SHIPPING_FEE, shippingCostFor } from "../lib/shipping.js";
+import { shippingCostFor } from "../lib/shipping.js";
 import { loadCashfree } from "../lib/load-cashfree.js";
 
 import { GoogleSignInScreen } from "../components/GoogleSignInScreen.jsx";
@@ -55,7 +55,7 @@ export function Checkout({
   );
   const discountAmount = categoryDiscount(appliedCoupon, checkoutItems);
   const discountedSubtotal = Math.max(0, Math.round((orderTotal - discountAmount) * 100) / 100);
-  const shippingCost = shippingCostFor(discountedSubtotal);
+  const shippingCost = shippingCostFor(discountedSubtotal, city);
   const payableTotal = Math.round((discountedSubtotal + shippingCost) * 100) / 100;
   const applyCoupon = async (requestedCode = couponCode) => {
     const code = requestedCode.trim().toUpperCase();
@@ -413,9 +413,7 @@ export function Checkout({
                         <b>Standard delivery</b>
                         <small>5–7 business days</small>
                       </span>
-                      <strong>
-                        {shippingCost === 0 ? "Complimentary" : money(FLAT_SHIPPING_FEE)}
-                      </strong>
+                      <strong>{shippingCost === 0 ? "Complimentary" : money(shippingCost)}</strong>
                       <Leaf size={16} />
                     </label>
                   </section>
@@ -613,7 +611,7 @@ export function Checkout({
               )}
               <div className="checkout-cost-row">
                 <span>Shipping</span>
-                <strong>{shippingCost === 0 ? "Complimentary" : money(FLAT_SHIPPING_FEE)}</strong>
+                <strong>{shippingCost === 0 ? "Complimentary" : money(shippingCost)}</strong>
               </div>
               <div className="checkout-total">
                 <span>Total</span>

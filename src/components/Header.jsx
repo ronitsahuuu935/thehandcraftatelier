@@ -18,7 +18,7 @@ export function Header({
   return (
     <header className="site-header">
       <div className="announcement">
-        A little love, in every stitch. Free shipping on orders ₹1,998+ · ₹50 below
+        A little love, in every stitch. Free shipping on orders ₹1,998+
       </div>
       <div className="brandbar">
         <button

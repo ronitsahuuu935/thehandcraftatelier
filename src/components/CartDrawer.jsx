@@ -71,7 +71,9 @@ export function CartDrawer({ cart, onClose, onRemove, onQuantityChange, onChecko
               <span>Subtotal</span>
               <strong>{money(subtotal)}</strong>
             </div>
-            <small>Shipping is ₹50 below ₹1,998 and free on orders of ₹1,998 or more.</small>
+            <small>
+              Shipping is ₹60 below ₹1,998 (₹50 in Jaipur) and free on orders of ₹1,998 or more.
+            </small>
             <button className="story-cta cart-checkout" onClick={onCheckout}>
               Proceed to checkout <ArrowRight size={15} />
             </button>

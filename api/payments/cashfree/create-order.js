@@ -156,7 +156,7 @@ export default async function createCashfreeOrder(request, response) {
         .json({ error: "This coupon does not apply to the items in your cart." });
   }
   const discountedSubtotal = Math.round((subtotal - discount) * 100) / 100;
-  const shippingCost = shippingCostFor(discountedSubtotal);
+  const shippingCost = shippingCostFor(discountedSubtotal, city);
   const total = Math.round((discountedSubtotal + shippingCost) * 100) / 100;
   if (!Number.isFinite(total) || discountedSubtotal < 200)
     return response

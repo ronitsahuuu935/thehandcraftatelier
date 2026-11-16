@@ -236,7 +236,7 @@ export function ProductDetail({
             {activeTab === "Details"
               ? "Soft, breathable fabric with hand embroidery in cotton thread. Each piece is finished by hand, so small variations make it yours."
               : activeTab === "Shipping"
-                ? "Carefully packed and dispatched in 5–7 business days. Shipping is ₹50 below ₹1,998 and free on orders of ₹1,998 or more."
+                ? "Carefully packed and dispatched in 5–7 business days. Shipping is ₹60 below ₹1,998 (₹50 in Jaipur) and free on orders of ₹1,998 or more."
                 : "Gentle hand wash in cold water. Do not wring or bleach. Dry in shade and iron on the reverse side."}
           </div>
         </div>
