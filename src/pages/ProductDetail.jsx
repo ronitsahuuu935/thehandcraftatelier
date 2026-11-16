@@ -39,6 +39,7 @@ export function ProductDetail({
   );
   const [active, setActive] = useState(0);
   const [imageExpanded, setImageExpanded] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState(null);
   useEffect(() => {
     if (!imageExpanded) return;
     const closeOnEscape = (event) => event.key === "Escape" && setImageExpanded(false);
@@ -48,7 +49,17 @@ export function ProductDetail({
   return (
     <main className="detail-page">
       <div className="breadcrumbs">
-        Home <span>/</span> Shop <span>/</span> {product.name}
+        <button type="button" onClick={() => navigate("home")}>
+          Home
+        </button>
+        <span>/</span>
+        <button type="button" onClick={() => goShop()}>
+          Shop
+        </button>
+        <span>/</span>
+        <span className="breadcrumbs-current" aria-current="page">
+          {product.name}
+        </span>
       </div>
       <div className="detail-layout">
         <div className={"detail-gallery" + (gallery.length > 1 ? "" : " single")}>
@@ -96,10 +107,19 @@ export function ProductDetail({
               />
             ) : (
               <button
-                className="detail-image-zoom"
+                className={`detail-image-zoom${zoomOrigin ? " is-zooming" : ""}`}
                 type="button"
                 onClick={() => setImageExpanded(true)}
-                aria-label="Enlarge product image"
+                onPointerMove={(event) => {
+                  if (event.pointerType !== "mouse") return;
+                  const bounds = event.currentTarget.getBoundingClientRect();
+                  setZoomOrigin({
+                    x: `${((event.clientX - bounds.left) / bounds.width) * 100}%`,
+                    y: `${((event.clientY - bounds.top) / bounds.height) * 100}%`,
+                  });
+                }}
+                onPointerLeave={() => setZoomOrigin(null)}
+                aria-label="Hover to zoom; click to enlarge product image"
               >
                 <img
                   src={gallery[active]?.src || product.image}
@@ -109,6 +129,9 @@ export function ProductDetail({
                   )}
                   fetchPriority="high"
                   alt={product.name}
+                  style={
+                    zoomOrigin ? { transformOrigin: `${zoomOrigin.x} ${zoomOrigin.y}` } : undefined
+                  }
                 />
               </button>
             )}

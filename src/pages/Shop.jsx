@@ -17,6 +17,7 @@ export function Shop({
   productCatalog,
   isWishlisted,
   onToggleWishlist,
+  onHome,
   loading = false,
 }) {
   const [sort, setSort] = useState("Featured");
@@ -47,7 +48,13 @@ export function Shop({
         </div>
       </section>
       <div className="breadcrumbs">
-        Home <span>/</span> Shop
+        <button type="button" onClick={onHome}>
+          Home
+        </button>
+        <span>/</span>
+        <span className="breadcrumbs-current" aria-current="page">
+          Shop
+        </span>
       </div>
       <div className="shop-layout">
         <aside className={filterOpen ? "filters show" : "filters"}>

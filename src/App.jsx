@@ -489,6 +489,7 @@ export function App() {
             {page === "contact" && <ContactUs contact={SOCIAL} />}
             {page === "shop" && (
               <Shop
+                onHome={() => navigate("home")}
                 loading={catalogLoading}
                 onOpen={(p) => navigate("product", p)}
                 onAdd={addToCart}
