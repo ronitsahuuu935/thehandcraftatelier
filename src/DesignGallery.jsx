@@ -9,6 +9,16 @@ export default function DesignGallery({ goShop, onStory, full = false }) {
   const featured = [24, 33, 26, 27, 28, 29, 30, 31].map((id) =>
     designs.find((design) => design.id === id),
   );
+  const storyImageExclusions = new Set([
+    "Tree of blooms",
+    "Peacock garden",
+    "Woodland deer",
+    "Floral garland",
+    "Garden songbird",
+  ]);
+  const galleryDesigns = full
+    ? designs.filter((design) => !storyImageExclusions.has(design.name))
+    : featured;
 
   useEffect(() => {
     if (!expandedDesign) return undefined;
@@ -33,7 +43,7 @@ export default function DesignGallery({ goShop, onStory, full = false }) {
         </div>
       </div>
       <div className="embroidery-gallery-grid">
-        {(full ? designs : featured).map((design) => (
+        {galleryDesigns.map((design) => (
           <figure key={design.id}>
             <button
               className="embroidery-gallery-image-button"

@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowRight, HeartHandshake, Sprout, Landmark, Heart } from "lucide-react";
+import DesignGallery from "./DesignGallery";
 import { imageUrl } from "./data/media.js";
 
 export default function OurStory({ goShop }) {
@@ -64,8 +65,8 @@ export default function OurStory({ goShop }) {
       <section className="story-journey">
         <figure className="story-photo">
           <img
-            src={imageUrl("/media/images/d1-wreath.webp")}
-            alt="A floral embroidery hoop with red blooms and green leaves, resting on soft fabric beside flowers and threads"
+            src={imageUrl("/media/images/d.jpeg")}
+            alt="A white embroidered swan standing among water lilies"
             loading="lazy"
           />
         </figure>
@@ -118,6 +119,7 @@ export default function OurStory({ goShop }) {
           </figure>
         </div>
       </section>
+      <DesignGallery goShop={goShop} full />
       <section className="story-wear">
         <figure>
           <img
