@@ -1,6 +1,5 @@
 import React from "react";
 import { ArrowRight, HeartHandshake, Sprout, Landmark, Heart } from "lucide-react";
-import DesignGallery from "./DesignGallery";
 import { imageUrl } from "./data/media.js";
 
 export default function OurStory({ goShop }) {
@@ -94,31 +93,6 @@ export default function OurStory({ goShop }) {
           </span>
         </div>
       </section>
-      <section className="story-maker">
-        <div className="story-maker-portrait">
-          <img
-            src={imageUrl("/media/images/ronit.webp")}
-            alt="Ronit, the person behind The Hand Craft Atelier"
-            loading="lazy"
-          />
-        </div>
-        <div>
-          <span className="eyebrow">THE PERSON BEHIND THE THREAD</span>
-          <h2>
-            A small atelier.
-            <br />A very personal story.
-          </h2>
-          <p>
-            Hi, I’m Ronit. The Hand Craft Atelier started with a love for hand embroidery and the
-            little details that make a piece feel personal.
-          </p>
-          <p>
-            From choosing a motif to finishing the last stitch, this is a space for patience,
-            colour, and things made with care. Thank you for being part of the journey.
-          </p>
-          <span className="story-handwritten">Made by hand, shared with love.</span>
-        </div>
-      </section>
       <section className="story-process">
         <div className="story-process-heading">
           <span className="eyebrow">A MOMENT IN THE MAKING</span>
@@ -144,7 +118,6 @@ export default function OurStory({ goShop }) {
           </figure>
         </div>
       </section>
-      <DesignGallery goShop={goShop} full />
       <section className="story-wear">
         <figure>
           <img

@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./story.css";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { designs } from "./data/designs.js";
 import { responsiveImageProps } from "./lib/responsive-images.js";
 
 export default function DesignGallery({ goShop, onStory, full = false }) {
+  const [expandedDesign, setExpandedDesign] = useState(null);
   const featured = [24, 33, 26, 27, 28, 29, 30, 31].map((id) =>
     designs.find((design) => design.id === id),
   );
+
+  useEffect(() => {
+    if (!expandedDesign) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setExpandedDesign(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [expandedDesign]);
+
   return (
     <section className="section-wrap embroidery-gallery">
       <div className="section-heading">
@@ -24,17 +35,48 @@ export default function DesignGallery({ goShop, onStory, full = false }) {
       <div className="embroidery-gallery-grid">
         {(full ? designs : featured).map((design) => (
           <figure key={design.id}>
-            <img
-              src={design.src}
-              {...responsiveImageProps(design.src)}
-              alt={`Hand embroidery: ${design.name}`}
-              loading="lazy"
-              decoding="async"
-            />
+            <button
+              className="embroidery-gallery-image-button"
+              type="button"
+              aria-label={`Enlarge ${design.name}`}
+              onClick={() => setExpandedDesign(design)}
+            >
+              <img
+                src={design.src}
+                {...responsiveImageProps(design.src)}
+                alt={`Hand embroidery: ${design.name}`}
+                loading="lazy"
+                decoding="async"
+              />
+            </button>
             <figcaption>{design.name}</figcaption>
           </figure>
         ))}
       </div>
+      {expandedDesign && (
+        <div
+          className="product-image-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Enlarged image: ${expandedDesign.name}`}
+          onClick={() => setExpandedDesign(null)}
+        >
+          <button
+            className="product-image-lightbox-close"
+            type="button"
+            aria-label="Close enlarged image"
+            onClick={() => setExpandedDesign(null)}
+          >
+            <X size={24} />
+          </button>
+          <img
+            src={expandedDesign.src}
+            {...responsiveImageProps(expandedDesign.src)}
+            alt={`Hand embroidery: ${expandedDesign.name}`}
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
       <div className="embroidery-gallery-actions">
         {!full && onStory && (
           <button className="text-link" onClick={onStory}>
