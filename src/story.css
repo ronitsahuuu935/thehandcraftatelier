@@ -24,6 +24,17 @@
   border-radius: 100px 100px 3px 3px;
   background: #e2dacd;
 }
+.embroidery-gallery .product-image-lightbox img {
+  width: auto;
+  height: auto;
+  max-width: min(100%, 1200px);
+  max-height: calc(100vh - 96px);
+  max-height: calc(100dvh - 96px);
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 0;
+  background: transparent;
+}
 .embroidery-gallery figcaption {
   font-family: "Cormorant Garamond", serif;
   font-size: 23px;
