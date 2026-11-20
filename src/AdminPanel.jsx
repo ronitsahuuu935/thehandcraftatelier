@@ -671,20 +671,26 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     setCatalogError("");
     try {
       if (categoryDialog?.original) {
-        const { error: categoryInsertError } = await supabase
-          .from("categories")
-          .upsert({ name }, { onConflict: "name" });
-        if (categoryInsertError) throw categoryInsertError;
+        // Keep renames working on stores where the standalone categories
+        // migration has not been applied yet. In that setup categories are
+        // derived from products, so changing the product rows is sufficient.
         const { error: productError } = await supabase
           .from("products")
           .update({ category: name })
           .eq("category", categoryDialog.original);
         if (productError) throw productError;
-        const { error: categoryError } = await supabase
+        const { error: categoryInsertError } = await supabase
           .from("categories")
-          .delete()
-          .eq("name", categoryDialog.original);
-        if (categoryError) throw categoryError;
+          .upsert({ name }, { onConflict: "name" });
+        if (categoryInsertError && !["PGRST205", "42P01"].includes(categoryInsertError.code))
+          throw categoryInsertError;
+        if (!categoryInsertError) {
+          const { error: categoryError } = await supabase
+            .from("categories")
+            .delete()
+            .eq("name", categoryDialog.original);
+          if (categoryError) throw categoryError;
+        }
       } else {
         const { error } = await supabase.from("categories").insert({ name });
         if (error) throw error;

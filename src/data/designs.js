@@ -33,11 +33,14 @@ const names = [
   "Little giraffe",
   "Horse portrait",
   "Tree of blooms",
-  "Garden songbird",
+  "Wildflower embroidery",
 ];
 
 export const designs = names.map((name, index) => ({
   id: index + 1,
   name,
-  src: imageUrl(`/media/images/design-${index + 1}.webp`),
+  src:
+    index === names.length - 1
+      ? imageUrl("/media/images/d1-wreath.webp")
+      : imageUrl(`/media/images/design-${index + 1}.webp`),
 }));

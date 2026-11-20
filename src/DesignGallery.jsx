@@ -14,7 +14,7 @@ export default function DesignGallery({ goShop, onStory, full = false }) {
     "Peacock garden",
     "Woodland deer",
     "Floral garland",
-    "Garden songbird",
+    "Wildflower embroidery",
   ]);
   const galleryDesigns = full
     ? designs.filter((design) => !storyImageExclusions.has(design.name))
