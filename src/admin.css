@@ -3088,6 +3088,46 @@
     grid-template-columns: 30px minmax(0, 1fr) auto;
     gap: 7px;
   }
+  .admin-categories-table {
+    white-space: normal;
+  }
+  .admin-categories-table thead {
+    display: none;
+  }
+  .admin-categories-table tbody,
+  .admin-categories-table tr {
+    display: grid;
+    width: 100%;
+  }
+  .admin-categories-table tr {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid #eee9df;
+  }
+  .admin-categories-table td {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 4px;
+    border: 0;
+    white-space: normal;
+  }
+  .admin-categories-table td:first-child {
+    grid-column: 1 / -1;
+    padding-bottom: 8px;
+    font-size: 13px;
+  }
+  .admin-categories-table td:not(:first-child)::before {
+    content: attr(data-label);
+    color: #70746a;
+    font-size: 10px;
+  }
+  .admin-categories-table td:last-child {
+    justify-content: flex-end;
+  }
   .admin-footer {
     padding: 0 12px 16px;
     flex-wrap: wrap;

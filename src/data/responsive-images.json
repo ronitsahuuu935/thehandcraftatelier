@@ -149,6 +149,11 @@
     "width": 500,
     "height": 500
   },
+  "/media/images/design-33.webp": {
+    "srcSet": "/media/responsive/design-33-443dc1a3efb8-400.webp 400w, /media/responsive/design-33-443dc1a3efb8-800.webp 800w, /media/images/design-33.webp 1053w",
+    "width": 1053,
+    "height": 1400
+  },
   "/media/images/design-4.webp": {
     "srcSet": "/media/responsive/design-4-cb3ba68ce76f-400.webp 400w, /media/responsive/design-4-cb3ba68ce76f-800.webp 800w, /media/images/design-4.webp 1054w",
     "width": 1054,

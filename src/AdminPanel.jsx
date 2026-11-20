@@ -671,25 +671,28 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
     setCatalogError("");
     try {
       if (categoryDialog?.original) {
-        // Keep renames working on stores where the standalone categories
-        // migration has not been applied yet. In that setup categories are
-        // derived from products, so changing the product rows is sufficient.
+        // Rename the category record itself. Older stores may not have the
+        // standalone categories table, in which case product rows are the source.
+        const { data: renamedCategories, error: categoryError } = await supabase
+          .from("categories")
+          .update({ name })
+          .eq("name", categoryDialog.original)
+          .select("name");
+        if (categoryError && !["PGRST205", "42P01"].includes(categoryError.code))
+          throw categoryError;
+
         const { error: productError } = await supabase
           .from("products")
           .update({ category: name })
           .eq("category", categoryDialog.original);
         if (productError) throw productError;
-        const { error: categoryInsertError } = await supabase
-          .from("categories")
-          .upsert({ name }, { onConflict: "name" });
-        if (categoryInsertError && !["PGRST205", "42P01"].includes(categoryInsertError.code))
-          throw categoryInsertError;
-        if (!categoryInsertError) {
-          const { error: categoryError } = await supabase
+
+        // Categories can predate the standalone table row on migrated stores.
+        if (!categoryError && !renamedCategories?.length) {
+          const { error: categoryInsertError } = await supabase
             .from("categories")
-            .delete()
-            .eq("name", categoryDialog.original);
-          if (categoryError) throw categoryError;
+            .upsert({ name }, { onConflict: "name" });
+          if (categoryInsertError) throw categoryInsertError;
         }
       } else {
         const { error } = await supabase.from("categories").insert({ name });
@@ -1834,7 +1837,7 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
               )}
               <section className="admin-panel-card admin-table-card">
                 <div className="admin-table-wrap">
-                  <table className="admin-table">
+                  <table className="admin-table admin-categories-table">
                     <thead>
                       <tr>
                         <th>Category</th>
@@ -1846,14 +1849,16 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
                     <tbody>
                       {categories.map((c) => (
                         <tr key={c}>
-                          <td>
+                          <td data-label="Category">
                             <b>{c}</b>
                           </td>
-                          <td>{catalogProducts.filter((p) => p.category === c).length}</td>
-                          <td>
+                          <td data-label="Products">
+                            {catalogProducts.filter((p) => p.category === c).length}
+                          </td>
+                          <td data-label="Status">
                             <Status>In catalog</Status>
                           </td>
-                          <td>
+                          <td data-label="Actions">
                             <button
                               className="admin-row-button"
                               onClick={() => {
@@ -2331,6 +2336,8 @@ function AdminPanel({ products = [], onProductsChange, onExit }) {
             >
               <form
                 className="admin-product-editor"
+                role="dialog"
+                aria-modal="true"
                 onSubmit={saveCategory}
                 aria-labelledby="category-editor-title"
               >

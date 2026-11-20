@@ -18,7 +18,7 @@ export function Header({
   return (
     <header className="site-header">
       <div className="announcement">
-        A little love, in every stitch. Flat delivery charge: ₹60 on every order
+        A little love, in every stitch. Free delivery on orders above ₹1,998
       </div>
       <div className="brandbar">
         <button

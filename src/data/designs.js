@@ -41,6 +41,6 @@ export const designs = names.map((name, index) => ({
   name,
   src:
     index === names.length - 1
-      ? imageUrl("/media/images/d1-wreath.webp")
+      ? imageUrl("/media/images/design-33.webp")
       : imageUrl(`/media/images/design-${index + 1}.webp`),
 }));
