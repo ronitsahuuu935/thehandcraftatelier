@@ -4568,16 +4568,41 @@ img {
   gap: 8px;
 }
 .color-options button {
-  padding: 9px 13px;
+  display: flex;
+  flex: 0 0 104px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 7px;
+  overflow: hidden;
   border: 1px solid var(--line);
+  border-radius: 9px;
   background: var(--white);
   color: var(--ink);
   font-size: 10px;
+  text-align: center;
+}
+.color-option-name {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.color-options button img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: #f7f4f0;
+  object-fit: cover;
 }
 .color-options button.selected {
   border-color: #596c4c;
   background: #edf0e6;
   color: #34442e;
+  box-shadow: 0 0 0 1px #596c4c;
 }
 .account-signin-page {
   min-height: calc(100vh - 190px);

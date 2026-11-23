@@ -169,19 +169,32 @@ export function ProductDetail({
                 Color <strong>{color}</strong>
               </div>
               <div className="color-options">
-                {colorOptions.map((name) => (
-                  <button
-                    type="button"
-                    key={name}
-                    className={color === name ? "selected" : ""}
-                    onClick={() => {
-                      setColor(name);
-                      setActive(0);
-                    }}
-                  >
-                    {name}
-                  </button>
-                ))}
+                {colorOptions.map((name) => {
+                  const colorImage = (product.gallery || []).find(
+                    (image) => String(image.color || "").trim() === name && !isVideo(image),
+                  );
+                  return (
+                    <button
+                      type="button"
+                      key={name}
+                      className={color === name ? "selected" : ""}
+                      aria-label={`Select ${name}`}
+                      aria-pressed={color === name}
+                      onClick={() => {
+                        setColor(name);
+                        setActive(0);
+                      }}
+                    >
+                      <span className="color-option-name">{name}</span>
+                      <img
+                        src={colorImage?.src || product.image}
+                        {...responsiveImageProps(colorImage?.src || product.image, "100px")}
+                        alt=""
+                        loading="lazy"
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </>
           )}
