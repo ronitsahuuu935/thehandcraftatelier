@@ -169,7 +169,6 @@ export function ProductDetail({
                           setActive(0);
                         }}
                       >
-                        <span className="color-option-name">{name}</span>
                         <img
                           src={colorImage?.src || product.image}
                           {...responsiveImageProps(colorImage?.src || product.image, "100px")}
