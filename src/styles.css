@@ -5257,7 +5257,26 @@ img {
     font-size: 9px;
   }
   .product-variant-options .color-options button img {
+    order: -1;
     width: 100%;
     aspect-ratio: 1;
+  }
+  .detail-layout {
+    gap: 10px;
+  }
+  .product-variant-options {
+    margin-bottom: 8px;
+  }
+  .product-variant-options > .option-label:first-child {
+    margin-top: 5px;
+    margin-bottom: 6px;
+  }
+  .product-variant-options .color-option-label {
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+  .product-variant-options .size-options button {
+    min-height: 36px;
+    padding: 6px 11px;
   }
 }
