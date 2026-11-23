@@ -4973,3 +4973,291 @@ img {
 .checkout-coupon section {
   margin-bottom: 0.8rem;
 }
+
+/* Responsive storefront refinements across phones, tablets, laptops and large displays. */
+.product-info {
+  min-width: 0;
+}
+.product-name {
+  max-width: 100%;
+  font-size: clamp(16px, 1.25vw, 20px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.product-info > .product-craft-note {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.product-variant-options {
+  margin-bottom: 14px;
+}
+.product-card-options {
+  flex-wrap: wrap;
+  overflow: visible;
+  white-space: normal;
+  row-gap: 5px;
+}
+.product-card-option-label {
+  align-self: center;
+}
+.product-card-option-value {
+  min-height: 32px;
+  padding: 5px 8px;
+}
+.quick-add {
+  min-height: 40px;
+}
+
+@media (min-width: 1600px) {
+  .section-wrap,
+  .shop-layout,
+  .detail-layout,
+  .breadcrumbs {
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .section-wrap {
+    max-width: 1800px;
+  }
+  .shop-layout,
+  .detail-layout {
+    max-width: 1760px;
+  }
+  .product-grid,
+  .shop-results .product-grid {
+    gap: 28px;
+  }
+  .hero {
+    min-height: min(72vh, 820px);
+  }
+}
+
+@media (min-width: 621px) and (max-width: 900px) {
+  .main-nav {
+    gap: clamp(16px, 3vw, 30px);
+  }
+  .shop-layout {
+    grid-template-columns: 165px minmax(0, 1fr);
+    gap: 20px;
+  }
+  .filters {
+    padding-right: 14px;
+  }
+  .shop-results .product-grid {
+    gap: 20px 12px;
+  }
+  .shop-toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+    gap: 24px;
+  }
+  .detail-gallery {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 9px;
+  }
+  .detail-info h1 {
+    font-size: clamp(28px, 4vw, 35px);
+  }
+}
+
+@media (max-width: 620px) {
+  .product-grid,
+  .shop-results .product-grid {
+    gap: 20px 12px;
+  }
+  .product-info {
+    padding: 9px 1px 12px;
+  }
+  .product-name {
+    font-size: clamp(16px, 4.5vw, 19px);
+  }
+  .product-card-option-label {
+    font-size: 9px;
+  }
+  .product-card-option-value {
+    min-width: 30px;
+    min-height: 34px;
+    padding: 5px 7px;
+    font-size: 10px;
+  }
+  .quick-add {
+    width: 100%;
+    justify-content: center;
+    font-size: 11px;
+  }
+  .shop-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+  }
+  .shop-toolbar > span {
+    margin: 0;
+    text-align: right;
+  }
+  .sort-label {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+  .sort-label select {
+    min-height: 40px;
+  }
+  .detail-gallery {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .detail-info h1 {
+    font-size: clamp(30px, 8vw, 36px);
+  }
+  .size-options,
+  .color-options {
+    gap: 8px;
+  }
+  .size-options button,
+  .color-options button {
+    min-height: 44px;
+  }
+  .float-social {
+    width: 40px;
+    height: 40px;
+  }
+  .float-social img {
+    width: 27px;
+    height: 27px;
+  }
+}
+
+@media (max-width: 360px) {
+  .product-grid,
+  .shop-results .product-grid,
+  .category-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .product-grid,
+  .shop-results .product-grid {
+    gap: 22px;
+  }
+  .product-image {
+    aspect-ratio: 4 / 3;
+    border-radius: 70px 70px 3px 3px;
+  }
+  .product-card-options {
+    gap: 7px;
+  }
+  .hero h1 {
+    font-size: 38px;
+  }
+  .section-heading h2 {
+    font-size: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Keep the brand, search field and actions in separate, shrink-safe header columns. */
+@media (min-width: 621px) and (max-width: 900px) {
+  .brandbar {
+    grid-template-columns: minmax(0, 1fr) minmax(120px, 0.8fr) auto;
+    gap: 12px;
+    padding-right: 3%;
+    padding-left: 3%;
+  }
+  .wordmark {
+    min-width: 0;
+    align-items: flex-start;
+  }
+  .wordmark span {
+    font-size: clamp(20px, 3.2vw, 26px);
+    white-space: nowrap;
+  }
+  .wordmark small {
+    font-size: 7px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .search-inline {
+    min-width: 0;
+    max-width: none;
+  }
+  .search-inline input {
+    min-width: 0;
+  }
+  .header-actions {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 620px) {
+  .brandbar {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    gap: clamp(3px, 1.2vw, 6px);
+    padding-right: 3%;
+    padding-left: 3%;
+  }
+  .brandbar > .wordmark {
+    min-width: 0;
+    width: 100%;
+    justify-self: center;
+    align-items: center;
+  }
+  .wordmark span {
+    max-width: 100%;
+    font-size: clamp(15px, 4.8vw, 20px);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .wordmark small {
+    max-width: 100%;
+    font-size: clamp(5px, 1.45vw, 6px);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .header-actions {
+    width: auto;
+    min-width: 0;
+    gap: clamp(2px, 1vw, 5px);
+  }
+  .header-actions .profile-trigger {
+    width: 30px;
+    min-width: 30px;
+    flex: 0 0 30px;
+  }
+  .header-actions .icon-btn {
+    width: 27px;
+    min-width: 27px;
+    flex: 0 0 27px;
+  }
+  .product-variant-options .color-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 68px);
+    gap: 8px;
+  }
+  .product-variant-options .color-options button {
+    width: 68px;
+    min-width: 0;
+    min-height: 0;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 8px;
+  }
+  .product-variant-options .color-option-name {
+    font-size: 9px;
+  }
+  .product-variant-options .color-options button img {
+    width: 100%;
+    aspect-ratio: 1;
+  }
+}

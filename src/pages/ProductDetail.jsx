@@ -138,6 +138,51 @@ export function ProductDetail({
           </div>
         </div>
         <div className="detail-info">
+          <div className="product-variant-options">
+            <div className="option-label">Size</div>
+            <div className="size-options">
+              {sizes.map((s) => (
+                <button key={s} className={size === s ? "selected" : ""} onClick={() => setSize(s)}>
+                  {s}
+                </button>
+              ))}
+            </div>
+            {colorOptions.length > 0 && (
+              <>
+                <div className="option-label color-option-label">
+                  Color <strong>{color}</strong>
+                </div>
+                <div className="color-options">
+                  {colorOptions.map((name) => {
+                    const colorImage = (product.gallery || []).find(
+                      (image) => String(image.color || "").trim() === name && !isVideo(image),
+                    );
+                    return (
+                      <button
+                        type="button"
+                        key={name}
+                        className={color === name ? "selected" : ""}
+                        aria-label={`Select ${name}`}
+                        aria-pressed={color === name}
+                        onClick={() => {
+                          setColor(name);
+                          setActive(0);
+                        }}
+                      >
+                        <span className="color-option-name">{name}</span>
+                        <img
+                          src={colorImage?.src || product.image}
+                          {...responsiveImageProps(colorImage?.src || product.image, "100px")}
+                          alt=""
+                          loading="lazy"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
           <span className="eyebrow">MADE SLOWLY, KEPT FOREVER</span>
           <div className="detail-title-row">
             <h1>{product.name}</h1>
@@ -155,49 +200,6 @@ export function ProductDetail({
             {product.description ||
               "Hand-embroidered with care, stitch by stitch. A little everyday beauty you can wear."}
           </p>
-          <div className="option-label">Size</div>
-          <div className="size-options">
-            {sizes.map((s) => (
-              <button key={s} className={size === s ? "selected" : ""} onClick={() => setSize(s)}>
-                {s}
-              </button>
-            ))}
-          </div>
-          {colorOptions.length > 0 && (
-            <>
-              <div className="option-label color-option-label">
-                Color <strong>{color}</strong>
-              </div>
-              <div className="color-options">
-                {colorOptions.map((name) => {
-                  const colorImage = (product.gallery || []).find(
-                    (image) => String(image.color || "").trim() === name && !isVideo(image),
-                  );
-                  return (
-                    <button
-                      type="button"
-                      key={name}
-                      className={color === name ? "selected" : ""}
-                      aria-label={`Select ${name}`}
-                      aria-pressed={color === name}
-                      onClick={() => {
-                        setColor(name);
-                        setActive(0);
-                      }}
-                    >
-                      <span className="color-option-name">{name}</span>
-                      <img
-                        src={colorImage?.src || product.image}
-                        {...responsiveImageProps(colorImage?.src || product.image, "100px")}
-                        alt=""
-                        loading="lazy"
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
           <label className="personal-label">
             Personalization <span>Optional</span>
             <input
